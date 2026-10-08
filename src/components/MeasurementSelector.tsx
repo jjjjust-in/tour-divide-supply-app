@@ -13,7 +13,7 @@ export function MeasurementSelector({ onSelect }: MeasurementSelectorProps) {
           className="px-6 pt-6 pb-4"
           style={navBgPattern ? { backgroundImage: `url(${navBgPattern})`, backgroundSize: '300px 300px' } : { backgroundColor: '#febc12' }}
         >
-          <h2 className="font-['Coordinates:Bold',sans-serif] text-xl text-[#231F20] uppercase tracking-tight">
+          <h2 className="font-['Coordinates:Bold',sans-serif] text-xl text-[#231F20] uppercase tracking-tight font-bold">
             Units
           </h2>
           <p className="text-sm text-[#231F20]/70 mt-1">

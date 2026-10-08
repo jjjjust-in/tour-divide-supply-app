@@ -83,7 +83,7 @@ export function TownsList({
         style={navBgPattern ? { backgroundImage: `url(${navBgPattern})`, backgroundSize: '300px 300px' } : { backgroundColor: '#febc12' }}
       >
         <div className="flex items-center justify-between mb-1">
-          <h1 className="font-['Coordinates:Bold',sans-serif] text-xl text-[#231F20] uppercase tracking-tight">Towns</h1>
+          <h1 className="font-['Coordinates:Bold',sans-serif] text-xl text-[#231F20] uppercase tracking-tight font-bold">Towns</h1>
           <div className="flex gap-1">
             <button onClick={onOpenTimer} className="p-1.5 rounded-full hover:bg-black/10">
               <Clock size={16} className="text-[#231F20]" />
@@ -150,7 +150,7 @@ export function TownsList({
                 <div className="px-4 pb-3 bg-gray-50 space-y-3">
                   {/* Fun facts */}
                   <div>
-                    <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-1">About {town.name}</h4>
+                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1">About {town.name}</h4>
                     <ul className="space-y-1">
                       {town.funFacts.map((fact, i) => (
                         <li key={i} className="text-xs text-gray-600 flex gap-2">
@@ -164,7 +164,7 @@ export function TownsList({
                   {/* Notes */}
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide">My Notes</h4>
+                      <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wide">My Notes</h4>
                       <button onClick={() => setAddingNoteFor(town.id)} className="text-[10px] text-[#febc12] font-semibold flex items-center gap-0.5">
                         <Plus size={10} /> Add
                       </button>
@@ -234,7 +234,7 @@ export function TownsList({
                   {/* Resupply */}
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Resupply</h4>
+                      <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wide">Resupply</h4>
                       <button onClick={() => setAddingResupplyFor(town.id)} className="text-[10px] text-green-600 font-semibold flex items-center gap-0.5">
                         <Plus size={10} /> Add
                       </button>

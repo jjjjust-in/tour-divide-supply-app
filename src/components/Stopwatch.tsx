@@ -231,7 +231,7 @@ export function Stopwatch({ onClose }: StopwatchProps) {
         >
           <div className="flex items-center gap-2">
             {mode === 'countdown' ? <Calendar size={20} className="text-[#40C8EF]" /> : <Clock size={20} className="text-[#40C8EF]" />}
-            <h2 className="uppercase text-[#40C8EF] font-['Coordinates:Bold',sans-serif] tracking-[-0.36px] text-base">{modeTitle}</h2>
+            <h2 className="uppercase text-[#40C8EF] font-['Coordinates:Bold',sans-serif] tracking-[-0.36px] text-base font-bold">{modeTitle}</h2>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-[#F5FCFF] rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center">
             <X size={20} className="text-[#40C8EF]" />
@@ -313,7 +313,7 @@ export function Stopwatch({ onClose }: StopwatchProps) {
 
               {currentLaps.length > 0 && (
                 <div className="mt-4 p-4 bg-[#F5FCFF] border-2 border-[#40C8EF]/20 rounded-lg">
-                  <h4 className="text-xs uppercase text-[#40C8EF] font-['Coordinates:Bold',sans-serif] tracking-[-0.36px] mb-3">
+                  <h4 className="text-xs uppercase text-[#40C8EF] font-['Coordinates:Bold',sans-serif] tracking-[-0.36px] mb-3 font-bold">
                     Current Ride States ({currentLaps.length})
                   </h4>
                   <div className="space-y-2 max-h-48 overflow-y-auto">
@@ -375,7 +375,7 @@ export function Stopwatch({ onClose }: StopwatchProps) {
         {showSaveDialog && (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center p-4">
             <div className="bg-white rounded-lg p-6 w-full max-w-sm border-2 border-[#40C8EF]">
-              <h3 className="uppercase text-[#40C8EF] font-['Coordinates:Bold',sans-serif] tracking-[-0.36px] mb-4">Save Timer</h3>
+              <h3 className="uppercase text-[#40C8EF] font-['Coordinates:Bold',sans-serif] tracking-[-0.36px] mb-4 font-bold">Save Timer</h3>
               <input type="text" value={saveTitle} onChange={e => setSaveTitle(e.target.value)} placeholder="Enter timer title..." className="w-full border-2 border-[#40C8EF] rounded px-3 py-2 mb-4 focus:outline-none" autoFocus onKeyDown={e => e.key === 'Enter' && handleSaveTimer()} />
               <div className="flex gap-2">
                 <button onClick={() => { setShowSaveDialog(false); setSaveTitle(''); }} className="flex-1 bg-[#999] text-white py-2 px-4 rounded-lg font-['Coordinates:Bold',sans-serif] uppercase text-sm">Cancel</button>
@@ -388,7 +388,7 @@ export function Stopwatch({ onClose }: StopwatchProps) {
         {showLapDialog && (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center p-4">
             <div className="bg-white rounded-lg p-6 w-full max-w-sm border-2 border-[#40C8EF] max-h-[80vh] overflow-y-auto">
-              <h3 className="uppercase text-[#40C8EF] font-['Coordinates:Bold',sans-serif] tracking-[-0.36px] mb-4">Record State</h3>
+              <h3 className="uppercase text-[#40C8EF] font-['Coordinates:Bold',sans-serif] tracking-[-0.36px] mb-4 font-bold">Record State</h3>
               {currentLaps.length > 0 && (
                 <div className="mb-4 p-3 bg-[#F5FCFF] border-2 border-[#40C8EF]/20 rounded-lg">
                   <div className="text-xs uppercase text-[#40C8EF] font-['Coordinates:Bold',sans-serif] mb-2">States Recorded ({currentLaps.length})</div>
@@ -417,7 +417,7 @@ export function Stopwatch({ onClose }: StopwatchProps) {
         {showResetDialog && (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center p-4">
             <div className="bg-white rounded-lg p-6 w-full max-w-sm border-2 border-[#40C8EF]">
-              <h3 className="uppercase text-[#40C8EF] font-['Coordinates:Bold',sans-serif] tracking-[-0.36px] mb-4">Reset Timer</h3>
+              <h3 className="uppercase text-[#40C8EF] font-['Coordinates:Bold',sans-serif] tracking-[-0.36px] mb-4 font-bold">Reset Timer</h3>
               <p className="text-gray-600 mb-4">Are you sure you want to reset the timer?</p>
               <div className="flex gap-2">
                 <button onClick={() => setShowResetDialog(false)} className="flex-1 bg-[#999] text-white py-2 px-4 rounded-lg font-['Coordinates:Bold',sans-serif] uppercase text-sm">Cancel</button>
@@ -430,7 +430,7 @@ export function Stopwatch({ onClose }: StopwatchProps) {
         {showScratchDialog && (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center p-4">
             <div className="bg-white rounded-lg p-6 w-full max-w-sm border-2 border-red-500">
-              <h3 className="uppercase text-red-500 font-['Coordinates:Bold',sans-serif] tracking-[-0.36px] mb-4">Record Scratch</h3>
+              <h3 className="uppercase text-red-500 font-['Coordinates:Bold',sans-serif] tracking-[-0.36px] mb-4 font-bold">Record Scratch</h3>
               <input type="text" value={scratchTitle} onChange={e => setScratchTitle(e.target.value)} placeholder="Enter location and reason for scratch..." className="w-full border-2 border-red-500 rounded px-3 py-2 mb-4 focus:outline-none" autoFocus onKeyDown={e => e.key === 'Enter' && handleSaveScratch()} />
               <div className="flex gap-2">
                 <button onClick={() => { setShowScratchDialog(false); setScratchTitle(''); }} className="flex-1 bg-[#999] text-white py-2 px-4 rounded-lg font-['Coordinates:Bold',sans-serif] uppercase text-sm">Cancel</button>
@@ -443,7 +443,7 @@ export function Stopwatch({ onClose }: StopwatchProps) {
         {showDeleteDialog && (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center p-4">
             <div className="bg-white rounded-lg p-6 w-full max-w-sm border-2 border-[#40C8EF]">
-              <h3 className="uppercase text-[#40C8EF] font-['Coordinates:Bold',sans-serif] tracking-[-0.36px] mb-4">Delete Timer</h3>
+              <h3 className="uppercase text-[#40C8EF] font-['Coordinates:Bold',sans-serif] tracking-[-0.36px] mb-4 font-bold">Delete Timer</h3>
               <p className="text-gray-600 mb-4">Are you sure? This cannot be undone.</p>
               <div className="flex gap-2">
                 <button onClick={() => setShowDeleteDialog(false)} className="flex-1 bg-[#999] text-white py-2 px-4 rounded-lg font-['Coordinates:Bold',sans-serif] uppercase text-sm">Cancel</button>

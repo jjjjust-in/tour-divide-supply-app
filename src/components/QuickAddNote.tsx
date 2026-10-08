@@ -94,7 +94,7 @@ export function QuickAddNote({ towns, onClose, onAddNote, onAddResupply, onAddJo
           style={navBgPattern ? { backgroundImage: `url(${navBgPattern})`, backgroundSize: '300px 300px' } : { backgroundColor: '#febc12' }}
         >
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-['Coordinates:Bold',sans-serif] text-base text-[#231F20] uppercase tracking-tight">Add</h2>
+            <h2 className="font-['Coordinates:Bold',sans-serif] text-base text-[#231F20] uppercase tracking-tight font-bold">Add</h2>
             <button onClick={onClose} className="p-1 rounded-full hover:bg-black/10">
               <X size={16} className="text-[#231F20]" />
             </button>
