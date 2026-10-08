@@ -86,11 +86,11 @@ export function NotesPanel({
             <h2 className="font-display font-bold text-lg text-[#231F20] uppercase tracking-tight">{selectedTown.name}</h2>
             <p className="text-xs text-[#231F20]/70">{selectedTown.state} · Mile {selectedTown.mileage}</p>
           </div>
-          <button onClick={onClose} className="p-1.5 rounded-full hover:bg-black/10 transition-colors mt-0.5">
+          <button onClick={onClose} className="p-1.5 rounded-full hover:bg-black/10 transition-colors mt-1">
             <X size={16} className="text-[#231F20]" />
           </button>
         </div>
-        <div className="flex gap-1 mt-3">
+        <div className="flex gap-1 mt-4">
           <button
             onClick={() => setActiveTab('notes')}
             className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
@@ -111,7 +111,7 @@ export function NotesPanel({
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2">
+      <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
         {activeTab === 'notes' ? (
           townNotes.length === 0 ? (
             <div className="text-center text-gray-400 py-8 text-sm">No notes yet</div>
@@ -119,7 +119,7 @@ export function NotesPanel({
             townNotes.map(note => (
               <div key={note.id} className="bg-gray-50 rounded-xl p-3 border border-gray-100">
                 {editingNoteId === note.id ? (
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <textarea
                       value={editingContent}
                       onChange={e => setEditingContent(e.target.value)}
@@ -137,7 +137,7 @@ export function NotesPanel({
                 ) : (
                   <>
                     <p className="text-sm text-gray-800 whitespace-pre-wrap">{note.content}</p>
-                    <div className="flex items-center justify-between mt-2">
+                    <div className="flex items-center justify-between mt-3">
                       <span className="text-[10px] text-gray-400">{new Date(note.timestamp).toLocaleDateString()}</span>
                       <div className="flex gap-2">
                         <button onClick={() => handleStartEdit(note)} className="text-gray-400 hover:text-[#231F20]">
@@ -162,7 +162,7 @@ export function NotesPanel({
               <div key={rs.id} className="bg-gray-50 rounded-xl p-3 border border-gray-100">
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2">
-                    <ShoppingCart size={14} className="text-[#febc12] flex-shrink-0 mt-0.5" />
+                    <ShoppingCart size={14} className="text-[#febc12] flex-shrink-0 mt-1" />
                     <div>
                       <div className="font-medium text-sm text-gray-900">{rs.name}</div>
                       <div className="text-xs text-gray-500">{rs.hours}</div>
@@ -175,7 +175,7 @@ export function NotesPanel({
               </div>
             ))}
             {showAddResupply && (
-              <div className="bg-gray-50 rounded-xl p-3 border border-[#febc12] space-y-2">
+              <div className="bg-gray-50 rounded-xl p-3 border border-[#febc12] space-y-3">
                 <input
                   value={newResupplyName}
                   onChange={e => setNewResupplyName(e.target.value)}

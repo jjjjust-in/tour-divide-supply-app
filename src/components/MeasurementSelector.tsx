@@ -16,11 +16,11 @@ export function MeasurementSelector({ onSelect }: MeasurementSelectorProps) {
           <h2 className="font-display font-bold text-xl text-[#231F20] uppercase tracking-tight">
             Units
           </h2>
-          <p className="text-sm text-[#231F20]/70 mt-1">
+          <p className="text-sm text-[#231F20]/70 mt-1.5">
             Choose your preferred measurement system
           </p>
         </div>
-        <div className="p-4 space-y-3">
+        <div className="p-4 space-y-4">
           <button
             onClick={() => onSelect('imperial')}
             className="w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 border-[#febc12] hover:bg-amber-50 transition-colors"

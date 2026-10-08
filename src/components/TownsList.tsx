@@ -82,7 +82,7 @@ export function TownsList({
         className="px-4 pt-4 pb-3 flex-shrink-0"
         style={navBgPattern ? { backgroundImage: `url(${navBgPattern})`, backgroundSize: '300px 300px' } : { backgroundColor: '#febc12' }}
       >
-        <div className="flex items-center justify-between mb-1">
+        <div className="flex items-center justify-between mb-1.5">
           <h1 className="font-display font-bold text-xl text-[#231F20] uppercase tracking-tight">Towns</h1>
           <div className="flex gap-1">
             <button onClick={onOpenTimer} className="p-1.5 rounded-full hover:bg-black/10">
@@ -94,7 +94,7 @@ export function TownsList({
           </div>
         </div>
         <p className="text-sm text-[#231F20]/70">{towns.length} stops along the route</p>
-        <div className="mt-2 relative">
+        <div className="mt-3 relative">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#231F20]/40" />
           <input
             type="text"
@@ -125,7 +125,7 @@ export function TownsList({
                     <span className="font-semibold text-sm text-gray-900">{town.name}</span>
                     <span className="text-xs text-gray-400 font-medium">{town.state}</span>
                   </div>
-                  <div className="flex items-center gap-3 mt-0.5">
+                  <div className="flex items-center gap-3 mt-1">
                     <span className="text-xs text-gray-500">{formatDistance(town.mileage, measurementSystem)}</span>
                     <span className="text-xs text-gray-400">·</span>
                     <span className="text-xs text-gray-500">{formatElevation(town.elevation, measurementSystem)}</span>
@@ -147,11 +147,11 @@ export function TownsList({
               </button>
 
               {isExpanded && (
-                <div className="px-4 pb-3 bg-gray-50 space-y-3">
+                <div className="px-4 pb-3 bg-gray-50 space-y-4">
                   {/* Fun facts */}
                   <div>
-                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1">About {town.name}</h4>
-                    <ul className="space-y-1">
+                    <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1.5">About {town.name}</h4>
+                    <ul className="space-y-1.5">
                       {town.funFacts.map((fact, i) => (
                         <li key={i} className="text-xs text-gray-600 flex gap-2">
                           <span className="text-[#febc12] flex-shrink-0">•</span>
@@ -163,14 +163,14 @@ export function TownsList({
 
                   {/* Notes */}
                   <div>
-                    <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center justify-between mb-1.5">
                       <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wide">My Notes</h4>
                       <button onClick={() => setAddingNoteFor(town.id)} className="text-[10px] text-[#febc12] font-semibold flex items-center gap-0.5">
                         <Plus size={10} /> Add
                       </button>
                     </div>
                     {addingNoteFor === town.id && (
-                      <div className="space-y-1.5 mb-2">
+                      <div className="space-y-2 mb-3">
                         <textarea
                           value={newNote}
                           onChange={e => setNewNote(e.target.value)}
@@ -190,11 +190,11 @@ export function TownsList({
                     {townNotes.length === 0 && !addingNoteFor ? (
                       <p className="text-xs text-gray-400 italic">No notes yet</p>
                     ) : (
-                      <div className="space-y-1.5">
+                      <div className="space-y-2">
                         {townNotes.slice(0, 2).map(note => (
                           <div key={note.id} className="bg-white rounded-lg p-2 border border-gray-100">
                             {editingNoteId === note.id ? (
-                              <div className="space-y-1">
+                              <div className="space-y-1.5">
                                 <textarea
                                   value={editingContent}
                                   onChange={e => setEditingContent(e.target.value)}
@@ -233,14 +233,14 @@ export function TownsList({
 
                   {/* Resupply */}
                   <div>
-                    <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center justify-between mb-1.5">
                       <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wide">Resupply</h4>
                       <button onClick={() => setAddingResupplyFor(town.id)} className="text-[10px] text-green-600 font-semibold flex items-center gap-0.5">
                         <Plus size={10} /> Add
                       </button>
                     </div>
                     {addingResupplyFor === town.id && (
-                      <div className="space-y-1.5 mb-2">
+                      <div className="space-y-2 mb-3">
                         <input
                           value={newResupplyName}
                           onChange={e => setNewResupplyName(e.target.value)}
@@ -259,7 +259,7 @@ export function TownsList({
                     {townResupplies.length === 0 && !addingResupplyFor ? (
                       <p className="text-xs text-gray-400 italic">No resupply options</p>
                     ) : (
-                      <div className="space-y-1.5">
+                      <div className="space-y-2">
                         {townResupplies.map(rs => (
                           <div key={rs.id} className="bg-white rounded-lg p-2 border border-gray-100 flex items-start justify-between">
                             <div>

@@ -72,14 +72,14 @@ export function NotesPage({
         className="px-4 pt-4 pb-3 flex-shrink-0"
         style={navBgPattern ? { backgroundImage: `url(${navBgPattern})`, backgroundSize: '300px 300px' } : { backgroundColor: '#febc12' }}
       >
-        <div className="flex items-center justify-between mb-1">
+        <div className="flex items-center justify-between mb-1.5">
           <h1 className="font-display font-bold text-xl text-[#231F20] uppercase tracking-tight">Notes</h1>
           <button onClick={onOpenTimer} className="p-1.5 rounded-full hover:bg-black/10">
             <Clock size={16} className="text-[#231F20]" />
           </button>
         </div>
         <p className="text-sm text-[#231F20]/70">{notes.length} notes · {resupplies.length} resupply options</p>
-        <div className="mt-2 relative">
+        <div className="mt-3 relative">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#231F20]/40" />
           <input
             type="text"
@@ -89,7 +89,7 @@ export function NotesPage({
             className="w-full pl-8 pr-3 py-2 rounded-xl text-sm bg-white/70 border border-white/50 focus:outline-none focus:ring-2 focus:ring-[#231F20]/30 placeholder-[#231F20]/40"
           />
         </div>
-        <div className="flex gap-1 mt-2">
+        <div className="flex gap-1 mt-3">
           {(['all', 'notes', 'resupply'] as FilterTab[]).map(tab => (
             <button
               key={tab}
@@ -110,12 +110,12 @@ export function NotesPage({
           <div key={note.id} className="px-4 py-3 border-b border-gray-100">
             <button
               onClick={() => onTownSelect(note.townId)}
-              className="text-xs text-[#febc12] font-semibold uppercase tracking-wide mb-1 hover:underline"
+              className="text-xs text-[#febc12] font-semibold uppercase tracking-wide mb-1.5 hover:underline"
             >
               {getTownName(note.townId)}
             </button>
             {editingNoteId === note.id ? (
-              <div className="space-y-2">
+              <div className="space-y-3">
                 <textarea
                   value={editingContent}
                   onChange={e => setEditingContent(e.target.value)}
@@ -135,7 +135,7 @@ export function NotesPage({
             ) : (
               <>
                 <p className="text-sm text-gray-800 whitespace-pre-wrap">{note.content}</p>
-                <div className="flex items-center justify-between mt-1.5">
+                <div className="flex items-center justify-between mt-2">
                   <span className="text-[10px] text-gray-400">{new Date(note.timestamp).toLocaleDateString()}</span>
                   <div className="flex gap-2">
                     <button onClick={() => handleStartEdit(note)} className="text-gray-300 hover:text-[#231F20]">
@@ -155,13 +155,13 @@ export function NotesPage({
           <div key={rs.id} className="px-4 py-3 border-b border-gray-100">
             <button
               onClick={() => onTownSelect(rs.townId)}
-              className="text-xs text-green-600 font-semibold uppercase tracking-wide mb-1 hover:underline"
+              className="text-xs text-green-600 font-semibold uppercase tracking-wide mb-1.5 hover:underline"
             >
               {getTownName(rs.townId)} · Resupply
             </button>
             <p className="text-sm font-medium text-gray-800">{rs.name}</p>
             <p className="text-xs text-gray-500">{rs.hours}</p>
-            <div className="flex items-center justify-end mt-1.5">
+            <div className="flex items-center justify-end mt-2">
               <button onClick={() => onDeleteResupply(rs.id)} className="text-gray-300 hover:text-red-400">
                 <Trash2 size={12} />
               </button>

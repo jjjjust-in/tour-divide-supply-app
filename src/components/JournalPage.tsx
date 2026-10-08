@@ -55,7 +55,7 @@ export function JournalPage({
         className="px-4 pt-4 pb-3 flex-shrink-0"
         style={navBgPattern ? { backgroundImage: `url(${navBgPattern})`, backgroundSize: '300px 300px' } : { backgroundColor: '#febc12' }}
       >
-        <div className="flex items-center justify-between mb-0.5">
+        <div className="flex items-center justify-between mb-1">
           <h1 className="font-display font-bold text-xl text-[#231F20] uppercase tracking-tight">Journal</h1>
           {onClose && (
             <button onClick={onClose} className="p-1.5 rounded-full hover:bg-black/10">
@@ -63,8 +63,8 @@ export function JournalPage({
             </button>
           )}
         </div>
-        <p className="text-sm text-[#231F20]/70 mt-0.5">{journalEntries.length} entries</p>
-        <div className="mt-2">
+        <p className="text-sm text-[#231F20]/70 mt-1">{journalEntries.length} entries</p>
+        <div className="mt-3">
           <select
             value={filterTownId}
             onChange={e => setFilterTownId(e.target.value)}
@@ -91,7 +91,7 @@ export function JournalPage({
             const townName = getTownName(entry.townId);
             return (
               <div key={entry.id} className="px-4 py-4 border-b border-gray-100">
-                <div className="flex items-start justify-between mb-2">
+                <div className="flex items-start justify-between mb-3">
                   <div>
                     {townName && (
                       <button
@@ -101,7 +101,7 @@ export function JournalPage({
                         {townName}
                       </button>
                     )}
-                    <div className="text-xs text-gray-400 mt-0.5">
+                    <div className="text-xs text-gray-400 mt-1">
                       {new Date(entry.timestamp).toLocaleDateString('en-US', {
                         weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'
                       })}
@@ -123,7 +123,7 @@ export function JournalPage({
                 </div>
 
                 {editingId === entry.id ? (
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <textarea
                       value={editingContent}
                       onChange={e => setEditingContent(e.target.value)}

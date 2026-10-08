@@ -244,7 +244,7 @@ export default function App() {
       {/* Bottom Navigation - Hidden on splash, always visible elsewhere */}
       {!showSplash && (
         <div
-          className="absolute bottom-0 left-0 right-0 md:bottom-4 md:left-4 md:right-auto z-50 flex flex-col gap-3 px-3 py-[18px] md:px-2 md:py-[18px] md:rounded-xl items-center md:items-start border-t-2 border-[#40C8EF] md:border-t-0"
+          className="absolute bottom-0 left-0 right-0 md:bottom-4 md:left-4 md:right-auto z-50 flex flex-col gap-4 px-3 py-[18px] md:px-2 md:py-[18px] md:rounded-xl items-center md:items-start border-t-2 border-[#40C8EF] md:border-t-0"
           style={{
             backgroundImage: `url(${navBgPattern})`,
             backgroundSize: '300px 300px',

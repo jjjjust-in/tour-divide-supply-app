@@ -160,7 +160,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
             </div>
             <div className="bg-white relative w-full">
               <div aria-hidden="true" className="absolute border border-[#40c8ef] inset-0 pointer-events-none" />
-              <div className="p-6 space-y-4 text-[#1a1a1a] leading-relaxed">
+              <div className="p-6 space-y-5 text-[#1a1a1a] leading-relaxed">
                 <p className="text-[12px]">
                   TourDivideSupply.com was created by{' '}
                   <span className="font-display font-bold text-[#40C8EF]">JJJJustin</span>,
@@ -189,10 +189,10 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
             </div>
             <div className="bg-white relative w-full">
               <div aria-hidden="true" className="absolute border border-[#40c8ef] inset-0 pointer-events-none" />
-              <div className="p-6 space-y-6">
+              <div className="p-6 space-y-8">
                 {/* GPX Files */}
                 {(topofusionFiles.length > 0 || acaFiles.length > 0) && (
-                  <div className="space-y-4">
+                  <div className="space-y-5">
                     <h2 className="font-display font-bold text-[#231f20] text-sm uppercase tracking-tight flex items-center gap-2">
                       <FileText size={18} className="text-[#40C8EF]" />
                       Download GPX Files
@@ -267,11 +267,11 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                 {/* Route Notes & Alerts */}
                 {noteResources.length > 0 && (
                   <div>
-                    <h2 className="font-display font-bold text-[#231f20] text-sm uppercase tracking-tight mb-3 flex items-center gap-2">
+                    <h2 className="font-display font-bold text-[#231f20] text-sm uppercase tracking-tight mb-4 flex items-center gap-2">
                       <AlertTriangle size={18} className="text-[#febc12]" />
                       Route Updates
                     </h2>
-                    <div className="space-y-2.5">
+                    <div className="space-y-3.5">
                       {noteResources.map((resource) => (
                         <div
                           key={resource.id}
@@ -281,7 +281,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                               : 'border-[#febc12] bg-[#FFFDF5]'
                           }`}
                         >
-                          <div className="p-4 space-y-2">
+                          <div className="p-4 space-y-3">
                             <div className="flex items-start gap-3">
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-start justify-between gap-2">
@@ -294,10 +294,10 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                                     </span>
                                   )}
                                 </div>
-                                <p className="text-sm text-[#231f20]/80 mt-2 leading-relaxed">
+                                <p className="text-sm text-[#231f20]/80 mt-3 leading-relaxed">
                                   {resource.description}
                                 </p>
-                                <div className="text-xs text-[#231f20]/50 mt-2">
+                                <div className="text-xs text-[#231f20]/50 mt-3">
                                   {formatDate(resource.timestamp)}
                                 </div>
                               </div>
@@ -321,10 +321,10 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
             </div>
             <div className="bg-white relative w-full">
               <div aria-hidden="true" className="absolute border border-[#40c8ef] inset-0 pointer-events-none" />
-              <div className="p-6 space-y-6">
+              <div className="p-6 space-y-8">
 
                 {/* Measurement System */}
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <div className="flex items-center gap-2">
                     <Ruler size={16} className="text-[#40C8EF]" />
                     <h3 className="uppercase font-display font-bold tracking-[-0.36px] text-[#40C8EF] text-sm">
@@ -359,7 +359,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                 </div>
 
                 {/* Data Management */}
-                <div className="space-y-3 pt-3 border-t border-[#40C8EF]/20">
+                <div className="space-y-4 pt-3 border-t border-[#40C8EF]/20">
                   <div className="flex items-center gap-2">
                     <Download size={16} className="text-[#40C8EF]" />
                     <h3 className="uppercase font-display font-bold tracking-[-0.36px] text-[#40C8EF] text-sm">
@@ -386,7 +386,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                 </div>
 
                 {/* Clear Data */}
-                <div className="space-y-3 pt-3 border-t border-[#40C8EF]/20">
+                <div className="space-y-4 pt-3 border-t border-[#40C8EF]/20">
                   <div className="flex items-center gap-2">
                     <Trash2 size={16} className="text-[#FF6B35]" />
                     <h3 className="uppercase font-display font-bold tracking-[-0.36px] text-[#FF6B35] text-sm">
@@ -429,10 +429,10 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
       {showClearConfirm && (
         <div className="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full border-4 border-[#FF6B35] shadow-2xl">
-            <h3 className="text-xl mb-4 uppercase font-display font-bold tracking-[-0.36px] text-[#FF6B35]">
+            <h3 className="text-xl mb-5 uppercase font-display font-bold tracking-[-0.36px] text-[#FF6B35]">
               Confirm Delete
             </h3>
-            <p className="text-gray-700 mb-6">
+            <p className="text-gray-700 mb-8">
               Are you sure you want to clear {clearTarget === 'all' ? 'all your data' : `all ${clearTarget}`}? This action cannot be undone.
             </p>
             <div className="flex gap-3">

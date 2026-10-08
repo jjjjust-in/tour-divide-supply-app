@@ -170,7 +170,7 @@ function ItineraryRow({
   return (
     <>
       <div
-        className={`content-stretch flex h-[20px] items-center min-h-px min-w-px relative shrink-0 w-full ${
+        className={`content-stretch flex h-[28px] items-center min-h-px min-w-px relative shrink-0 w-full ${
           isClickable ? 'cursor-pointer hover:bg-[#40c8ef]/5 active:bg-[#40c8ef]/10 transition-colors' : ''
         }`}
         onClick={handleClick}
@@ -215,11 +215,11 @@ function ItineraryRow({
       {/* Expanded Town Details */}
       {isExpanded && isClickable && town && (
         <div className="w-full bg-[#F5FCFF] border-x border-b border-[#40c8ef]">
-          <div className="p-3 space-y-2">
+          <div className="p-3 space-y-3">
             {/* Stats Grid */}
             <div className="grid grid-cols-3 gap-2">
               <div>
-                <div className="text-black uppercase font-display font-bold tracking-[-0.36px] text-[12px] mb-0.5">
+                <div className="text-black uppercase font-display font-bold tracking-[-0.36px] text-[12px] mb-1">
                   ELEV
                 </div>
                 <div className="text-black text-[14px] font-display font-medium leading-[120%]">
@@ -228,7 +228,7 @@ function ItineraryRow({
               </div>
               {town.population && (
                 <div>
-                  <div className="text-black uppercase font-display font-bold tracking-[-0.36px] text-[12px] mb-0.5">
+                  <div className="text-black uppercase font-display font-bold tracking-[-0.36px] text-[12px] mb-1">
                     POP
                   </div>
                   <div className="text-black text-[14px] font-display font-medium leading-[120%]">
@@ -238,7 +238,7 @@ function ItineraryRow({
               )}
               {mileageToNext !== null && (
                 <div>
-                  <div className="text-black uppercase font-display font-bold tracking-[-0.36px] text-[12px] mb-0.5">
+                  <div className="text-black uppercase font-display font-bold tracking-[-0.36px] text-[12px] mb-1">
                     TO NEXT
                   </div>
                   <div className="text-black text-[14px] font-display font-medium leading-[120%]">
@@ -251,7 +251,7 @@ function ItineraryRow({
             {/* Fun Facts */}
             {town.funFacts && town.funFacts.length > 0 && (
               <div className="pt-2 border-t border-[#40c8ef]/20">
-                <div className="space-y-1">
+                <div className="space-y-1.5">
                   {town.funFacts.map((fact, index) => (
                     <div key={index} className="text-[13px] text-black flex items-start gap-1.5">
                       <span className="text-black flex-shrink-0 text-[13px] leading-[120%]">•</span>
@@ -263,7 +263,7 @@ function ItineraryRow({
             )}
 
             {/* Tabs */}
-            <div className="pt-2 border-t border-[#40c8ef]/20 space-y-2">
+            <div className="pt-2 border-t border-[#40c8ef]/20 space-y-3">
               <div className="flex gap-1">
                 <button
                   onClick={() => {
@@ -297,14 +297,14 @@ function ItineraryRow({
 
               {/* Notes Tab Content */}
               {activeTab === 'notes' && (
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   {townNotes.length === 0 ? (
                     <p className="text-[13px] text-black italic leading-[120%]">No notes yet</p>
                   ) : (
                     townNotes.map(note => (
                       <div key={note.id} className="bg-white/50 border border-[#40c8ef]/20 rounded p-1.5 group">
                         {editingNoteId === note.id ? (
-                          <div className="space-y-1">
+                          <div className="space-y-1.5">
                             <textarea
                               value={editNoteContent}
                               onChange={(e) => setEditNoteContent(e.target.value)}
@@ -361,7 +361,7 @@ function ItineraryRow({
                       Add Note
                     </button>
                   ) : (
-                    <form onSubmit={handleSubmitNote} className="space-y-1">
+                    <form onSubmit={handleSubmitNote} className="space-y-1.5">
                       <textarea
                         value={newNote}
                         onChange={(e) => setNewNote(e.target.value)}
@@ -396,14 +396,14 @@ function ItineraryRow({
 
               {/* Resupplies Tab Content */}
               {activeTab === 'resupplies' && (
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   {townResupplies.length === 0 ? (
                     <p className="text-[13px] text-black italic leading-[120%]">No resupplies yet</p>
                   ) : (
                     townResupplies.map(resupply => (
                       <div key={resupply.id} className="bg-[#FFFAEB] border border-[#febc12]/40 rounded p-1.5 group">
                         {editingResupplyId === resupply.id ? (
-                          <div className="space-y-1">
+                          <div className="space-y-1.5">
                             <input
                               type="text"
                               value={editResupply.name}
@@ -455,17 +455,17 @@ function ItineraryRow({
                                 {resupply.name}
                               </h4>
                               {resupply.hours && (
-                                <p className="text-[10px] text-black leading-[120%] mt-0.5">
+                                <p className="text-[10px] text-black leading-[120%] mt-1">
                                   <span className="font-display font-bold text-black">Hours:</span> {resupply.hours}
                                 </p>
                               )}
                               {resupply.phone && (
-                                <p className="text-[10px] text-black leading-[120%] mt-0.5">
+                                <p className="text-[10px] text-black leading-[120%] mt-1">
                                   <span className="font-display font-bold text-black">Phone:</span> {resupply.phone}
                                 </p>
                               )}
                               {resupply.address && (
-                                <p className="text-[10px] text-black leading-[120%] mt-0.5">
+                                <p className="text-[10px] text-black leading-[120%] mt-1">
                                   <span className="font-display font-bold text-black">Address:</span>{' '}
                                   <a
                                     href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(resupply.address)}`}
@@ -509,7 +509,7 @@ function ItineraryRow({
                       Add Resupply
                     </button>
                   ) : (
-                    <form onSubmit={handleSubmitResupply} className="space-y-1">
+                    <form onSubmit={handleSubmitResupply} className="space-y-1.5">
                       <input
                         type="text"
                         value={newResupply.name}

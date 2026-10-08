@@ -88,7 +88,7 @@ export function QuickAddNote({ towns, onClose, onAddResupply, onAddJournalEntry 
           className="px-4 pt-3 pb-0"
           style={navBgPattern ? { backgroundImage: `url(${navBgPattern})`, backgroundSize: '300px 300px' } : { backgroundColor: '#febc12' }}
         >
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-4">
             <h2 className="font-display font-bold text-base text-[#231F20] uppercase tracking-tight">Add</h2>
             <button onClick={onClose} className="p-1 rounded-full hover:bg-black/10">
               <X size={16} className="text-[#231F20]" />
@@ -116,11 +116,11 @@ export function QuickAddNote({ towns, onClose, onAddResupply, onAddJournalEntry 
 
         {/* Content */}
         <div className="mx-4 border-2 border-[#40C8EF] rounded-b-xl rounded-tr-xl overflow-hidden">
-        <div className="p-4 space-y-3 max-h-[60vh] overflow-y-auto bg-white">
+        <div className="p-4 space-y-4 max-h-[60vh] overflow-y-auto bg-white">
           {/* Town selector (Resupply) */}
           {activeTab === 'resupply' && (
             <div>
-              <label className="text-xs font-medium text-gray-500 uppercase tracking-wide block mb-1">Town</label>
+              <label className="text-xs font-medium text-gray-500 uppercase tracking-wide block mb-1.5">Town</label>
               <select
                 value={selectedTownId}
                 onChange={e => setSelectedTownId(e.target.value)}
@@ -137,7 +137,7 @@ export function QuickAddNote({ towns, onClose, onAddResupply, onAddJournalEntry 
 
           {/* Resupply tab */}
           {activeTab === 'resupply' && (
-            <div className="space-y-2">
+            <div className="space-y-3">
               <input
                 value={resupply.name}
                 onChange={e => setResupply(r => ({ ...r, name: e.target.value }))}
@@ -169,9 +169,9 @@ export function QuickAddNote({ towns, onClose, onAddResupply, onAddJournalEntry 
 
           {/* Journal tab */}
           {activeTab === 'journal' && (
-            <div className="space-y-2">
+            <div className="space-y-3">
               <div>
-                <label className="text-xs font-medium text-gray-500 uppercase tracking-wide block mb-1">Town (optional)</label>
+                <label className="text-xs font-medium text-gray-500 uppercase tracking-wide block mb-1.5">Town (optional)</label>
                 <select
                   value={journalTownId}
                   onChange={e => setJournalTownId(e.target.value)}
