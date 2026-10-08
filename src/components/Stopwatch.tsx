@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Play, X, Clock, Calendar, Save, Flag, XCircle, Download } from 'lucide-react';
-import navBgPattern from 'figma:asset/53e87b274f9e9eae37a672b63e5feb2e3c44276d.png';
+import { X, Flag, Download } from 'lucide-react';
 
 interface StopwatchProps {
   onClose: () => void;
@@ -33,6 +32,19 @@ function getSecondFridayInJune(year: number): Date {
     }
   }
   return new Date(year, 5, 8);
+}
+
+// Small confirmation dialog in the same style: centered title, line of text, two buttons
+function Dialog({ title, text, children }: { title: string; text?: string; children: React.ReactNode }) {
+  return (
+  <div className="fixed inset-0 z-[70] bg-black/40 flex items-center justify-center p-5" role="dialog" aria-modal="true" aria-label={title}>
+    <div className="bg-white rounded-2xl w-full max-w-sm px-5 pt-6 pb-5 shadow-2xl">
+      <h3 className="font-display font-bold text-black text-[20px] tracking-[-0.36px] uppercase text-center">{title}</h3>
+      {text && <p className="text-[13px] text-black/60 text-center mt-1">{text}</p>}
+      <div className="mt-5 space-y-4">{children}</div>
+    </div>
+  </div>
+);
 }
 
 export function Stopwatch({ onClose }: StopwatchProps) {
@@ -165,6 +177,7 @@ export function Stopwatch({ onClose }: StopwatchProps) {
       localStorage.setItem('saved-timers', JSON.stringify(updated));
       setSaveTitle('');
       setShowSaveDialog(false);
+      setCurrentLaps([]);
       handleReset(true);
     }
   };
@@ -213,254 +226,248 @@ export function Stopwatch({ onClose }: StopwatchProps) {
   let time, modeTitle, infoMessage;
   if (mode === 'countdown') {
     time = formatTime(targetDate.getTime() - currentTime);
-    modeTitle = 'Countdown to Tour Divide';
-    infoMessage = `The second Friday in June is: ${targetDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`;
+    modeTitle = 'Countdown';
+    infoMessage = `Tour Divide starts ${targetDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}`;
   } else {
     time = formatTime(elapsedTime);
     modeTitle = 'Ride Timer';
-    infoMessage = isRunning ? 'Your ride timer is running.' : elapsedTime === 0 ? 'Press Start to begin tracking your Tour Divide adventure!' : 'Your ride timer is stopped.';
+    infoMessage = isRunning ? 'Running' : elapsedTime === 0 ? 'Tap Start when you roll out' : 'Paused';
   }
 
+  // Shared button styles, matching the main nav and the Add sheet
+  const btnLabel = 'uppercase font-display font-medium tracking-[-0.36px] text-[13px] md:text-sm';
+  const btnFilled = 'w-full border-2 border-[#40C8EF] bg-[#40C8EF] text-white py-2.5 rounded-lg hover:bg-[#00B6EB] hover:border-[#00B6EB] transition-colors disabled:opacity-40';
+  const btnOutline = 'w-full border-2 border-[#40C8EF] bg-white text-[#40C8EF] py-2.5 rounded-lg hover:bg-[#F5FCFF] transition-colors';
+  const btnDanger = 'w-full border-2 border-[#FF6B35] bg-white text-[#FF6B35] py-2.5 rounded-lg hover:bg-[#FFF4EF] transition-colors';
+  const btnDangerFilled = 'w-full border-2 border-[#FF6B35] bg-[#FF6B35] text-white py-2.5 rounded-lg hover:opacity-90 transition-opacity disabled:opacity-40';
+  const fieldClass = 'w-full bg-white border-2 border-[#40C8EF] rounded-lg px-4 py-2.5 text-[14px] text-black placeholder:text-black/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#40C8EF]/40';
+
+
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg w-full max-w-md shadow-xl overflow-hidden border-2 border-[#40C8EF] relative max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div
-          className="flex items-center justify-between p-4 sticky top-0"
-          style={{ backgroundImage: `url(${navBgPattern})`, backgroundSize: '300px 300px', backgroundPosition: 'center' }}
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="timer-title"
+        className="relative w-full max-w-lg bg-white rounded-t-2xl shadow-2xl max-h-[92vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex justify-center pt-3">
+          <div className="w-10 h-1 bg-[#231F20]/20 rounded-full" />
+        </div>
+        <button
+          onClick={onClose}
+          aria-label="Close"
+          className="absolute right-2 top-3 w-11 h-11 flex items-center justify-center text-black/60 hover:text-black transition-colors touch-manipulation"
         >
-          <div className="flex items-center gap-2">
-            {mode === 'countdown' ? <Calendar size={20} className="text-[#40C8EF]" /> : <Clock size={20} className="text-[#40C8EF]" />}
-            <h2 className="uppercase text-[#40C8EF] font-display font-bold tracking-[-0.36px] text-base">{modeTitle}</h2>
+          <X size={22} />
+        </button>
+
+        {/* Header: same title, subheadline and switch as the Route page */}
+        <div className="flex flex-col items-center gap-1 text-center px-5 pt-4">
+          <h2 id="timer-title" className="font-display font-bold text-black text-[20px] tracking-[-0.36px] uppercase">{modeTitle}</h2>
+          <p className="text-[13px] text-black/60">{infoMessage}</p>
+        </div>
+
+        <div className="px-5 pt-5">
+          <div role="radiogroup" aria-label="Timer mode" className="relative grid grid-cols-2 border-2 border-[#40C8EF] rounded-lg bg-white overflow-hidden">
+            <span
+              aria-hidden="true"
+              className={`absolute inset-y-0 left-0 w-1/2 bg-[#40C8EF] motion-safe:transition-transform motion-safe:duration-200 ease-out ${
+                mode === 'stopwatch' ? 'translate-x-full' : 'translate-x-0'
+              }`}
+            />
+            {([
+              { key: 'countdown', label: 'Countdown' },
+              { key: 'stopwatch', label: 'Stopwatch' },
+            ] as const).map(({ key, label }) => (
+              <button
+                key={key}
+                role="radio"
+                aria-checked={mode === key}
+                onClick={() => setMode(key)}
+                className={`relative z-10 px-4 py-2.5 transition-colors ${mode === key ? 'text-white' : 'text-[#40C8EF] hover:text-[#00B6EB]'}`}
+              >
+                <span className={btnLabel}>{label}</span>
+              </button>
+            ))}
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-[#F5FCFF] rounded-lg transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center">
-            <X size={20} className="text-[#40C8EF]" />
-          </button>
         </div>
 
-        {/* Mode Toggle */}
-        <div className="flex bg-[#F5FCFF]">
-          <button
-            onClick={() => setMode('countdown')}
-            className={`flex-1 flex items-center justify-center gap-2 py-3.5 uppercase font-display font-medium tracking-[-0.36px] text-xs transition-all ${
-              mode === 'countdown' ? 'bg-white text-[#40C8EF] border-t-2 border-r-2 border-[#40C8EF]' : 'bg-[#e5e5e5] text-[#666] hover:bg-[#40C8EF]/10 border-b-2 border-[#40C8EF]'
-            }`}
-          >
-            <Calendar size={16} /> Countdown
-          </button>
-          <button
-            onClick={() => setMode('stopwatch')}
-            className={`flex-1 flex items-center justify-center gap-2 py-3.5 uppercase font-display font-medium tracking-[-0.36px] text-xs transition-all ${
-              mode === 'stopwatch' ? 'bg-white text-[#40C8EF] border-t-2 border-l-2 border-[#40C8EF]' : 'bg-[#e5e5e5] text-[#666] hover:bg-[#40C8EF]/10 border-b-2 border-[#40C8EF]'
-            }`}
-          >
-            <Clock size={16} /> Stopwatch
-          </button>
-        </div>
-
-        {/* Time Display */}
-        <div className="p-6 bg-white">
-          <div className="grid grid-cols-4 gap-3 mb-8">
-            {[{ label: 'Days', val: time.days }, { label: 'Hours', val: time.hours }, { label: 'Minutes', val: time.minutes }, { label: 'Seconds', val: time.seconds }].map(({ label, val }) => (
+        {/* Time */}
+        <div className="px-5 pt-6">
+          <div className="grid grid-cols-4 gap-2.5" aria-live="off">
+            {[{ label: 'Days', val: time.days }, { label: 'Hours', val: time.hours }, { label: 'Min', val: time.minutes }, { label: 'Sec', val: time.seconds }].map(({ label, val }) => (
               <div key={label} className="text-center">
-                <div className="bg-white border-2 border-[#40C8EF] rounded-lg p-2 mb-3 min-h-[56px] flex items-center justify-center">
-                  <div className="text-2xl font-display font-medium text-[#40C8EF]">{String(val).padStart(2, '0')}</div>
+                <div className="border-2 border-[#40C8EF] rounded-lg py-3 flex items-center justify-center">
+                  <span className="font-display font-bold text-[26px] leading-none text-black tabular-nums">{String(val).padStart(2, '0')}</span>
                 </div>
-                <div className="text-xs uppercase text-gray-600 font-display font-medium">{label}</div>
+                <div className="mt-1.5 font-display font-medium text-[11px] uppercase tracking-[0.02em] text-black/60">{label}</div>
               </div>
             ))}
           </div>
+        </div>
 
-          {mode === 'stopwatch' && (
-            <div className="space-y-4">
-              <div className="flex flex-col gap-3 w-full max-w-xs mx-auto">
-                {!isRunning ? (
-                  <button
-                    onClick={handleStart}
-                    className="flex items-center justify-center gap-2 bg-[#40C8EF] text-white px-6 py-3.5 rounded-lg hover:bg-[#00B6EB] transition-colors font-display font-medium uppercase tracking-[-0.36px] w-full"
-                  >
-                    <Play size={20} /> {elapsedTime > 0 ? 'Resume' : 'Start'}
+        {mode === 'stopwatch' && (
+          <div className="px-5 pt-6 space-y-4">
+            {!isRunning ? (
+              <button onClick={handleStart} className={btnFilled}>
+                <span className={btnLabel}>{elapsedTime > 0 ? 'Resume' : 'Start'}</span>
+              </button>
+            ) : (
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <button onClick={() => setShowLapDialog(true)} className={btnOutline}>
+                    <span className={btnLabel}>Record state</span>
                   </button>
-                ) : (
-                  <>
-                    <button
-                      onClick={() => setShowLapDialog(true)}
-                      className="flex items-center justify-center gap-2 bg-[#febc12] text-[#231f20] px-6 py-3.5 rounded-lg hover:bg-[#e5aa10] transition-colors font-display font-medium uppercase tracking-[-0.36px] w-full"
-                    >
-                      <Flag size={20} /> State
-                    </button>
-                    <button
-                      onClick={() => setShowScratchDialog(true)}
-                      className="flex items-center justify-center gap-2 bg-red-500 text-white px-6 py-3.5 rounded-lg hover:bg-red-600 transition-colors font-display font-medium uppercase tracking-[-0.36px] w-full"
-                    >
-                      <XCircle size={20} /> Scratch
-                    </button>
-                    <button
-                      onClick={() => setShowSaveDialog(true)}
-                      className="flex items-center justify-center gap-2 bg-[#40C8EF] text-white px-6 py-3.5 rounded-lg hover:bg-[#00B6EB] transition-colors font-display font-medium uppercase tracking-[-0.36px] w-full"
-                    >
-                      <Save size={20} /> Finish
-                    </button>
-                  </>
-                )}
-                <button
-                  onClick={() => handleReset()}
-                  className="text-gray-400 hover:text-gray-600 transition-colors font-display font-medium uppercase tracking-[-0.36px] text-xs py-2.5"
-                >
-                  Reset
+                  <button onClick={() => setShowScratchDialog(true)} className={btnDanger}>
+                    <span className={btnLabel}>Scratch</span>
+                  </button>
+                </div>
+                <button onClick={() => setShowSaveDialog(true)} className={btnFilled}>
+                  <span className={btnLabel}>Finish</span>
                 </button>
               </div>
+            )}
+            {(isRunning || elapsedTime > 0) && (
+              <button onClick={() => handleReset()} className="w-full py-1.5 text-black/50 hover:text-black transition-colors">
+                <span className={btnLabel}>Reset</span>
+              </button>
+            )}
 
-              {currentLaps.length > 0 && (
-                <div className="mt-5 p-4 bg-[#F5FCFF] border-2 border-[#40C8EF]/20 rounded-lg">
-                  <h4 className="text-xs uppercase text-[#40C8EF] font-display font-bold tracking-[-0.36px] mb-4">
-                    Current Ride States ({currentLaps.length})
-                  </h4>
-                  <div className="space-y-3 max-h-48 overflow-y-auto">
-                    {currentLaps.map((lap, i) => {
-                      const lt = formatTime(lap.time);
-                      return (
-                        <div key={i} className="flex justify-between items-start text-xs p-2 bg-white rounded border border-[#40C8EF]/10">
-                          <div className="font-display font-medium text-gray-700">{i + 1}. {lap.title}</div>
-                          <div className="text-gray-500 ml-2">{lt.days}d {lt.hours}h {lt.minutes}m</div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {savedTimers.length > 0 && (
-                <div className="mt-5 border-2 border-[#40C8EF]/20 rounded-lg overflow-hidden">
-                  {savedTimers.map(timer => {
-                    const st = formatTime(timer.time);
+            {currentLaps.length > 0 && (
+              <div>
+                <h4 className="font-display font-medium text-[12px] uppercase tracking-[-0.2px] text-black mb-1.5">
+                  States this ride · {currentLaps.length}
+                </h4>
+                <ul className="border-2 border-[#40C8EF] rounded-lg divide-y divide-[#40C8EF]/30 max-h-48 overflow-y-auto">
+                  {currentLaps.map((lap, i) => {
+                    const lt = formatTime(lap.time);
                     return (
-                      <div key={timer.id} className="p-3 hover:bg-[#F5FCFF] transition-colors border-b border-gray-100 last:border-b-0">
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1.5">
-                              <span className="font-display font-medium text-[#40C8EF] uppercase tracking-[-0.36px] text-sm">{timer.title}</span>
-                              <span className={`px-2 py-0.5 rounded text-xs font-display font-medium uppercase ${timer.type === 'finish' ? 'bg-[#40C8EF] text-white' : 'bg-red-500 text-white'}`}>
-                                {timer.type}
-                              </span>
-                            </div>
-                            <div className="text-sm text-gray-600">{st.days}d {st.hours}h {st.minutes}m {st.seconds}s</div>
-                            {timer.laps?.length > 0 && <div className="text-xs text-gray-400">{timer.laps.length} state{timer.laps.length !== 1 ? 's' : ''}</div>}
-                            <div className="text-xs text-gray-400">{new Date(timer.savedAt).toLocaleDateString()}</div>
-                          </div>
-                          <div className="flex gap-1">
-                            <button onClick={() => handleDownloadTimer(timer)} className="p-2 text-[#40C8EF] hover:bg-[#F5FCFF] rounded-lg min-w-[40px] min-h-[40px] flex items-center justify-center">
-                              <Download size={16} />
-                            </button>
-                            <button onClick={() => { setTimerToDelete(timer.id); setShowDeleteDialog(true); }} className="p-2 text-red-500 hover:bg-red-50 rounded-lg min-w-[40px] min-h-[40px] flex items-center justify-center">
-                              <X size={16} />
-                            </button>
-                          </div>
-                        </div>
-                      </div>
+                      <li key={i} className="flex justify-between items-center px-4 py-2.5 text-[13px]">
+                        <span className="font-display font-medium uppercase text-black">{lap.title}</span>
+                        <span className="text-black/60 tabular-nums">{lt.days}d {lt.hours}h {lt.minutes}m</span>
+                      </li>
                     );
                   })}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+                </ul>
+              </div>
+            )}
 
-        {/* Info */}
-        <div className="p-4 bg-[#F5FCFF] border-t-2 border-[#40C8EF]/20">
-          <p className="text-xs text-gray-600 text-center">{infoMessage}</p>
-        </div>
+            {savedTimers.length > 0 && (
+              <div>
+                <h4 className="font-display font-medium text-[12px] uppercase tracking-[-0.2px] text-black mb-1.5">Saved rides</h4>
+                <ul className="border-2 border-[#40C8EF] rounded-lg divide-y divide-[#40C8EF]/30">
+                  {savedTimers.map((timer) => {
+                    const st = formatTime(timer.time);
+                    return (
+                      <li key={timer.id} className="flex items-start justify-between gap-2 px-4 py-3">
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="font-display font-medium uppercase text-[13px] text-black truncate">{timer.title}</span>
+                            <span className={`px-1.5 py-0.5 rounded text-[10px] font-display font-medium uppercase text-white ${timer.type === 'finish' ? 'bg-[#40C8EF]' : 'bg-[#FF6B35]'}`}>
+                              {timer.type}
+                            </span>
+                          </div>
+                          <p className="text-[13px] text-black/70 tabular-nums mt-0.5">{st.days}d {st.hours}h {st.minutes}m {st.seconds}s</p>
+                          <p className="text-[11px] text-black/50 mt-0.5">
+                            {new Date(timer.savedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            {timer.laps?.length > 0 && ` · ${timer.laps.length} state${timer.laps.length !== 1 ? 's' : ''}`}
+                          </p>
+                        </div>
+                        <div className="flex shrink-0">
+                          <button onClick={() => handleDownloadTimer(timer)} aria-label={`Download ${timer.title}`} className="w-10 h-10 flex items-center justify-center text-black/50 hover:text-black">
+                            <Download size={16} />
+                          </button>
+                          <button
+                            onClick={() => {
+                              setTimerToDelete(timer.id);
+                              setShowDeleteDialog(true);
+                            }}
+                            aria-label={`Delete ${timer.title}`}
+                            className="w-10 h-10 flex items-center justify-center text-black/50 hover:text-[#FF6B35]"
+                          >
+                            <X size={16} />
+                          </button>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="h-6" />
 
         {/* Dialogs */}
         {showSaveDialog && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg p-6 w-full max-w-sm border-2 border-[#40C8EF]">
-              <h3 className="uppercase text-[#40C8EF] font-display font-bold tracking-[-0.36px] mb-5">Save Timer</h3>
-              <input type="text" value={saveTitle} onChange={e => setSaveTitle(e.target.value)} placeholder="Enter timer title..." className="w-full border-2 border-[#40C8EF] rounded px-3 py-2 mb-5 focus:outline-none" autoFocus onKeyDown={e => e.key === 'Enter' && handleSaveTimer()} />
-              <div className="flex gap-2">
-                <button onClick={() => { setShowSaveDialog(false); setSaveTitle(''); }} className="flex-1 bg-[#999] text-white py-2.5 px-4 rounded-lg font-display font-medium uppercase text-sm">Cancel</button>
-                <button onClick={handleSaveTimer} disabled={!saveTitle.trim()} className="flex-1 bg-[#40C8EF] text-white py-2.5 px-4 rounded-lg font-display font-medium uppercase text-sm disabled:opacity-50">Save</button>
-              </div>
+          <Dialog title="Finish Ride" text="Name this ride to save it">
+            <input type="text" value={saveTitle} onChange={(e) => setSaveTitle(e.target.value)} placeholder="Tour Divide 2027" className={fieldClass} autoFocus onKeyDown={(e) => e.key === 'Enter' && handleSaveTimer()} />
+            <div className="grid grid-cols-2 gap-3">
+              <button onClick={() => { setShowSaveDialog(false); setSaveTitle(''); }} className={btnOutline}><span className={btnLabel}>Cancel</span></button>
+              <button onClick={handleSaveTimer} disabled={!saveTitle.trim()} className={btnFilled}><span className={btnLabel}>Save</span></button>
             </div>
-          </div>
+          </Dialog>
         )}
 
         {showLapDialog && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg p-6 w-full max-w-sm border-2 border-[#40C8EF] max-h-[80vh] overflow-y-auto">
-              <h3 className="uppercase text-[#40C8EF] font-display font-bold tracking-[-0.36px] mb-5">Record State</h3>
-              {currentLaps.length > 0 && (
-                <div className="mb-5 p-3 bg-[#F5FCFF] border-2 border-[#40C8EF]/20 rounded-lg">
-                  <div className="text-xs uppercase text-[#40C8EF] font-display font-medium mb-3">States Recorded ({currentLaps.length})</div>
-                  <div className="space-y-1.5 max-h-32 overflow-y-auto">
-                    {currentLaps.map((lap, i) => {
-                      const lt = formatTime(lap.time);
-                      return (
-                        <div key={i} className="flex justify-between text-xs">
-                          <span className="font-display font-medium text-gray-700">{i + 1}. {lap.title}</span>
-                          <span className="text-gray-500 ml-2">{lt.days}d {lt.hours}h {lt.minutes}m</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-              <input type="text" value={lapTitle} onChange={e => setLapTitle(e.target.value)} placeholder="Enter state name..." className="w-full border-2 border-[#40C8EF] rounded px-3 py-2 mb-5 focus:outline-none" autoFocus onKeyDown={e => e.key === 'Enter' && handleSaveLap()} />
-              <div className="flex gap-2">
-                <button onClick={() => { setShowLapDialog(false); setLapTitle(''); }} className="flex-1 bg-[#999] text-white py-2.5 px-4 rounded-lg font-display font-medium uppercase text-sm">Cancel</button>
-                <button onClick={handleSaveLap} disabled={!lapTitle.trim()} className="flex-1 bg-[#40C8EF] text-white py-2.5 px-4 rounded-lg font-display font-medium uppercase text-sm disabled:opacity-50">Save</button>
-              </div>
+          <Dialog title="Record State" text="Log the time as you cross into a new state">
+            <input type="text" value={lapTitle} onChange={(e) => setLapTitle(e.target.value)} placeholder="Montana" className={fieldClass} autoFocus onKeyDown={(e) => e.key === 'Enter' && handleSaveLap()} />
+            <div className="grid grid-cols-2 gap-3">
+              <button onClick={() => { setShowLapDialog(false); setLapTitle(''); }} className={btnOutline}><span className={btnLabel}>Cancel</span></button>
+              <button onClick={handleSaveLap} disabled={!lapTitle.trim()} className={btnFilled}><span className={btnLabel}>Save</span></button>
             </div>
-          </div>
+          </Dialog>
         )}
 
         {showResetDialog && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg p-6 w-full max-w-sm border-2 border-[#40C8EF]">
-              <h3 className="uppercase text-[#40C8EF] font-display font-bold tracking-[-0.36px] mb-5">Reset Timer</h3>
-              <p className="text-gray-600 mb-5">Are you sure you want to reset the timer?</p>
-              <div className="flex gap-2">
-                <button onClick={() => setShowResetDialog(false)} className="flex-1 bg-[#999] text-white py-2.5 px-4 rounded-lg font-display font-medium uppercase text-sm">Cancel</button>
-                <button onClick={confirmReset} className="flex-1 bg-red-500 text-white py-2.5 px-4 rounded-lg font-display font-medium uppercase text-sm">Reset</button>
-              </div>
+          <Dialog title="Reset Timer" text="This clears the current time and states.">
+            <div className="grid grid-cols-2 gap-3">
+              <button onClick={() => setShowResetDialog(false)} className={btnOutline}><span className={btnLabel}>Cancel</span></button>
+              <button onClick={confirmReset} className={btnDangerFilled}><span className={btnLabel}>Reset</span></button>
             </div>
-          </div>
+          </Dialog>
         )}
 
         {showScratchDialog && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg p-6 w-full max-w-sm border-2 border-red-500">
-              <h3 className="uppercase text-red-500 font-display font-bold tracking-[-0.36px] mb-5">Record Scratch</h3>
-              <input type="text" value={scratchTitle} onChange={e => setScratchTitle(e.target.value)} placeholder="Enter location and reason for scratch..." className="w-full border-2 border-red-500 rounded px-3 py-2 mb-5 focus:outline-none" autoFocus onKeyDown={e => e.key === 'Enter' && handleSaveScratch()} />
-              <div className="flex gap-2">
-                <button onClick={() => { setShowScratchDialog(false); setScratchTitle(''); }} className="flex-1 bg-[#999] text-white py-2.5 px-4 rounded-lg font-display font-medium uppercase text-sm">Cancel</button>
-                <button onClick={handleSaveScratch} disabled={!scratchTitle.trim()} className="flex-1 bg-red-500 text-white py-2.5 px-4 rounded-lg font-display font-medium uppercase text-sm disabled:opacity-50">Save</button>
-              </div>
+          <Dialog title="Scratch" text="Where and why you stopped">
+            <input type="text" value={scratchTitle} onChange={(e) => setScratchTitle(e.target.value)} placeholder="Lima, MT · knee" className={fieldClass.replace(/#40C8EF/g, '#FF6B35')} autoFocus onKeyDown={(e) => e.key === 'Enter' && handleSaveScratch()} />
+            <div className="grid grid-cols-2 gap-3">
+              <button onClick={() => { setShowScratchDialog(false); setScratchTitle(''); }} className={btnOutline}><span className={btnLabel}>Cancel</span></button>
+              <button onClick={handleSaveScratch} disabled={!scratchTitle.trim()} className={btnDangerFilled}><span className={btnLabel}>Save</span></button>
             </div>
-          </div>
+          </Dialog>
         )}
 
         {showDeleteDialog && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg p-6 w-full max-w-sm border-2 border-[#40C8EF]">
-              <h3 className="uppercase text-[#40C8EF] font-display font-bold tracking-[-0.36px] mb-5">Delete Timer</h3>
-              <p className="text-gray-600 mb-5">Are you sure? This cannot be undone.</p>
-              <div className="flex gap-2">
-                <button onClick={() => setShowDeleteDialog(false)} className="flex-1 bg-[#999] text-white py-2.5 px-4 rounded-lg font-display font-medium uppercase text-sm">Cancel</button>
-                <button onClick={() => { if (timerToDelete) { handleDeleteTimer(timerToDelete); setShowDeleteDialog(false); } }} className="flex-1 bg-red-500 text-white py-2.5 px-4 rounded-lg font-display font-medium uppercase text-sm">Delete</button>
-              </div>
+          <Dialog title="Delete Ride" text="This can’t be undone.">
+            <div className="grid grid-cols-2 gap-3">
+              <button onClick={() => setShowDeleteDialog(false)} className={btnOutline}><span className={btnLabel}>Cancel</span></button>
+              <button
+                onClick={() => {
+                  if (timerToDelete) {
+                    handleDeleteTimer(timerToDelete);
+                    setShowDeleteDialog(false);
+                  }
+                }}
+                className={btnDangerFilled}
+              >
+                <span className={btnLabel}>Delete</span>
+              </button>
             </div>
-          </div>
+          </Dialog>
         )}
 
         {showConfirmation && (
-          <div className="absolute top-4 left-4 right-4 z-50">
-            <div className="bg-[#40C8EF] text-white rounded-lg p-4 shadow-lg border-2 border-[#00B6EB] flex items-center justify-between gap-2">
+          <div className="fixed top-4 left-4 right-4 z-[70] flex justify-center" role="status">
+            <div className="w-full max-w-md bg-[#231F20] text-white rounded-lg px-4 py-3 shadow-lg flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 <Flag size={16} />
-                <span className="font-display font-medium text-sm">{confirmationMessage}</span>
+                <span className="font-display font-medium text-[13px]">{confirmationMessage}</span>
               </div>
-              <button onClick={() => setShowConfirmation(false)} className="p-1 hover:bg-white/20 rounded">
+              <button onClick={() => setShowConfirmation(false)} aria-label="Dismiss" className="p-1 text-white/70 hover:text-white">
                 <X size={16} />
               </button>
             </div>
