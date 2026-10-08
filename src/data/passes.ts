@@ -26,6 +26,7 @@ export const ROUTE_POIS: RoutePoi[] = [
   { id: 'fleecer-ridge', name: 'Fleecer Ridge', mile: 752, elevationFt: 7840, source: 'profile' },
   { id: 'old-bannack-road', name: 'Old Bannack Road Pass', mile: 861, elevationFt: 7880, source: 'profile' },
   { id: 'union-pass', name: 'Union Pass', mile: 1152, elevationFt: 9212, source: 'TopoQuest (USGS)' },
+  { id: 'lander-cutoff', name: 'Lander Cutoff', mile: 1274, elevationFt: 8240, source: 'profile (one rider log from Boulder to Atlantic City: 2480 m high point)' },
   { id: 'lynx-pass', name: 'Lynx Pass', mile: 1594, elevationFt: 8953, source: 'TopoQuest (USGS)' },
   { id: 'boreas-pass', name: 'Boreas Pass', mile: 1699, elevationFt: 11481, source: 'Wikipedia (NAVD 88)' },
   { id: 'marshall-pass', name: 'Marshall Pass', mile: 1814, elevationFt: 10846, source: 'cyclepass.com' },
