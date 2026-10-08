@@ -1,15 +1,18 @@
 import { useState } from 'react';
-import type { Note, JournalEntry, Town } from '../types';
+import type { Note, JournalEntry, Resupply, Town } from '../types';
 import type { MeasurementSystem } from '../utils/measurements';
 import { Trash2, Edit2 } from 'lucide-react';
 import { PageLayout, PageSelect } from './PageLayout';
 import { inRideOrder, type RideDirection } from '../utils/direction';
+import { RecapSheet } from './RecapSheet';
+import { loadSavedTimers, recapYears } from '../utils/recap';
 
 interface JournalPageProps {
   direction: RideDirection;
   notes: Note[];
   journalEntries: JournalEntry[];
   towns: Town[];
+  resupplies: Resupply[];
   measurementSystem: MeasurementSystem;
   onDeleteNote: (noteId: string) => void;
   onDeleteJournalEntry: (entryId: string) => void;
@@ -20,10 +23,13 @@ interface JournalPageProps {
 
 // Journal: same layout as the Itinerary. Title, entry count, town filter,
 // then the entries in a bordered list.
-export function JournalPage({ direction, journalEntries, towns, onDeleteJournalEntry, onEditJournalEntry, onTownSelect }: JournalPageProps) {
+export function JournalPage({ direction, journalEntries, towns, resupplies, onDeleteJournalEntry, onEditJournalEntry, onTownSelect }: JournalPageProps) {
   const [filterTownId, setFilterTownId] = useState<string>('all');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState('');
+  const [showRecap, setShowRecap] = useState(false);
+  // Newest year with anything to recap (journal entries or a saved ride)
+  const recapYear = recapYears(journalEntries, loadSavedTimers())[0];
 
   const townsInRouteOrder = inRideOrder([...towns].sort((a, b) => a.mileage - b.mileage), direction);
   const townLabel = (townId?: string) => {
@@ -56,6 +62,23 @@ export function JournalPage({ direction, journalEntries, towns, onDeleteJournalE
         </PageSelect>
       }
     >
+      {recapYear !== undefined && (
+        <button
+          onClick={() => setShowRecap(true)}
+          className="w-[298px] mb-4 border-2 border-[#40C8EF] bg-white text-[#40C8EF] py-2.5 rounded-lg hover:bg-[#F5FCFF] transition-colors"
+        >
+          <span className="uppercase font-display font-medium tracking-[-0.36px] text-[13px] md:text-sm">{recapYear} Recap</span>
+        </button>
+      )}
+      {showRecap && (
+        <RecapSheet
+          direction={direction}
+          journalEntries={journalEntries}
+          towns={towns}
+          resupplies={resupplies}
+          onClose={() => setShowRecap(false)}
+        />
+      )}
       {sorted.length === 0 ? (
         <div className="w-[298px] border-2 border-[#40C8EF] px-6 py-10 text-center">
           <p className="font-display font-medium text-[13px] uppercase text-black">No entries yet</p>
