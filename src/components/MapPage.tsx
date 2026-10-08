@@ -66,7 +66,7 @@ export function MapPage({ towns, measurementSystem, onOpenTown }: MapPageProps) 
             );
           })}
         </div>
-        <div className="w-full max-w-[360px]">
+        <div className="w-full">
           <RouteMap view={view} towns={towns} measurementSystem={measurementSystem} onOpenTown={onOpenTown} />
         </div>
       </div>

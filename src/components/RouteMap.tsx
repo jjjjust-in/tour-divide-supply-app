@@ -26,6 +26,16 @@ const LAYERS = {
 // The grid is 16 x 27 squares, each one 100 x 100 miles
 const GRID = { cols: 16, rows: 27, x0: 0.5, y0: 0.5, cellW: 18.625, cellH: 17.7778 };
 
+// The grid is drawn at the same height as the Itinerary list (27 rows of
+// 24px plus its 1px border), keeping its true shape. That makes it wider than
+// a phone, so the map scrolls sideways there.
+const ITINERARY_LIST_PX = 27 * 24 + 2;
+const GRID_UNITS_TALL = 481;
+const MAP_SCALE = ITINERARY_LIST_PX / GRID_UNITS_TALL;
+const MAP_PX_WIDTH = MAP_LAYOUT.viewBox.width * MAP_SCALE;
+// Room on the right for artwork that breaks past the grid
+const BREAKOUT_PX = 32 * MAP_SCALE;
+
 // The prototype build can't use GPS, so it gets a slider to preview positions
 const DEMO_LOCATION = import.meta.env.VITE_DEMO_LOCATION === 'true';
 
@@ -242,10 +252,13 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
   const stepTo = (i: number) => setWaypointIndex(Math.max(0, Math.min(waypoints.length - 1, i)));
 
   return (
-    <div className="w-full max-w-[360px] mx-auto space-y-4">
-      {/* Grid area is a little narrower than the card so artwork can break out to the right */}
+    <div className="w-full space-y-4">
       {/* Map */}
-      <div className="relative w-full max-w-[318px] mx-auto select-none">
+      {/* Full-width strip that scrolls sideways on narrow screens */}
+      <div className="relative w-screen max-w-[100vw] left-1/2 -translate-x-1/2">
+      <div className="overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="mx-auto px-4" style={{ width: MAP_PX_WIDTH + BREAKOUT_PX + 32 }}>
+      <div className="relative select-none" style={{ width: MAP_PX_WIDTH }}>
         {view === 'elevation' ? (
           <svg
             ref={svgRef}
@@ -399,16 +412,6 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
         </svg>
         )}
 
-        {!DEMO_LOCATION && (
-          <button
-            onClick={locate}
-            disabled={location.status === 'locating'}
-            aria-label="Find my location"
-            className="absolute right-1 bottom-1 w-11 h-11 flex items-center justify-center rounded-full bg-[#febc12] text-[#231F20] shadow-lg hover:bg-[#feca3d] transition-colors disabled:opacity-60 touch-manipulation"
-          >
-            {location.status === 'locating' ? <Loader2 size={20} className="animate-spin" /> : <LocateFixed size={20} />}
-          </button>
-        )}
 
         {/* Label for the selected square or state */}
         {label && (
@@ -424,10 +427,23 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
           </div>
         )}
       </div>
+      </div>
+      </div>
+        {!DEMO_LOCATION && (
+          <button
+            onClick={locate}
+            disabled={location.status === 'locating'}
+            aria-label="Find my location"
+            className="absolute right-4 bottom-2 z-10 w-11 h-11 flex items-center justify-center rounded-full bg-[#febc12] text-[#231F20] shadow-lg hover:bg-[#feca3d] transition-colors disabled:opacity-60 touch-manipulation"
+          >
+            {location.status === 'locating' ? <Loader2 size={20} className="animate-spin" /> : <LocateFixed size={20} />}
+          </button>
+        )}
+      </div>
 
       {/* Waypoint: step through the towns */}
       {waypoint && (
-        <div className="bg-white border border-[#40c8ef]">
+        <div className="bg-white border border-[#40c8ef] max-w-[360px] mx-auto">
           <div className="flex items-stretch">
             <button
               onClick={() => stepTo(activeIndex - 1)}
