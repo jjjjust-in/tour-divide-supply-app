@@ -10,7 +10,7 @@ interface QuickAddNoteProps {
   measurementSystem: MeasurementSystem;
   onClose: () => void;
   onAddResupply: (townId: string, resupply: Omit<Resupply, 'id' | 'townId' | 'timestamp'>) => void;
-  onAddJournalEntry: (content: string, imageUrl?: string, townId?: string) => void;
+  onAddJournalEntry: (content: string, imageUrl: string | undefined, townId: string) => void;
 }
 
 // Notes and journal entries overlap, so adding from here is Resupply or Journal only.
@@ -57,15 +57,16 @@ export function QuickAddNote({ towns, onClose, onAddResupply, onAddJournalEntry 
         address: resupply.address.trim(),
       });
       onClose();
-    } else if (activeTab === 'journal' && journalContent.trim()) {
-      onAddJournalEntry(journalContent.trim(), imageUrl, journalTownId || undefined);
+    } else if (activeTab === 'journal' && journalTownId && journalContent.trim()) {
+      // Every journal entry is tied to a town
+      onAddJournalEntry(journalContent.trim(), imageUrl, journalTownId);
       onClose();
     }
   };
 
   const canSubmit =
     (activeTab === 'resupply' && !!resupply.name.trim() && !!selectedTownId) ||
-    (activeTab === 'journal' && !!journalContent.trim());
+    (activeTab === 'journal' && !!journalContent.trim() && !!journalTownId);
 
   const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
     { key: 'resupply', label: 'Resupply', icon: <ShoppingCart size={13} /> },
@@ -173,13 +174,13 @@ export function QuickAddNote({ towns, onClose, onAddResupply, onAddJournalEntry 
           {activeTab === 'journal' && (
             <div className="space-y-3">
               <div>
-                <label className="text-xs font-medium text-gray-500 uppercase tracking-wide block mb-1.5">Town (optional)</label>
+                <label className="text-xs font-medium text-gray-500 uppercase tracking-wide block mb-1.5">Town</label>
                 <select
                   value={journalTownId}
                   onChange={e => setJournalTownId(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#40C8EF] bg-white"
                 >
-                  <option value="">No town</option>
+                  <option value="" disabled>Choose a town</option>
                   {towns.map(town => (
                     <option key={town.id} value={town.id}>
                       {town.name}, {town.state}

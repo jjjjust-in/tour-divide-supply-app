@@ -38,7 +38,7 @@ export interface Resupply {
 
 export interface Resource {
   id: string;
-  type: 'gpx' | 'note';
+  type: 'gpx' | 'reroute' | 'note';
   title: string;
   description: string;
   timestamp: number;

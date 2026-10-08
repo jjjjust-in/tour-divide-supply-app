@@ -154,7 +154,7 @@ export default function App() {
     ));
   };
 
-  const handleAddJournalEntry = (content: string, imageUrl?: string, townId?: string) => {
+  const handleAddJournalEntry = (content: string, imageUrl: string | undefined, townId: string) => {
     const newEntry: JournalEntry = {
       id: `journal-${Date.now()}-${Math.random()}`,
       content,

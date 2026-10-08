@@ -1,4 +1,4 @@
-import { ChevronLeft, Ruler, Download, Upload, Trash2, RotateCcw, FileText, Instagram, Globe, ExternalLink } from 'lucide-react';
+import { ChevronLeft, Ruler, Download, Upload, Trash2, RotateCcw, Instagram, Globe, ExternalLink } from 'lucide-react';
 import { socialLinks } from '../data/social';
 import { useState } from 'react';
 import type { MeasurementSystem } from '../utils/measurements';
@@ -104,14 +104,12 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
     if (diffDays === 0) return 'Today';
     if (diffDays === 1) return 'Yesterday';
     if (diffDays < 7) return `${diffDays} days ago`;
-    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+    if (diffDays < 30) { const weeks = Math.floor(diffDays / 7); return `${weeks} week${weeks === 1 ? '' : 's'} ago`; }
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
   const gpxFiles = sampleResources.filter(r => r.type === 'gpx');
-  const noteResources = sampleResources.filter(r => r.type === 'note');
-  const topofusionFiles = gpxFiles.filter(r => r.fileName?.toLowerCase().includes('topofusion') || r.title.toLowerCase().includes('topofusion'));
-  const acaFiles = gpxFiles.filter(r => r.fileName?.toLowerCase().includes('aca') || r.title.toLowerCase().includes('aca') || r.title.toLowerCase().includes('adventure cycling'));
+  const rerouteResources = sampleResources.filter(r => r.type === 'reroute');
 
   return (
     <div className="fixed inset-0 z-50 bg-[#E6F7FD] flex flex-col">
@@ -154,8 +152,8 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
 
           {/* About Section */}
           <div className="w-full">
-            <div className="space-y-5 text-[#1a1a1a]">
-              <p className="font-display font-semibold text-[22px] leading-[1.25] tracking-[-0.02em] text-balance">
+            <div className="space-y-5 text-[#1a1a1a] pr-8">
+              <p className="font-display font-semibold text-[22px] leading-[1.25] tracking-[-0.02em] text-balance max-w-[320px]">
                 Tour Divide Supply is built by{' '}
                 <span className="text-[#40C8EF]">JJJJustin</span>,
                 a bikepacker and product designer with over 5,000 miles on the Tour Divide route.
@@ -225,124 +223,47 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                 Resources
               </p>
             </div>
-            <div className="bg-white relative w-full">
-              <div aria-hidden="true" className="absolute border border-[#40c8ef] inset-0 pointer-events-none" />
-              <div className="p-6 space-y-8">
-                {/* GPX Files */}
-                {(topofusionFiles.length > 0 || acaFiles.length > 0) && (
-                  <div className="space-y-5">
-                    <h2 className="font-display font-bold text-[#231f20] text-sm uppercase tracking-tight flex items-center gap-2">
-                      <FileText size={18} className="text-[#40C8EF]" />
-                      Download GPX Files
-                    </h2>
-
-                    {topofusionFiles.length > 0 && (
-                      <div className="border-2 border-[#40C8EF] rounded-lg overflow-hidden">
-                        <table className="w-full">
-                          <thead>
-                            <tr className="bg-[#40C8EF]">
-                              <th colSpan={3} className="text-left p-3 font-display font-medium text-sm uppercase tracking-tight text-white">
-                                Official Tour Divide Route from Topofusion
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {topofusionFiles.map((resource, index) => (
-                              <tr
-                                key={resource.id}
-                                className={`${index !== topofusionFiles.length - 1 ? 'border-b border-[#40C8EF]/30' : ''} hover:bg-[#F5FCFF] transition-colors`}
-                              >
-                                <td className="p-3 font-display font-medium text-sm uppercase tracking-tight text-[#231f20]">
-                                  {resource.fileName}
-                                </td>
-                                <td className="p-3 text-xs text-[#231f20]/60">{resource.fileSize}</td>
-                                <td className="p-3">
-                                  <button onClick={() => handleDownload(resource)} className="text-[#40C8EF] hover:text-[#00B6EB] transition-colors touch-manipulation">
-                                    <Download size={18} />
-                                  </button>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
+            <div className="space-y-4">
+              {/* Current GPX downloads, one per route */}
+              <div className="bg-white relative w-full">
+                <div aria-hidden="true" className="absolute border border-[#40c8ef] inset-0 pointer-events-none" />
+                <ul className="divide-y divide-[#40C8EF]/30">
+                  {gpxFiles.map((resource) => (
+                    <li key={resource.id} className="flex items-center gap-4 px-6 py-4">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-display font-medium text-[13px] uppercase tracking-tight text-[#231f20]">
+                          {resource.title}
+                        </p>
+                        <p className="text-[13px] text-[#231f20]/70 mt-1">{resource.description}</p>
+                        <p className="text-[12px] text-[#231f20]/50 mt-1">
+                          {resource.fileName} · {resource.fileSize} · Updated {formatDate(resource.timestamp).replace(/^(Today|Yesterday)$/, (m) => m.toLowerCase())}
+                        </p>
                       </div>
-                    )}
-
-                    {acaFiles.length > 0 && (
-                      <div className="border-2 border-[#40C8EF] rounded-lg overflow-hidden">
-                        <table className="w-full">
-                          <thead>
-                            <tr className="bg-[#40C8EF]">
-                              <th colSpan={3} className="text-left p-3 font-display font-medium text-sm uppercase tracking-tight text-white">
-                                Great Divide Mountain Bike Route from ACA
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {acaFiles.map((resource, index) => (
-                              <tr
-                                key={resource.id}
-                                className={`${index !== acaFiles.length - 1 ? 'border-b border-[#40C8EF]/30' : ''} hover:bg-[#F5FCFF] transition-colors`}
-                              >
-                                <td className="p-3 font-display font-medium text-sm uppercase tracking-tight text-[#231f20]">
-                                  {resource.fileName}
-                                </td>
-                                <td className="p-3 text-xs text-[#231f20]/60">{resource.fileSize}</td>
-                                <td className="p-3">
-                                  <button onClick={() => handleDownload(resource)} className="text-[#40C8EF] hover:text-[#00B6EB] transition-colors touch-manipulation">
-                                    <Download size={18} />
-                                  </button>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Route Notes & Alerts */}
-                {noteResources.length > 0 && (
-                  <div>
-                    <div className="space-y-3.5">
-                      {noteResources.map((resource) => (
-                        <div
-                          key={resource.id}
-                          className={`border-2 rounded-lg overflow-hidden transition-all ${
-                            resource.isPushed
-                              ? 'border-[#EF4444] bg-[#FEF2F2]'
-                              : 'border-[#febc12] bg-[#FFFDF5]'
-                          }`}
-                        >
-                          <div className="p-4 space-y-3">
-                            <div className="flex items-start gap-3">
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-start justify-between gap-2">
-                                  <h3 className="font-display font-bold text-[#231f20] text-base">
-                                    {resource.title}
-                                  </h3>
-                                  {resource.isPushed && (
-                                    <span className="bg-[#EF4444] text-white text-xs px-2 py-1 rounded uppercase font-display font-medium tracking-tight shrink-0">
-                                      Alert
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="text-sm text-[#231f20]/80 mt-3 leading-relaxed">
-                                  {resource.description}
-                                </p>
-                                <div className="text-xs text-[#231f20]/50 mt-3">
-                                  {formatDate(resource.timestamp)}
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                      <button
+                        onClick={() => handleDownload(resource)}
+                        aria-label={`Download ${resource.title} GPX`}
+                        className="w-11 h-11 shrink-0 flex items-center justify-center rounded-full bg-[#40C8EF] text-white hover:bg-[#00B6EB] transition-colors touch-manipulation"
+                      >
+                        <Download size={18} />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
               </div>
+
+              {/* Active reroutes, always red */}
+              {rerouteResources.map((resource) => (
+                <div key={resource.id} className="border-2 border-[#EF4444] bg-[#FEF2F2] rounded-lg p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <h3 className="font-display font-bold text-[#231f20] text-base">{resource.title}</h3>
+                    <span className="bg-[#EF4444] text-white text-xs px-2 py-1 rounded uppercase font-display font-medium tracking-tight shrink-0">
+                      Reroute
+                    </span>
+                  </div>
+                  <p className="text-sm text-[#231f20]/80 mt-3 leading-relaxed">{resource.description}</p>
+                  <div className="text-xs text-[#231f20]/50 mt-3">{formatDate(resource.timestamp)}</div>
+                </div>
+              ))}
             </div>
           </div>
 
