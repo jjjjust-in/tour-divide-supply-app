@@ -3,8 +3,10 @@ import type { Note, JournalEntry, Town } from '../types';
 import type { MeasurementSystem } from '../utils/measurements';
 import { Trash2, Edit2 } from 'lucide-react';
 import { PageLayout, PageSelect } from './PageLayout';
+import { inRideOrder, type RideDirection } from '../utils/direction';
 
 interface JournalPageProps {
+  direction: RideDirection;
   notes: Note[];
   journalEntries: JournalEntry[];
   towns: Town[];
@@ -18,12 +20,12 @@ interface JournalPageProps {
 
 // Journal: same layout as the Itinerary. Title, entry count, town filter,
 // then the entries in a bordered list.
-export function JournalPage({ journalEntries, towns, onDeleteJournalEntry, onEditJournalEntry, onTownSelect }: JournalPageProps) {
+export function JournalPage({ direction, journalEntries, towns, onDeleteJournalEntry, onEditJournalEntry, onTownSelect }: JournalPageProps) {
   const [filterTownId, setFilterTownId] = useState<string>('all');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState('');
 
-  const townsInRouteOrder = [...towns].sort((a, b) => a.mileage - b.mileage);
+  const townsInRouteOrder = inRideOrder([...towns].sort((a, b) => a.mileage - b.mileage), direction);
   const townLabel = (townId?: string) => {
     const town = towns.find((t) => t.id === townId);
     return town ? `${town.name}, ${town.state}` : null;

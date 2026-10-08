@@ -10,6 +10,7 @@ import { ELEVATION_LAYOUT, ELEVATION_LINE, ELEVATION_SCALE_X } from '../data/ele
 import { MAP_LAYOUT, TOWN_ANCHORS } from '../data/mapGeometry';
 import { MAP_STATES, STATES_OUTLINE, type MapState } from '../data/mapStates';
 import { ROUTE_POIS, TOTAL_CLIMBING_FT, type RoutePoi } from '../data/passes';
+import { inRideOrder, rideMile, ROUTE_TOTAL_MILES, type RideDirection } from '../utils/direction';
 import { ELEVATION_POLYGON } from '../data/elevationGeometry';
 import type { Town } from '../types';
 import type { MeasurementSystem } from '../utils/measurements';
@@ -75,6 +76,8 @@ type MapSelection =
 interface RouteMapProps {
   /** Which picture to show above the waypoint card */
   view?: 'map' | 'elevation';
+  /** Mileposts and waypoint order follow the rider's direction */
+  direction?: RideDirection;
   towns: Town[];
   measurementSystem: MeasurementSystem;
   onOpenTown: (townId: string) => void;
@@ -117,7 +120,7 @@ function mileToElevationPoint(mile: number): [number, number] {
 
 const toPoints = (poly: [number, number][]) => poly.map(([x, y]) => `${x},${y}`).join(' ');
 
-export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }: RouteMapProps) {
+export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementSystem, onOpenTown }: RouteMapProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const mapScale = useMapScale();
   const MAP_PX_WIDTH = MAP_LAYOUT.viewBox.width * mapScale;
@@ -138,9 +141,14 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
       TOWN_ANCHORS.map((anchor) => {
         const town = towns.find((t) => t.id === anchor.townId);
         const [x, y] = mileToRoutePoint(anchor.mile);
-        return town ? { town, mile: anchor.mile, x, y } : null;
+        return town ? { town, mile: anchor.mile, ride: rideMile(anchor.mile, direction), x, y } : null;
       }).filter((m): m is NonNullable<typeof m> => m !== null),
-    [towns],
+    [towns, direction],
+  );
+  const rideWaypoints = useMemo(() => inRideOrder(waypoints, direction), [waypoints, direction]);
+  const passes = useMemo(
+    () => inRideOrder(ROUTE_POIS, direction).map((p) => ({ ...p, ride: rideMile(p.mile, direction) })),
+    [direction],
   );
 
   const locate = useCallback(() => {
@@ -179,16 +187,18 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
       : null;
 
   // Until the rider picks a waypoint, show the next town ahead of them
-  const nextIndex = position ? waypoints.findIndex((w) => w.mile > position.mile + 0.5) : -1;
-  const activeIndex = waypointIndex ?? (nextIndex >= 0 ? nextIndex : position ? waypoints.length - 1 : 0);
-  const waypoint = waypoints[activeIndex];
-  const following = waypoints[activeIndex + 1];
+  // Rider's own milepost (counts from Antelope Wells when northbound)
+  const positionRide = position ? rideMile(position.mile, direction) : null;
+  const nextIndex = positionRide !== null ? rideWaypoints.findIndex((w) => w.ride > positionRide + 0.5) : -1;
+  const activeIndex = waypointIndex ?? (nextIndex >= 0 ? nextIndex : position ? rideWaypoints.length - 1 : 0);
+  const waypoint = rideWaypoints[activeIndex];
+  const following = rideWaypoints[activeIndex + 1];
 
   // Elevation view steps through passes and climbs instead of towns
-  const nextPassIndex = position ? ROUTE_POIS.findIndex((p) => p.mile > position.mile + 0.5) : -1;
-  const activePassIndex = passIndex ?? (nextPassIndex >= 0 ? nextPassIndex : position ? ROUTE_POIS.length - 1 : 0);
-  const pass = ROUTE_POIS[activePassIndex];
-  const followingPass = ROUTE_POIS[activePassIndex + 1];
+  const nextPassIndex = positionRide !== null ? passes.findIndex((p) => p.ride > positionRide + 0.5) : -1;
+  const activePassIndex = passIndex ?? (nextPassIndex >= 0 ? nextPassIndex : position ? passes.length - 1 : 0);
+  const pass = passes[activePassIndex];
+  const followingPass = passes[activePassIndex + 1];
 
   // Map coordinates of a pointer event
   const toMapPoint = (clientX: number, clientY: number): [number, number] | null => {
@@ -270,8 +280,11 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
         measurementSystem === 'metric'
           ? `${formatNumber((Math.round((lowFt * 0.3048) / 10) * 10))}–${formatNumber((Math.round(((lowFt + feetPerCol) * 0.3048) / 10) * 10))} m`
           : `${formatNumber((Math.round(lowFt / 50) * 50))}–${formatNumber((Math.round((lowFt + feetPerCol) / 50) * 50))}'`;
-      const from = formatNumber(Math.round(toUnits(shownCell.row * 100, measurementSystem)));
-      const to = formatNumber(Math.round(toUnits((shownCell.row + 1) * 100, measurementSystem)));
+      const sStart = shownCell.row * 100;
+      const sEnd = Math.min(ROUTE_TOTAL_MILES, (shownCell.row + 1) * 100);
+      const [rStart, rEnd] = direction === 'nobo' ? [rideMile(sEnd, direction), rideMile(sStart, direction)] : [sStart, sEnd];
+      const from = formatNumber(Math.round(toUnits(rStart, measurementSystem)));
+      const to = formatNumber(Math.round(toUnits(rEnd, measurementSystem)));
       return {
         ...pct(cellRect.x + GRID.cellW / 2, cellRect.y),
         text: band,
@@ -302,7 +315,7 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
 
   const dot = position ? (position.onRoute ? position.snapped : position.actual) : null;
   const isElevation = view === 'elevation';
-  const cardCount = isElevation ? ROUTE_POIS.length : waypoints.length;
+  const cardCount = isElevation ? passes.length : rideWaypoints.length;
   const cardIndex = isElevation ? activePassIndex : activeIndex;
   const stepTo = (i: number) => {
     const next = Math.max(0, Math.min(cardCount - 1, i));
@@ -349,7 +362,7 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
 
 
             {/* Passes and climbs: dots like the towns on the map; tap to show one in the card */}
-            {ROUTE_POIS.map((poi, i) => {
+            {passes.map((poi, i) => {
               const [x, y] = mileToElevationPoint(poi.mile);
               return (
                 <g
@@ -422,7 +435,7 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
             <g fill="none" pointerEvents="none" dangerouslySetInnerHTML={{ __html: LAYERS.route }} />
 
             {/* Towns */}
-            {waypoints.map(({ town, x, y }, i) => (
+            {rideWaypoints.map(({ town, x, y }, i) => (
               <g
                 key={town.id}
                 onClick={(e) => {
@@ -513,8 +526,8 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
                 <>
                   <p className="font-display font-bold text-[15px] uppercase tracking-tight text-black truncate">{pass.name}</p>
                   <p className="text-[11px] text-black/60 tabular-nums truncate mt-0.5">
-                    {formatMilepost(pass.mile, measurementSystem)} · {passElevation(pass.elevationFt)}
-                    {followingPass ? ` · ${formatDistance(followingPass.mile - pass.mile, measurementSystem)} to ${followingPass.name}` : ' · last big climb'}
+                    {formatMilepost(pass.ride, measurementSystem)} · {passElevation(pass.elevationFt)}
+                    {followingPass ? ` · ${formatDistance(followingPass.ride - pass.ride, measurementSystem)} to ${followingPass.name}` : ' · last big climb'}
                   </p>
                 </>
               ) : (
@@ -527,8 +540,8 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
                     {waypoint.town.name}, {waypoint.town.state}
                   </button>
                   <p className="text-[11px] text-black/60 tabular-nums truncate mt-0.5">
-                    {formatMilepost(waypoint.mile, measurementSystem)} · {passElevation(waypoint.town.elevation)}
-                    {following ? ` · ${formatDistance(following.mile - waypoint.mile, measurementSystem)} to ${following.town.name}` : ' · finish line'}
+                    {formatMilepost(waypoint.ride, measurementSystem)} · {passElevation(waypoint.town.elevation)}
+                    {following ? ` · ${formatDistance(following.ride - waypoint.ride, measurementSystem)} to ${following.town.name}` : ' · finish line'}
                   </p>
                 </>
               )}
@@ -548,7 +561,7 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
       {/* Only speak up when something needs attention */}
       {position && !position.onRoute ? (
         <p className="text-[13px] text-black/70 text-center px-2" aria-live="polite">
-          Off route: {formatDistance(position.milesFromRoute, measurementSystem)} from the nearest point, {formatMilepost(position.mile, measurementSystem).toLowerCase()}.
+          Off route: {formatDistance(position.milesFromRoute, measurementSystem)} from the nearest point, {formatMilepost(rideMile(position.mile, direction), measurementSystem).toLowerCase()}.
         </p>
       ) : location.status === 'error' ? (
         <p className="text-[13px] text-black/70 text-center px-2" aria-live="polite">{location.message}</p>

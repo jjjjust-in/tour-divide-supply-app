@@ -13,6 +13,7 @@ import { sampleResupplies } from './data/sampleResupplies';
 import { sampleJournalEntries } from './data/sampleJournalEntries';
 import type { Note, Resupply, JournalEntry } from './types';
 import type { MeasurementSystem } from './utils/measurements';
+import { inRideOrder, loadDirection, saveDirection, type RideDirection } from './utils/direction';
 import { loadCollection, saveCollection, requestPersistentStorage, STORAGE_KEYS } from './utils/storage';
 import { Plus, Clock, BookOpen, ListOrdered, MapIcon } from 'lucide-react';
 import { MapPage } from './components/MapPage';
@@ -108,6 +109,10 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('tour-divide-measurement-system', measurementSystem);
   }, [measurementSystem]);
+
+  // Southbound (Banff first) or northbound (Antelope Wells first)
+  const [direction, setDirection] = useState<RideDirection>(loadDirection);
+  useEffect(() => saveDirection(direction), [direction]);
 
 
   // Town panels and lists still speak in "notes"; they now show the
@@ -213,6 +218,7 @@ export default function App() {
           onTownSelect={handleTownSelect}
           notesCount={notesCount}
           measurementSystem={measurementSystem}
+          direction={direction}
           focusTownId={routeFocusTownId}
           onFocusHandled={clearRouteFocus}
           onClose={undefined}
@@ -230,6 +236,7 @@ export default function App() {
 
       {showMap && (
         <MapPage
+          direction={direction}
           towns={towns}
           measurementSystem={measurementSystem}
           onOpenTown={(townId) => {
@@ -353,7 +360,7 @@ export default function App() {
       {showQuickAdd && (
         <AnimatePresence>
           <QuickAddNote
-            towns={towns}
+            towns={inRideOrder(towns, direction)}
             measurementSystem={measurementSystem}
             onClose={() => setShowQuickAdd(false)}
             onAddResupply={handleAddResupply}
@@ -366,12 +373,15 @@ export default function App() {
         <AboutPage
           measurementSystem={measurementSystem}
           onChangeMeasurementSystem={setMeasurementSystem}
+          direction={direction}
+          onChangeDirection={setDirection}
           onClose={() => setShowAbout(false)}
         />
       )}
 
       {showJournal && (
         <JournalPage
+          direction={direction}
           notes={[]}
           journalEntries={journalEntries}
           towns={towns}

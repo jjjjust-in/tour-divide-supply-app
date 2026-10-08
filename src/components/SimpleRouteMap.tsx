@@ -3,12 +3,15 @@ import { itinerary } from '../data/itinerary';
 import type { MeasurementSystem } from '../utils/measurements';
 import { formatDistance, formatElevation, milesToKm, formatNumber } from '../utils/measurements';
 import { ChevronDown, ChevronUp, Plus, Trash2, Edit2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { PageLayout } from './PageLayout';
+import { inRideOrder, rideMile, routeLabel, type RideDirection } from '../utils/direction';
 import type { Note, Resupply } from '../types';
 
 interface SimpleRouteMapProps {
   towns: Town[];
+  /** Southbound lists Banff first; northbound lists Antelope Wells first */
+  direction: RideDirection;
   /** Town to open and scroll to, e.g. after "View town" on the Map page */
   focusTownId?: string | null;
   onFocusHandled?: () => void;
@@ -45,10 +48,12 @@ function ItineraryRow({
   onDeleteResupply,
   onEditResupply,
   isExpanded,
-  onExpandedChange
+  onExpandedChange,
+  direction
 }: {
   isExpanded: boolean;
   onExpandedChange: (expanded: boolean) => void;
+  direction: RideDirection;
   mileage: number;
   location: string;
   isClickable: boolean;
@@ -106,10 +111,12 @@ function ItineraryRow({
     }
   };
 
+  // Distance to the next town in the rider's direction
   const mileageToNext = town ? (() => {
     const townIndex = towns.findIndex(t => t.id === town.id);
-    const nextTown = townIndex < towns.length - 1 ? towns[townIndex + 1] : null;
-    return nextTown ? nextTown.mileage - town.mileage : null;
+    const step = direction === 'nobo' ? -1 : 1;
+    const nextTown = towns[townIndex + step];
+    return nextTown ? Math.abs(nextTown.mileage - town.mileage) : null;
   })() : null;
 
   const townNotes = town ? notes.filter(note => note.townId === town.id) : [];
@@ -579,8 +586,9 @@ function ItineraryRow({
   );
 }
 
-export function SimpleRouteMap({ towns, measurementSystem, focusTownId, onFocusHandled, notes, resupplies, onAddNote, onDeleteNote, onEditNote, onAddResupply, onDeleteResupply, onEditResupply }: SimpleRouteMapProps) {
-  const mappedStops = itinerary;
+export function SimpleRouteMap({ towns, direction, measurementSystem, focusTownId, onFocusHandled, notes, resupplies, onAddNote, onDeleteNote, onEditNote, onAddResupply, onDeleteResupply, onEditResupply }: SimpleRouteMapProps) {
+  // Stops in riding order, with mileposts counted from the rider's start
+  const mappedStops = useMemo(() => inRideOrder(itinerary, direction), [direction]);
   // Only one town can be open at a time
   const [expandedStopId, setExpandedStopId] = useState<string | null>(null);
   // Opening a town from the Map page: expand it and bring it into view
@@ -597,7 +605,7 @@ export function SimpleRouteMap({ towns, measurementSystem, focusTownId, onFocusH
   return (
     <PageLayout
       title="Itinerary"
-      meta="Banff → Antelope Wells"
+      meta={routeLabel(direction)}
     >
           {/* Itinerary List */}
           <div className="content-stretch flex flex-col items-start relative shrink-0 w-[298px] border border-[#40C8EF]">
@@ -608,7 +616,8 @@ export function SimpleRouteMap({ towns, measurementSystem, focusTownId, onFocusH
                   key={stop.id}
                   isExpanded={expandedStopId === stop.id}
                   onExpandedChange={(open) => setExpandedStopId(open ? stop.id : null)}
-                  mileage={stop.mileage}
+                  direction={direction}
+                  mileage={rideMile(stop.mileage, direction)}
                   location={stop.location}
                   isClickable={stop.isClickable}
                   linkedTownId={stop.linkedTownId}

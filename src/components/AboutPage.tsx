@@ -1,5 +1,6 @@
-import { ChevronLeft, Ruler, Download, Upload, Trash2, RotateCcw, Instagram, Globe, ExternalLink } from 'lucide-react';
+import { ChevronLeft, Ruler, Compass, Download, Upload, Trash2, RotateCcw, Instagram, Globe, ExternalLink } from 'lucide-react';
 import { socialLinks } from '../data/social';
+import type { RideDirection } from '../utils/direction';
 import { useState } from 'react';
 import type { MeasurementSystem } from '../utils/measurements';
 import navBgPattern from 'figma:asset/53e87b274f9e9eae37a672b63e5feb2e3c44276d.png';
@@ -10,10 +11,12 @@ import { STORAGE_KEYS } from '../utils/storage';
 interface AboutPageProps {
   measurementSystem: MeasurementSystem;
   onChangeMeasurementSystem: (system: MeasurementSystem) => void;
+  direction: RideDirection;
+  onChangeDirection: (direction: RideDirection) => void;
   onClose: () => void;
 }
 
-export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClose }: AboutPageProps) {
+export function AboutPage({ measurementSystem, onChangeMeasurementSystem, direction, onChangeDirection, onClose }: AboutPageProps) {
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [clearTarget, setClearTarget] = useState<'notes' | 'resupplies' | 'all' | null>(null);
 
@@ -277,8 +280,43 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
               <div aria-hidden="true" className="absolute border border-[#40c8ef] inset-0 pointer-events-none" />
               <div className="p-6 space-y-8">
 
-                {/* Measurement System */}
+                {/* Ride Direction */}
                 <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Compass size={16} className="text-[#40C8EF]" />
+                    <h3 className="uppercase font-display font-bold tracking-[-0.36px] text-[#40C8EF] text-sm">
+                      Ride Direction
+                    </h3>
+                  </div>
+                  <div className="flex bg-white border-2 border-[#40C8EF] rounded-lg overflow-hidden" role="radiogroup" aria-label="Ride direction">
+                    <button
+                      role="radio"
+                      aria-checked={direction === 'sobo'}
+                      onClick={() => onChangeDirection('sobo')}
+                      className={`flex-1 py-3.5 px-4 transition-all touch-manipulation ${
+                        direction === 'sobo' ? 'bg-[#40C8EF] text-white' : 'bg-gray-100 text-[#999] hover:bg-[#F5FCFF]'
+                      }`}
+                    >
+                      <div className="text-sm uppercase font-display font-medium tracking-[-0.36px]">Southbound</div>
+                      <div className="text-xs opacity-80">Banff → Antelope Wells</div>
+                    </button>
+                    <div className="w-px bg-[#40C8EF]" />
+                    <button
+                      role="radio"
+                      aria-checked={direction === 'nobo'}
+                      onClick={() => onChangeDirection('nobo')}
+                      className={`flex-1 py-3.5 px-4 transition-all touch-manipulation ${
+                        direction === 'nobo' ? 'bg-[#40C8EF] text-white' : 'bg-gray-100 text-[#999] hover:bg-[#F5FCFF]'
+                      }`}
+                    >
+                      <div className="text-sm uppercase font-display font-medium tracking-[-0.36px]">Northbound</div>
+                      <div className="text-xs opacity-80">Antelope Wells → Banff</div>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Measurement System */}
+                <div className="space-y-4 pt-3 border-t border-[#40C8EF]/20">
                   <div className="flex items-center gap-2">
                     <Ruler size={16} className="text-[#40C8EF]" />
                     <h3 className="uppercase font-display font-bold tracking-[-0.36px] text-[#40C8EF] text-sm">

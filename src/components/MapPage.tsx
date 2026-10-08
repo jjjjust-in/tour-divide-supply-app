@@ -4,9 +4,11 @@ import type { MeasurementSystem } from '../utils/measurements';
 import { formatNumber } from '../utils/measurements';
 import { RouteMap } from './RouteMap';
 import { PageLayout } from './PageLayout';
+import type { RideDirection } from '../utils/direction';
 import { TOTAL_CLIMBING_FT } from '../data/passes';
 
 interface MapPageProps {
+  direction: RideDirection;
   towns: Town[];
   measurementSystem: MeasurementSystem;
   onOpenTown: (townId: string) => void;
@@ -15,7 +17,7 @@ interface MapPageProps {
 type RouteView = 'map' | 'elevation';
 
 // The Route page: map or elevation profile, each with the live location dot
-export function MapPage({ towns, measurementSystem, onOpenTown }: MapPageProps) {
+export function MapPage({ direction, towns, measurementSystem, onOpenTown }: MapPageProps) {
   const [view, setView] = useState<RouteView>(() => {
     try {
       return localStorage.getItem('tour-divide-route-view') === 'elevation' ? 'elevation' : 'map';
@@ -78,7 +80,7 @@ export function MapPage({ towns, measurementSystem, onOpenTown }: MapPageProps) 
       control={viewSwitch}
     >
       <div className="w-full">
-        <RouteMap view={view} towns={towns} measurementSystem={measurementSystem} onOpenTown={onOpenTown} />
+        <RouteMap view={view} direction={direction} towns={towns} measurementSystem={measurementSystem} onOpenTown={onOpenTown} />
       </div>
     </PageLayout>
   );
