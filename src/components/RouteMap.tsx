@@ -331,7 +331,8 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
     if (Math.abs(gap) < 0.5) return "You're here";
     // Whole miles (or km), not the rounded-to-5 used for route stats
     const n = Math.max(1, Math.round(toUnits(Math.abs(gap), measurementSystem)));
-    const d = `${formatNumber(n)} ${unit(measurementSystem)}`;
+    const word = measurementSystem === 'metric' ? (n === 1 ? 'kilometer' : 'kilometers') : n === 1 ? 'mile' : 'miles';
+    const d = `${formatNumber(n)} ${word}`;
     return gap > 0 ? `${d} ahead` : `${d} behind you`;
   };
   // Mile marker (MM), or kilometer marker (KM) in metric
@@ -544,7 +545,7 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
                     <p className="font-display font-semibold text-[13px] uppercase text-black tabular-nums truncate mt-0.5">{distanceFromRider(pass.ride)}</p>
                   )}
                   <p className="text-[11px] uppercase text-black/60 tabular-nums truncate mt-0.5">
-                    {markerLabel(pass.ride)} · Elevation {passElevation(pass.elevationFt)}
+                    {markerLabel(pass.ride)} · Elev {passElevation(pass.elevationFt)}
                     {tracking ? '' : followingPass ? ` · ${formatDistance(followingPass.ride - pass.ride, measurementSystem)} to ${followingPass.name}` : ' · last big climb'}
                   </p>
                 </>
@@ -561,7 +562,7 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
                     <p className="font-display font-semibold text-[13px] uppercase text-black tabular-nums truncate mt-0.5">{distanceFromRider(waypoint.ride)}</p>
                   )}
                   <p className="text-[11px] uppercase text-black/60 tabular-nums truncate mt-0.5">
-                    {markerLabel(waypoint.ride)} · Elevation {passElevation(waypoint.town.elevation)}
+                    {markerLabel(waypoint.ride)} · Elev {passElevation(waypoint.town.elevation)}
                     {tracking ? '' : following ? ` · ${formatDistance(following.ride - waypoint.ride, measurementSystem)} to ${following.town.name}` : ' · finish line'}
                   </p>
                 </>
