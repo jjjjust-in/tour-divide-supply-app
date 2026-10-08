@@ -599,7 +599,7 @@ export function SimpleRouteMap({ towns, measurementSystem, focusTownId, onFocusH
         <div className="box-border content-stretch flex flex-col gap-[10px] items-center justify-center px-[20px] md:px-[85px] py-[40px] pb-[150px] md:py-[96px] md:pb-[206px] relative">
           {/* Title */}
           <div className="flex flex-col gap-5 items-center justify-center pb-4 relative shrink-0 w-full">
-            <p className="font-display font-bold leading-[normal] not-italic relative shrink-0 text-black text-[20px] text-nowrap tracking-[-0.36px] uppercase whitespace-pre">The Route</p>
+            <p className="font-display font-bold leading-[normal] not-italic relative shrink-0 text-black text-[20px] text-nowrap tracking-[-0.36px] uppercase whitespace-pre">Itinerary</p>
           </div>
 
           {/* Itinerary List */}
