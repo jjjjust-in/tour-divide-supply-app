@@ -32,6 +32,7 @@ export const ROUTE_POIS: RoutePoi[] = [
   { id: 'carnero-pass', name: 'Carnero Pass', mile: 1905, elevationFt: 10166, source: 'passbagger.org (USGS BGN: 10,170)' },
   { id: 'indiana-pass', name: 'Indiana Pass', mile: 1964, elevationFt: 11958, source: 'passbagger.org road crest (often quoted as 11,910)' },
   { id: 'polvadera', name: 'Polvadera', mile: 2143, elevationFt: 10328, source: 'MTB Project Polvadera Mesa high point' },
+  { id: 'mangas-road-climb', name: 'Mangas Road Climb', mile: 2414, elevationFt: 8340, source: 'profile' },
 ];
 
 /**
