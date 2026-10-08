@@ -435,7 +435,7 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
             className={`absolute pointer-events-none -translate-y-[calc(100%+6px)] whitespace-nowrap ${
               // keep the label on screen: anchor it inward near the edges
               label.left > 65 ? '-translate-x-[calc(100%-10px)]' : label.left < 35 ? '-translate-x-[10px]' : '-translate-x-1/2'
-            } bg-[#231F20] text-white text-[11px] font-display font-medium uppercase tracking-[0.02em] px-2.5 py-1.5 rounded`}
+            } bg-[#231F20] text-white text-center text-[11px] font-display font-medium uppercase tracking-[0.02em] px-2.5 py-1.5 rounded`}
             style={{ left: `${label.left}%`, top: `${label.top}%` }}
             role="status"
           >
