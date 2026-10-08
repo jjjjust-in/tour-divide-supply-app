@@ -4,6 +4,7 @@ import type { MeasurementSystem } from '../utils/measurements';
 import { formatDistance, formatElevation, milesToKm } from '../utils/measurements';
 import { ChevronDown, ChevronUp, Plus, Trash2, Edit2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { PageLayout } from './PageLayout';
 import type { Note, Resupply } from '../types';
 
 interface SimpleRouteMapProps {
@@ -593,15 +594,14 @@ export function SimpleRouteMap({ towns, measurementSystem, focusTownId, onFocusH
     onFocusHandled?.();
   }, [focusTownId, mappedStops, onFocusHandled]);
 
-  return (
-    <div className="relative w-full h-full flex items-center justify-start bg-white overflow-auto">
-      <div className="flex flex-col items-center justify-start size-full">
-        <div className="box-border content-stretch flex flex-col gap-[10px] items-center justify-center px-[20px] md:px-[85px] py-[40px] pb-[150px] md:py-[96px] md:pb-[206px] relative">
-          {/* Title */}
-          <div className="flex flex-col gap-5 items-center justify-center pb-4 relative shrink-0 w-full">
-            <p className="font-display font-bold leading-[normal] not-italic relative shrink-0 text-black text-[20px] text-nowrap tracking-[-0.36px] uppercase whitespace-pre">Itinerary</p>
-          </div>
+  const totalMiles = mappedStops[mappedStops.length - 1].mileage;
+  const townCount = mappedStops.filter((st) => st.linkedTownId).length;
 
+  return (
+    <PageLayout
+      title="Itinerary"
+      meta={`${townCount} towns · ${measurementSystem === 'metric' ? `${milesToKm(totalMiles).toLocaleString('en-US')} km` : `${totalMiles.toLocaleString('en-US')} mi`}`}
+    >
           {/* Itinerary List */}
           <div className="content-stretch flex flex-col items-start relative shrink-0 w-[298px] border border-[#40C8EF]">
             {mappedStops.map((stop) => {
@@ -630,8 +630,6 @@ export function SimpleRouteMap({ towns, measurementSystem, focusTownId, onFocusH
               );
             })}
           </div>
-        </div>
-      </div>
-    </div>
+    </PageLayout>
   );
 }

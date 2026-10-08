@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
 import { SimpleRouteMap } from './components/SimpleRouteMap';
-import { NotesPanel } from './components/NotesPanel';
 import { TownsList } from './components/TownsList';
 import { NotesPage } from './components/NotesPage';
 import { JournalPage } from './components/JournalPage';
@@ -32,7 +31,7 @@ export default function App() {
     }
     return 'imperial'; // Default, will show selector on first load
   });
-  const [selectedTownId, setSelectedTownId] = useState<string | null>(null);
+  const [selectedTownId] = useState<string | null>(null);
   // Saved data loads asynchronously from IndexedDB. Sample data is only
   // used on a true first launch, so clearing your data stays cleared.
   const [resupplies, setResupplies] = useState<Resupply[]>([]);
@@ -68,7 +67,8 @@ export default function App() {
     return () => { cancelled = true; };
   }, []);
   // Single active page — enforces one-page-at-a-time
-  type ActivePage = 'route' | 'map' | 'journal' | 'towns' | 'notes' | null;
+  // Exactly one main page is open at a time
+  type ActivePage = 'route' | 'map' | 'journal' | 'towns' | 'notes';
   const [activePage, setActivePage] = useState<ActivePage>('route');
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
@@ -109,7 +109,6 @@ export default function App() {
     localStorage.setItem('tour-divide-measurement-system', measurementSystem);
   }, [measurementSystem]);
 
-  const selectedTown = towns.find(t => t.id === selectedTownId) || null;
 
   // Town panels and lists still speak in "notes"; they now show the
   // journal entries tied to each town.
@@ -185,14 +184,12 @@ export default function App() {
     ));
   };
 
+  // Opening a town from anywhere: show it expanded in the Itinerary
   const handleTownSelect = (townId: string) => {
-    setSelectedTownId(townId);
+    setRouteFocusTownId(townId);
     setActivePage('route');
   };
 
-  const handleClosePanel = () => {
-    setSelectedTownId(null);
-  };
 
   const handleMeasurementSelect = (system: MeasurementSystem) => {
     setMeasurementSystem(system);
@@ -337,22 +334,6 @@ export default function App() {
         </div>
       )}
 
-      {selectedTown && (
-        <NotesPanel
-          selectedTown={selectedTown}
-          notes={notes}
-          resupplies={resupplies}
-          measurementSystem={measurementSystem}
-          onAddNote={handleAddNote}
-          onDeleteNote={handleDeleteNote}
-          onEditNote={handleEditNote}
-          onAddResupply={handleAddResupply}
-          onDeleteResupply={handleDeleteResupply}
-          onEditResupply={handleEditResupply}
-          onClose={handleClosePanel}
-          onNavigateToTown={() => setActivePage('towns')}
-        />
-      )}
 
       {showAllNotes && (
         <NotesPage
@@ -400,7 +381,6 @@ export default function App() {
           onEditNote={handleEditNote}
           onEditJournalEntry={handleEditJournalEntry}
           onTownSelect={handleTownSelect}
-          onClose={() => setActivePage(null)}
         />
       )}
 
