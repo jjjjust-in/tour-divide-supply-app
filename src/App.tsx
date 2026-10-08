@@ -17,6 +17,7 @@ import type { MeasurementSystem } from './utils/measurements';
 import { loadCollection, saveCollection, requestPersistentStorage, STORAGE_KEYS } from './utils/storage';
 import { Plus, Clock, BookOpen, ListOrdered, MapIcon } from 'lucide-react';
 import { MapPage } from './components/MapPage';
+import { Wordmark } from './components/Wordmark';
 import { AnimatePresence } from 'motion/react';
 import navBgPattern from 'figma:asset/53e87b274f9e9eae37a672b63e5feb2e3c44276d.png';
 import svgPaths from './imports/svg-do3t78tvh5';
@@ -331,11 +332,7 @@ export default function App() {
                 <path d={svgPaths.pee90000} fill="var(--fill-0, #40C8EF)" />
               </svg>
             </div>
-            <p className="font-display font-medium leading-[normal] not-italic relative shrink-0 text-[#40c8ef] text-[11px] text-nowrap tracking-[-0.22px] uppercase whitespace-pre">
-              tourdividesupp<span className="tracking-[-1.37px]">l</span>
-              <span className="tracking-[-2.64px]">y</span>
-              <span className="tracking-[-1.56px]">.</span>com
-            </p>
+            <Wordmark className="w-[130px] h-auto text-[#40c8ef] shrink-0" />
           </div>
         </div>
       )}

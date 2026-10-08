@@ -1,24 +1,30 @@
 // Passes and points of interest on the elevation profile.
-// Route miles read from Justin's elevation profile design (0 to 2,700 axis);
-// Indiana Pass lands on the profile's high point, which checks the scale.
+//
+// Route miles come from Justin's elevation profile design, snapped to the
+// profile's local high point. Elevations: the five marked `published` use
+// the passes' published summit elevations; the rest are read from the
+// profile artwork (corrected for its ~85 ft high bias against the published
+// passes), so treat them as within about 100 ft. Edit freely.
 
 export interface RoutePoi {
   id: string;
   name: string;
   mile: number;
+  elevationFt: number;
+  published?: boolean;
 }
 
 export const ROUTE_POIS: RoutePoi[] = [
-  { id: 'koko-claims', name: 'Koko Claims', mile: 106 },
-  { id: 'galton-pass', name: 'Galton Pass', mile: 254 },
-  { id: 'red-meadow', name: 'Red Meadow', mile: 337 },
-  { id: 'richmond-peak', name: 'Richmond Peak', mile: 494 },
-  { id: 'lava-mountain', name: 'Lava Mountain', mile: 660 },
-  { id: 'fleecer-ridge', name: 'Fleecer Ridge', mile: 752 },
-  { id: 'union-pass', name: 'Union Pass', mile: 1150 },
-  { id: 'lynx-pass', name: 'Lynx Pass', mile: 1594 },
-  { id: 'boreas-pass', name: 'Boreas Pass', mile: 1700 },
-  { id: 'marshall-pass', name: 'Marshall Pass', mile: 1813 },
-  { id: 'indiana-pass', name: 'Indiana Pass', mile: 1964 },
-  { id: 'polvadera', name: 'Polvadera', mile: 2142 },
+  { id: 'koko-claims', name: 'Koko Claims', mile: 105, elevationFt: 6730 },
+  { id: 'galton-pass', name: 'Galton Pass', mile: 254, elevationFt: 6250 },
+  { id: 'red-meadow', name: 'Red Meadow', mile: 337, elevationFt: 5630 },
+  { id: 'richmond-peak', name: 'Richmond Peak', mile: 494, elevationFt: 6700 },
+  { id: 'lava-mountain', name: 'Lava Mountain', mile: 659, elevationFt: 7470 },
+  { id: 'fleecer-ridge', name: 'Fleecer Ridge', mile: 752, elevationFt: 7840 },
+  { id: 'union-pass', name: 'Union Pass', mile: 1152, elevationFt: 9210, published: true },
+  { id: 'lynx-pass', name: 'Lynx Pass', mile: 1594, elevationFt: 8937, published: true },
+  { id: 'boreas-pass', name: 'Boreas Pass', mile: 1699, elevationFt: 11482, published: true },
+  { id: 'marshall-pass', name: 'Marshall Pass', mile: 1814, elevationFt: 10842, published: true },
+  { id: 'indiana-pass', name: 'Indiana Pass', mile: 1964, elevationFt: 11910, published: true },
+  { id: 'polvadera', name: 'Polvadera', mile: 2143, elevationFt: 10290 },
 ];

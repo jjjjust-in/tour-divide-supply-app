@@ -5,7 +5,7 @@ import outlineSvg from '../assets/map/states-outline.svg?raw';
 import stateLinesSvg from '../assets/map/state-lines.svg?raw';
 import routeSvg from '../assets/map/route.svg?raw';
 import elevationSvg from '../assets/map/elevation-profile.svg?raw';
-import { ELEVATION_LAYOUT, ELEVATION_LINE, ELEVATION_POLYGON, ELEVATION_SCALE_X } from '../data/elevationGeometry';
+import { ELEVATION_LAYOUT, ELEVATION_LINE, ELEVATION_SCALE_X } from '../data/elevationGeometry';
 import { MAP_LAYOUT, TOWN_ANCHORS } from '../data/mapGeometry';
 import { MAP_STATES, STATES_OUTLINE, type MapState } from '../data/mapStates';
 import { ROUTE_POIS, type RoutePoi } from '../data/passes';
@@ -180,15 +180,8 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
     return null;
   };
 
-  // Elevation view: grid squares outside the profile shape
-  const hitTestElevation = (p: [number, number]): MapSelection => {
-    const artX = ELEVATION_LAYOUT.artLeft + (p[0] - ELEVATION_LAYOUT.artLeft) / ELEVATION_SCALE_X;
-    if (pointInPolygon([artX, p[1]], ELEVATION_POLYGON)) return null;
-    const col = Math.floor((p[0] - GRID.x0) / GRID.cellW);
-    const row = Math.floor((p[1] - GRID.y0) / GRID.cellH);
-    if (col >= 0 && col < GRID.cols && row >= 0 && row < GRID.rows) return { kind: 'cell', col, row };
-    return null;
-  };
+  // Elevation view: the grid is a scale only, nothing to tap
+  const hitTestElevation = (_p: [number, number]): MapSelection => null;
   const hitFor = (p: [number, number]) => (view === 'elevation' ? hitTestElevation(p) : hitTest(p));
 
   // A fresh view starts with nothing selected
@@ -229,25 +222,13 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
       left: Math.min(98, Math.max(2, ((x - viewBox.x) / viewBox.width) * 100)),
       top: ((y - viewBox.y) / viewBox.height) * 100,
     });
-    if (cellRect && shownCell && view === 'elevation') {
-      // Each row of the elevation grid is 100 route miles
-      const from = Math.round(toUnits(shownCell.row * 100, measurementSystem));
-      const to = Math.round(toUnits((shownCell.row + 1) * 100, measurementSystem));
-      // Each column is one slice of 1,500' to 12,000'
-      const feetPerCol = (ELEVATION_LAYOUT.maxFeet - ELEVATION_LAYOUT.minFeet) / GRID.cols;
-      const lowFt = ELEVATION_LAYOUT.minFeet + shownCell.col * feetPerCol;
-      const band = measurementSystem === 'metric'
-        ? `${Math.round((lowFt * 0.3048) / 10) * 10}–${Math.round(((lowFt + feetPerCol) * 0.3048) / 10) * 10} m`
-        : `${(Math.round(lowFt / 50) * 50).toLocaleString('en-US')}–${(Math.round((lowFt + feetPerCol) / 50) * 50).toLocaleString('en-US')}'`;
-      return { ...pct(cellRect.x + GRID.cellW / 2, cellRect.y), text: `${band} · ${unit(measurementSystem) === 'km' ? 'km' : 'mi'} ${from.toLocaleString('en-US')}–${to.toLocaleString('en-US')}` };
-    }
     if (cellRect) {
       const side = Math.round(toUnits(100, measurementSystem));
       return { ...pct(cellRect.x + GRID.cellW / 2, cellRect.y), text: `${side} × ${side} ${unit(measurementSystem)}` };
     }
     if (selection?.kind === 'poi') {
       const [px, py] = mileToElevationPoint(selection.poi.mile);
-      return { ...pct(px, py - 4), text: `${selection.poi.name} · ${formatMilepost(selection.poi.mile, measurementSystem).toLowerCase()}` };
+      return { ...pct(px, py - 4), text: `${selection.poi.name} · ${measurementSystem === 'metric' ? `${Math.round(selection.poi.elevationFt * 0.3048).toLocaleString('en-US')} m` : `${selection.poi.elevationFt.toLocaleString('en-US')}'`}` };
     }
     if (selection?.kind === 'state') {
       const [lx, ly] = selection.state.labelAt;
@@ -266,7 +247,7 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
     <div className="w-full space-y-4">
       {/* Map */}
       {/* Full-width strip; the grid is centered and the rest falls off the sides */}
-      <div className="relative w-screen max-w-[100vw] left-1/2 -translate-x-1/2 overflow-hidden" style={{ height: MAP_PX_HEIGHT }}>
+      <div className="relative w-screen max-w-[100vw] left-1/2 -translate-x-1/2 overflow-clip" style={{ height: MAP_PX_HEIGHT }}>
       <div className="absolute top-0 select-none" style={{ width: MAP_PX_WIDTH, left: `calc(50% - ${MAP_PX_LEFT_OF_CENTER}px)` }}>
         {view === 'elevation' ? (
           <svg
@@ -299,26 +280,7 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
               {measurementSystem === 'metric' ? '3,658 m' : "12,000'"}
             </text>
 
-            {/* Towns */}
-            {waypoints.map(({ town, mile }, i) => {
-              const [x, y] = mileToElevationPoint(mile);
-              return (
-                <g
-                  key={town.id}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelection(null);
-                    setWaypointIndex(i);
-                  }}
-                >
-                  <circle cx={x} cy={y} r={7} fill="transparent" />
-                  {i === activeIndex && <circle cx={x} cy={y} r={4.6} fill="none" stroke="#231F20" strokeWidth={1} />}
-                  <circle cx={x} cy={y} r={2.4} fill="#231F20" />
-                </g>
-              );
-            })}
-
-            {/* Passes and points of interest: tap for the name */}
+            {/* Passes and points of interest: tap for name and elevation */}
             {ROUTE_POIS.map((poi) => {
               const [x, y] = mileToElevationPoint(poi.mile);
               const isSelected = selection?.kind === 'poi' && selection.poi.id === poi.id;
