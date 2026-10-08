@@ -11,10 +11,8 @@
     <link rel="icon" type="image/svg+xml" href="/icon.svg" />
 
     <!-- iOS Home Screen Icons -->
-    <link rel="apple-touch-icon" href="/icon.svg" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/icon.svg" />
-    <link rel="apple-touch-icon" sizes="152x152" href="/icon.svg" />
-    <link rel="apple-touch-icon" sizes="167x167" href="/icon.svg" />
+    <!-- iOS ignores SVG touch icons, so these must be PNG -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/icon-180.png" />
 
     <!-- iOS Status Bar Style -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -24,8 +22,7 @@
     <!-- Theme Color -->
     <meta name="theme-color" content="#febc12" />
 
-    <!-- Web App Manifest -->
-    <link rel="manifest" href="/manifest.json" />
+    <!-- Web App Manifest is generated and linked by vite-plugin-pwa -->
 
     <!-- Description -->
     <meta name="description" content="Tour Divide route notes - organize your thoughts and map out resupply ideas as you plan your ride." />

@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import navBgPattern from 'figma:asset/53e87b274f9e9eae37a672b63e5feb2e3c44276d.png';
 import type { Town, Resupply } from '../types';
 import type { MeasurementSystem } from '../utils/measurements';
+import { resizeImageFile } from '../utils/storage';
 import { BookOpen, ShoppingCart, FileText, Image as ImageIcon, X } from 'lucide-react';
 
 interface QuickAddNoteProps {
@@ -29,13 +30,22 @@ export function QuickAddNote({ towns, onClose, onAddNote, onAddResupply, onAddJo
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const result = ev.target?.result as string;
-      setImageUrl(result);
-      setImagePreview(result);
-    };
-    reader.readAsDataURL(file);
+    // Downscale before storing so photos don't eat the device's storage quota
+    resizeImageFile(file)
+      .then((result) => {
+        setImageUrl(result);
+        setImagePreview(result);
+      })
+      .catch(() => {
+        // Fall back to the original file if the browser can't decode it on canvas
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const result = ev.target?.result as string;
+          setImageUrl(result);
+          setImagePreview(result);
+        };
+        reader.readAsDataURL(file);
+      });
   };
 
   const handleSubmit = () => {

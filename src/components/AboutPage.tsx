@@ -3,6 +3,8 @@ import { useState } from 'react';
 import type { MeasurementSystem } from '../utils/measurements';
 import navBgPattern from 'figma:asset/53e87b274f9e9eae37a672b63e5feb2e3c44276d.png';
 import { sampleResources } from '../data/resources';
+import { get, set } from 'idb-keyval';
+import { STORAGE_KEYS } from '../utils/storage';
 
 interface AboutPageProps {
   measurementSystem: MeasurementSystem;
@@ -14,14 +16,18 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [clearTarget, setClearTarget] = useState<'notes' | 'resupplies' | 'all' | null>(null);
 
-  const handleExportData = () => {
-    const notes = localStorage.getItem('tour-divide-notes') || '[]';
-    const resupplies = localStorage.getItem('tour-divide-resupplies') || '[]';
+  const handleExportData = async () => {
+    const [notes, resupplies, journalEntries] = await Promise.all([
+      get(STORAGE_KEYS.notes),
+      get(STORAGE_KEYS.resupplies),
+      get(STORAGE_KEYS.journal),
+    ]);
     const measurement = localStorage.getItem('tour-divide-measurement-system') || 'imperial';
 
     const data = {
-      notes: JSON.parse(notes),
-      resupplies: JSON.parse(resupplies),
+      notes: notes ?? [],
+      resupplies: resupplies ?? [],
+      journalEntries: journalEntries ?? [],
       measurementSystem: measurement,
       exportDate: new Date().toISOString()
     };
@@ -40,21 +46,23 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
   const handleImportData = () => {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = '.json';
+    input.accept = '.json,application/json';
     input.onchange = (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = (ev) => {
+      reader.onload = async (ev) => {
         try {
           const data = JSON.parse(ev.target?.result as string);
-          if (data.notes) localStorage.setItem('tour-divide-notes', JSON.stringify(data.notes));
-          if (data.resupplies) localStorage.setItem('tour-divide-resupplies', JSON.stringify(data.resupplies));
+          if (Array.isArray(data.notes)) await set(STORAGE_KEYS.notes, data.notes);
+          if (Array.isArray(data.resupplies)) await set(STORAGE_KEYS.resupplies, data.resupplies);
+          if (Array.isArray(data.journalEntries)) await set(STORAGE_KEYS.journal, data.journalEntries);
           if (data.measurementSystem) {
             localStorage.setItem('tour-divide-measurement-system', data.measurementSystem);
             onChangeMeasurementSystem(data.measurementSystem);
           }
-          alert('Data imported successfully! Reload the page to see your data.');
+          alert('Backup imported.');
+          window.location.reload();
         } catch {
           alert('Error importing data. Please check the file format.');
         }
@@ -69,16 +77,19 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
     setShowClearConfirm(true);
   };
 
-  const confirmClearData = () => {
+  const confirmClearData = async () => {
     if (clearTarget === 'notes' || clearTarget === 'all') {
-      localStorage.setItem('tour-divide-notes', '[]');
+      await set(STORAGE_KEYS.notes, []);
     }
     if (clearTarget === 'resupplies' || clearTarget === 'all') {
-      localStorage.setItem('tour-divide-resupplies', '[]');
+      await set(STORAGE_KEYS.resupplies, []);
+    }
+    if (clearTarget === 'all') {
+      await set(STORAGE_KEYS.journal, []);
     }
     setShowClearConfirm(false);
     setClearTarget(null);
-    alert(`${clearTarget === 'all' ? 'All data' : clearTarget ? clearTarget.charAt(0).toUpperCase() + clearTarget.slice(1) : ''} cleared! Reload the page to see changes.`);
+    window.location.reload();
   };
 
   const handleDownload = (resource: { fileName?: string }) => {

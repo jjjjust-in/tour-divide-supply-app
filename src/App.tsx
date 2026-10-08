@@ -15,6 +15,7 @@ import { sampleResupplies } from './data/sampleResupplies';
 import { sampleJournalEntries } from './data/sampleJournalEntries';
 import type { Note, Resupply, JournalEntry } from './types';
 import type { MeasurementSystem } from './utils/measurements';
+import { loadCollection, saveCollection, requestPersistentStorage, STORAGE_KEYS } from './utils/storage';
 import { Plus, MapIcon, Clock, BookOpen } from 'lucide-react';
 import { AnimatePresence } from 'motion/react';
 import navBgPattern from 'figma:asset/53e87b274f9e9eae37a672b63e5feb2e3c44276d.png';
@@ -31,51 +32,30 @@ export default function App() {
     return 'imperial'; // Default, will show selector on first load
   });
   const [selectedTownId, setSelectedTownId] = useState<string | null>(null);
-  const [notes, setNotes] = useState<Note[]>(() => {
-    const saved = localStorage.getItem('tour-divide-notes');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      // If saved data is empty, load sample notes
-      if (parsed.length === 0) {
-        localStorage.setItem('tour-divide-notes', JSON.stringify(sampleNotes));
-        return sampleNotes;
-      }
-      return parsed;
-    }
-    // Load sample notes on first visit
-    localStorage.setItem('tour-divide-notes', JSON.stringify(sampleNotes));
-    return sampleNotes;
-  });
-  const [resupplies, setResupplies] = useState<Resupply[]>(() => {
-    const saved = localStorage.getItem('tour-divide-resupplies');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      // If saved data is empty, load sample resupplies
-      if (parsed.length === 0) {
-        localStorage.setItem('tour-divide-resupplies', JSON.stringify(sampleResupplies));
-        return sampleResupplies;
-      }
-      return parsed;
-    }
-    // Load sample resupplies on first visit
-    localStorage.setItem('tour-divide-resupplies', JSON.stringify(sampleResupplies));
-    return sampleResupplies;
-  });
-  const [journalEntries, setJournalEntries] = useState<JournalEntry[]>(() => {
-    const saved = localStorage.getItem('tour-divide-journal-entries');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      // If saved data is empty, load sample journal entries
-      if (parsed.length === 0) {
-        localStorage.setItem('tour-divide-journal-entries', JSON.stringify(sampleJournalEntries));
-        return sampleJournalEntries;
-      }
-      return parsed;
-    }
-    // Load sample journal entries on first visit
-    localStorage.setItem('tour-divide-journal-entries', JSON.stringify(sampleJournalEntries));
-    return sampleJournalEntries;
-  });
+  // Saved data loads asynchronously from IndexedDB. Sample data is only
+  // used on a true first launch, so clearing your data stays cleared.
+  const [notes, setNotes] = useState<Note[]>([]);
+  const [resupplies, setResupplies] = useState<Resupply[]>([]);
+  const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([]);
+  const [dataLoaded, setDataLoaded] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const [n, r, j] = await Promise.all([
+        loadCollection<Note>(STORAGE_KEYS.notes, sampleNotes),
+        loadCollection<Resupply>(STORAGE_KEYS.resupplies, sampleResupplies),
+        loadCollection<JournalEntry>(STORAGE_KEYS.journal, sampleJournalEntries),
+      ]);
+      if (cancelled) return;
+      setNotes(n);
+      setResupplies(r);
+      setJournalEntries(j);
+      setDataLoaded(true);
+    })();
+    requestPersistentStorage();
+    return () => { cancelled = true; };
+  }, []);
   // Single active page — enforces one-page-at-a-time
   type ActivePage = 'route' | 'journal' | 'towns' | 'notes' | null;
   const [activePage, setActivePage] = useState<ActivePage>('route');
@@ -101,17 +81,19 @@ export default function App() {
     }
   }, []);
 
+  // Persist changes, but never before the initial load finishes
+  // (otherwise the empty starting arrays would overwrite saved data).
   useEffect(() => {
-    localStorage.setItem('tour-divide-notes', JSON.stringify(notes));
-  }, [notes]);
+    if (dataLoaded) saveCollection(STORAGE_KEYS.notes, notes);
+  }, [notes, dataLoaded]);
 
   useEffect(() => {
-    localStorage.setItem('tour-divide-resupplies', JSON.stringify(resupplies));
-  }, [resupplies]);
+    if (dataLoaded) saveCollection(STORAGE_KEYS.resupplies, resupplies);
+  }, [resupplies, dataLoaded]);
 
   useEffect(() => {
-    localStorage.setItem('tour-divide-journal-entries', JSON.stringify(journalEntries));
-  }, [journalEntries]);
+    if (dataLoaded) saveCollection(STORAGE_KEYS.journal, journalEntries);
+  }, [journalEntries, dataLoaded]);
 
   useEffect(() => {
     localStorage.setItem('tour-divide-measurement-system', measurementSystem);
