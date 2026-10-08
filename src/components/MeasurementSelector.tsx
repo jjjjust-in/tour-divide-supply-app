@@ -23,7 +23,7 @@ export function MeasurementSelector({ onSelect }: MeasurementSelectorProps) {
         <div className="p-4 space-y-4">
           <button
             onClick={() => onSelect('imperial')}
-            className="w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 border-[#febc12] hover:bg-amber-50 transition-colors"
+            className="w-full flex items-center justify-between px-4 py-3.5 rounded-xl border-2 border-[#febc12] hover:bg-amber-50 transition-colors"
           >
             <div className="text-left">
               <div className="font-semibold text-[#231F20]">Imperial</div>
@@ -33,7 +33,7 @@ export function MeasurementSelector({ onSelect }: MeasurementSelectorProps) {
           </button>
           <button
             onClick={() => onSelect('metric')}
-            className="w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 border-gray-200 hover:border-[#febc12] hover:bg-amber-50 transition-colors"
+            className="w-full flex items-center justify-between px-4 py-3.5 rounded-xl border-2 border-gray-200 hover:border-[#febc12] hover:bg-amber-50 transition-colors"
           >
             <div className="text-left">
               <div className="font-semibold text-[#231F20]">Metric</div>

@@ -118,7 +118,7 @@ export function TownsList({
             <div key={town.id} className="border-b border-gray-100">
               <button
                 onClick={() => setExpandedTown(isExpanded ? null : town.id)}
-                className="w-full flex items-start justify-between px-4 py-3 hover:bg-gray-50 transition-colors text-left"
+                className="w-full flex items-start justify-between px-4 py-3.5 hover:bg-gray-50 transition-colors text-left"
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
@@ -180,10 +180,10 @@ export function TownsList({
                           autoFocus
                         />
                         <div className="flex gap-1">
-                          <button onClick={() => handleAddNote(town.id)} className="flex items-center gap-1 px-2 py-1 bg-[#febc12] text-[#231F20] rounded-lg text-[10px] font-semibold">
+                          <button onClick={() => handleAddNote(town.id)} className="flex items-center gap-1 px-2 py-2 bg-[#febc12] text-[#231F20] rounded-lg text-[10px] font-semibold">
                             <Check size={10} /> Save
                           </button>
-                          <button onClick={() => { setAddingNoteFor(null); setNewNote(''); }} className="px-2 py-1 text-gray-400 text-[10px]">Cancel</button>
+                          <button onClick={() => { setAddingNoteFor(null); setNewNote(''); }} className="px-2 py-2 text-gray-400 text-[10px]">Cancel</button>
                         </div>
                       </div>
                     )}
@@ -203,7 +203,7 @@ export function TownsList({
                                   autoFocus
                                 />
                                 <div className="flex gap-1">
-                                  <button onClick={handleSaveEdit} className="flex items-center gap-1 px-2 py-0.5 bg-[#febc12] text-[#231F20] rounded text-[10px] font-semibold">
+                                  <button onClick={handleSaveEdit} className="flex items-center gap-1 px-2 py-1.5 bg-[#febc12] text-[#231F20] rounded text-[10px] font-semibold">
                                     <Check size={9} /> Save
                                   </button>
                                   <button onClick={() => setEditingNoteId(null)} className="text-gray-400 text-[10px] px-1">Cancel</button>
@@ -249,10 +249,10 @@ export function TownsList({
                           autoFocus
                         />
                         <div className="flex gap-1">
-                          <button onClick={() => handleAddResupply(town.id)} className="flex items-center gap-1 px-2 py-1 bg-green-500 text-white rounded-lg text-[10px] font-semibold">
+                          <button onClick={() => handleAddResupply(town.id)} className="flex items-center gap-1 px-2 py-2 bg-green-500 text-white rounded-lg text-[10px] font-semibold">
                             <Check size={10} /> Save
                           </button>
-                          <button onClick={() => { setAddingResupplyFor(null); setNewResupplyName(''); }} className="px-2 py-1 text-gray-400 text-[10px]">Cancel</button>
+                          <button onClick={() => { setAddingResupplyFor(null); setNewResupplyName(''); }} className="px-2 py-2 text-gray-400 text-[10px]">Cancel</button>
                         </div>
                       </div>
                     )}

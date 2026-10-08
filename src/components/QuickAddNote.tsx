@@ -102,7 +102,7 @@ export function QuickAddNote({ towns, onClose, onAddResupply, onAddJournalEntry 
             <button
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
-              className={`flex items-center gap-1.5 px-4 py-2 text-xs font-semibold transition-colors rounded-t-lg border-2 mr-1 ${
+              className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold transition-colors rounded-t-lg border-2 mr-1 ${
                 activeTab === tab.key
                   ? 'border-[#40C8EF] border-b-white bg-white text-[#40C8EF]'
                   : 'border-[#40C8EF] bg-[#E6F7FD] text-[#40C8EF]/70 hover:bg-[#d0f0fb]'
@@ -208,7 +208,7 @@ export function QuickAddNote({ towns, onClose, onAddResupply, onAddJournalEntry 
                 ) : (
                   <button
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-full py-2.5 rounded-xl border-2 border-dashed border-gray-200 text-xs text-gray-400 flex items-center justify-center gap-2 hover:border-[#40C8EF] hover:text-[#40C8EF] transition-colors"
+                    className="w-full py-3 rounded-xl border-2 border-dashed border-gray-200 text-xs text-gray-400 flex items-center justify-center gap-2 hover:border-[#40C8EF] hover:text-[#40C8EF] transition-colors"
                   >
                     <ImageIcon size={14} />
                     Add photo
@@ -232,14 +232,14 @@ export function QuickAddNote({ towns, onClose, onAddResupply, onAddJournalEntry 
         <div className="flex gap-3 px-4 pb-6 pt-3 border-t border-gray-100">
           <button
             onClick={onClose}
-            className="flex-1 py-2.5 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50"
+            className="flex-1 py-3 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
             disabled={!canSubmit}
-            className="flex-1 py-2.5 rounded-xl bg-[#40C8EF] text-white text-sm font-bold disabled:opacity-40 hover:bg-[#00B6EB] transition-colors"
+            className="flex-1 py-3 rounded-xl bg-[#40C8EF] text-white text-sm font-bold disabled:opacity-40 hover:bg-[#00B6EB] transition-colors"
           >
             Add
           </button>

@@ -93,7 +93,7 @@ export function NotesPanel({
         <div className="flex gap-1 mt-4">
           <button
             onClick={() => setActiveTab('notes')}
-            className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+            className={`flex-1 py-2.5 rounded-lg text-xs font-semibold transition-colors ${
               activeTab === 'notes' ? 'bg-[#231F20] text-white' : 'bg-white/60 text-[#231F20]'
             }`}
           >
@@ -101,7 +101,7 @@ export function NotesPanel({
           </button>
           <button
             onClick={() => setActiveTab('resupply')}
-            className={`flex-1 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
+            className={`flex-1 py-2.5 rounded-lg text-xs font-semibold transition-colors ${
               activeTab === 'resupply' ? 'bg-[#231F20] text-white' : 'bg-white/60 text-[#231F20]'
             }`}
           >
@@ -128,10 +128,10 @@ export function NotesPanel({
                       autoFocus
                     />
                     <div className="flex gap-2">
-                      <button onClick={handleSaveEdit} className="flex items-center gap-1 px-2 py-1 bg-[#febc12] text-[#231F20] rounded-lg text-xs font-medium">
+                      <button onClick={handleSaveEdit} className="flex items-center gap-1 px-2 py-2 bg-[#febc12] text-[#231F20] rounded-lg text-xs font-medium">
                         <Check size={12} /> Save
                       </button>
-                      <button onClick={() => setEditingNoteId(null)} className="px-2 py-1 text-gray-400 text-xs">Cancel</button>
+                      <button onClick={() => setEditingNoteId(null)} className="px-2 py-2 text-gray-400 text-xs">Cancel</button>
                     </div>
                   </div>
                 ) : (
@@ -190,10 +190,10 @@ export function NotesPanel({
                   className="w-full text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:border-[#febc12]"
                 />
                 <div className="flex gap-2">
-                  <button onClick={handleAddResupply} className="flex items-center gap-1 px-2 py-1 bg-[#febc12] text-[#231F20] rounded-lg text-xs font-medium">
+                  <button onClick={handleAddResupply} className="flex items-center gap-1 px-2 py-2 bg-[#febc12] text-[#231F20] rounded-lg text-xs font-medium">
                     <Check size={12} /> Add
                   </button>
-                  <button onClick={() => setShowAddResupply(false)} className="px-2 py-1 text-gray-400 text-xs">Cancel</button>
+                  <button onClick={() => setShowAddResupply(false)} className="px-2 py-2 text-gray-400 text-xs">Cancel</button>
                 </div>
               </div>
             )}
@@ -224,7 +224,7 @@ export function NotesPanel({
         ) : (
           <button
             onClick={() => setShowAddResupply(true)}
-            className="w-full flex items-center justify-center gap-2 py-2 bg-[#febc12] text-[#231F20] rounded-xl text-sm font-semibold"
+            className="w-full flex items-center justify-center gap-2 py-2.5 bg-[#febc12] text-[#231F20] rounded-xl text-sm font-semibold"
           >
             <Plus size={16} /> Add Resupply
           </button>

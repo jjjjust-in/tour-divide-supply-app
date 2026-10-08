@@ -94,7 +94,7 @@ export function NotesPage({
             <button
               key={tab}
               onClick={() => setFilterTab(tab)}
-              className={`px-3 py-1 rounded-full text-xs font-semibold capitalize transition-colors ${
+              className={`px-3 py-2 rounded-full text-xs font-semibold capitalize transition-colors ${
                 filterTab === tab ? 'bg-[#231F20] text-white' : 'bg-white/60 text-[#231F20]'
               }`}
             >
@@ -124,10 +124,10 @@ export function NotesPage({
                   autoFocus
                 />
                 <div className="flex gap-2">
-                  <button onClick={handleSaveEdit} className="flex items-center gap-1 px-2 py-1 bg-[#febc12] text-[#231F20] rounded-lg text-xs font-medium">
+                  <button onClick={handleSaveEdit} className="flex items-center gap-1 px-2 py-2 bg-[#febc12] text-[#231F20] rounded-lg text-xs font-medium">
                     <Check size={12} /> Save
                   </button>
-                  <button onClick={() => setEditingNoteId(null)} className="flex items-center gap-1 px-2 py-1 text-gray-400 text-xs">
+                  <button onClick={() => setEditingNoteId(null)} className="flex items-center gap-1 px-2 py-2 text-gray-400 text-xs">
                     <X size={12} /> Cancel
                   </button>
                 </div>

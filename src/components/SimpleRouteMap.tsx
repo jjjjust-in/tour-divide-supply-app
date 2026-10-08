@@ -271,7 +271,7 @@ function ItineraryRow({
                     setShowNoteForm(false);
                     setShowResupplyForm(false);
                   }}
-                  className={`flex-1 px-2 py-1 text-[12px] font-display font-medium uppercase tracking-[-0.2px] rounded transition-colors flex items-center justify-center gap-1 ${
+                  className={`flex-1 px-2 py-2 text-[12px] font-display font-medium uppercase tracking-[-0.2px] rounded transition-colors flex items-center justify-center gap-1 ${
                     activeTab === 'notes'
                       ? 'bg-[#40c8ef] text-white'
                       : 'bg-gray-200 text-black hover:bg-gray-300'
@@ -285,7 +285,7 @@ function ItineraryRow({
                     setShowNoteForm(false);
                     setShowResupplyForm(false);
                   }}
-                  className={`flex-1 px-2 py-1 text-[12px] font-display font-medium uppercase tracking-[-0.2px] rounded transition-colors flex items-center justify-center gap-1 ${
+                  className={`flex-1 px-2 py-2 text-[12px] font-display font-medium uppercase tracking-[-0.2px] rounded transition-colors flex items-center justify-center gap-1 ${
                     activeTab === 'resupplies'
                       ? 'bg-[#40c8ef] text-white'
                       : 'bg-gray-200 text-black hover:bg-gray-300'
@@ -314,14 +314,14 @@ function ItineraryRow({
                             <div className="flex gap-1">
                               <button
                                 onClick={handleCancelEditNote}
-                                className="flex-1 bg-gray-300 text-black py-1 px-1.5 rounded hover:bg-gray-400 transition-colors text-[11px] font-display font-medium uppercase"
+                                className="flex-1 bg-gray-300 text-black py-2 px-1.5 rounded hover:bg-gray-400 transition-colors text-[11px] font-display font-medium uppercase"
                               >
                                 Cancel
                               </button>
                               <button
                                 onClick={handleSaveNote}
                                 disabled={!editNoteContent.trim()}
-                                className="flex-1 bg-[#40c8ef] text-white py-1 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[11px] font-display font-medium uppercase"
+                                className="flex-1 bg-[#40c8ef] text-white py-2 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[11px] font-display font-medium uppercase"
                               >
                                 Save
                               </button>
@@ -355,7 +355,7 @@ function ItineraryRow({
                   {!showNoteForm ? (
                     <button
                       onClick={() => setShowNoteForm(true)}
-                      className="w-full bg-[#40c8ef] text-white py-1.5 px-2 rounded hover:bg-[#00B6EB] transition-colors flex items-center justify-center gap-1 text-[11px] font-display font-medium uppercase tracking-[-0.2px]"
+                      className="w-full bg-[#40c8ef] text-white py-2.5 px-2 rounded hover:bg-[#00B6EB] transition-colors flex items-center justify-center gap-1 text-[11px] font-display font-medium uppercase tracking-[-0.2px]"
                     >
                       <Plus size={10} />
                       Add Note
@@ -377,14 +377,14 @@ function ItineraryRow({
                             setShowNoteForm(false);
                             setNewNote('');
                           }}
-                          className="flex-1 bg-gray-300 text-black py-1 px-1.5 rounded hover:bg-gray-400 transition-colors text-[11px] font-display font-medium uppercase"
+                          className="flex-1 bg-gray-300 text-black py-2 px-1.5 rounded hover:bg-gray-400 transition-colors text-[11px] font-display font-medium uppercase"
                         >
                           Cancel
                         </button>
                         <button
                           type="submit"
                           disabled={!newNote.trim()}
-                          className="flex-1 bg-[#40c8ef] text-white py-1 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[11px] font-display font-medium uppercase"
+                          className="flex-1 bg-[#40c8ef] text-white py-2 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[11px] font-display font-medium uppercase"
                         >
                           Add
                         </button>
@@ -435,14 +435,14 @@ function ItineraryRow({
                             <div className="flex gap-1">
                               <button
                                 onClick={handleCancelEditResupply}
-                                className="flex-1 bg-gray-300 text-black py-1 px-1.5 rounded hover:bg-gray-400 transition-colors text-[11px] font-display font-medium uppercase"
+                                className="flex-1 bg-gray-300 text-black py-2 px-1.5 rounded hover:bg-gray-400 transition-colors text-[11px] font-display font-medium uppercase"
                               >
                                 Cancel
                               </button>
                               <button
                                 onClick={handleSaveResupply}
                                 disabled={!editResupply.name.trim()}
-                                className="flex-1 bg-[#40c8ef] text-white py-1 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[11px] font-display font-medium uppercase"
+                                className="flex-1 bg-[#40c8ef] text-white py-2 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[11px] font-display font-medium uppercase"
                               >
                                 Save
                               </button>
@@ -503,7 +503,7 @@ function ItineraryRow({
                   {!showResupplyForm ? (
                     <button
                       onClick={() => setShowResupplyForm(true)}
-                      className="w-full bg-[#40c8ef] text-white py-1.5 px-2 rounded hover:bg-[#00B6EB] transition-colors flex items-center justify-center gap-1 text-[11px] font-display font-medium uppercase tracking-[-0.2px]"
+                      className="w-full bg-[#40c8ef] text-white py-2.5 px-2 rounded hover:bg-[#00B6EB] transition-colors flex items-center justify-center gap-1 text-[11px] font-display font-medium uppercase tracking-[-0.2px]"
                     >
                       <Plus size={10} />
                       Add Resupply
@@ -547,14 +547,14 @@ function ItineraryRow({
                             setShowResupplyForm(false);
                             setNewResupply({ name: '', hours: '', phone: '', address: '' });
                           }}
-                          className="flex-1 bg-gray-300 text-black py-1 px-1.5 rounded hover:bg-gray-400 transition-colors text-[11px] font-display font-medium uppercase"
+                          className="flex-1 bg-gray-300 text-black py-2 px-1.5 rounded hover:bg-gray-400 transition-colors text-[11px] font-display font-medium uppercase"
                         >
                           Cancel
                         </button>
                         <button
                           type="submit"
                           disabled={!newResupply.name.trim()}
-                          className="flex-1 bg-[#40c8ef] text-white py-1 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[11px] font-display font-medium uppercase"
+                          className="flex-1 bg-[#40c8ef] text-white py-2 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[11px] font-display font-medium uppercase"
                         >
                           Add
                         </button>

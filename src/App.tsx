@@ -254,7 +254,7 @@ export default function App() {
           <div className="flex gap-2 md:gap-3">
           <button
             onClick={() => setActivePage('route')}
-            className={`border-2 px-3 md:px-4 py-2 rounded-lg transition-all shadow-lg flex items-center gap-2 ${
+            className={`border-2 px-3 md:px-4 py-2.5 rounded-lg transition-all shadow-lg flex items-center gap-2 ${
               showRoute
                 ? 'bg-[#40C8EF] text-white border-[#40C8EF]'
                 : 'bg-white text-[#40C8EF] border-[#40C8EF] hover:bg-[#F5FCFF]'
@@ -268,7 +268,7 @@ export default function App() {
           </button>
           <button
             onClick={() => setActivePage('journal')}
-            className={`border-2 px-3 md:px-4 py-2 rounded-lg transition-all shadow-lg flex items-center gap-2 ${
+            className={`border-2 px-3 md:px-4 py-2.5 rounded-lg transition-all shadow-lg flex items-center gap-2 ${
               showJournal
                 ? 'bg-[#40C8EF] text-white border-[#40C8EF]'
                 : 'bg-white text-[#40C8EF] border-[#40C8EF] hover:bg-[#F5FCFF]'

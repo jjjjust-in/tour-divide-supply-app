@@ -152,7 +152,7 @@ export default function StoryExport({ towns, journalEntries, notes, onClose }: S
           <button
             key={f}
             onClick={() => setFormat(f)}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+            className={`px-3 py-2.5 rounded-full text-xs font-medium transition-colors ${
               format === f
                 ? 'bg-[#231F20] text-white'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
@@ -163,7 +163,7 @@ export default function StoryExport({ towns, journalEntries, notes, onClose }: S
         ))}
         <button
           onClick={handleCopy}
-          className={`ml-auto px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+          className={`ml-auto px-3 py-2.5 rounded-full text-xs font-medium transition-colors ${
             copied
               ? 'bg-green-100 text-green-700'
               : 'bg-[#febc12] text-[#231F20] hover:bg-amber-400'
@@ -184,7 +184,7 @@ export default function StoryExport({ towns, journalEntries, notes, onClose }: S
       <div className="px-4 pb-6 pt-3 border-t border-gray-100">
         <button
           onClick={onClose}
-          className="w-full py-3 rounded-xl bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition-colors"
+          className="w-full py-3.5 rounded-xl bg-gray-100 text-gray-700 text-sm font-medium hover:bg-gray-200 transition-colors"
         >
           Close
         </button>

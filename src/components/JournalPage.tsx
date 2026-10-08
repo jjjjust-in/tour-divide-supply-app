@@ -132,10 +132,10 @@ export function JournalPage({
                       autoFocus
                     />
                     <div className="flex gap-2">
-                      <button onClick={() => handleSaveEdit(entry)} className="flex items-center gap-1 px-2 py-1 bg-[#febc12] text-[#231F20] rounded-lg text-xs font-medium">
+                      <button onClick={() => handleSaveEdit(entry)} className="flex items-center gap-1 px-2 py-2 bg-[#febc12] text-[#231F20] rounded-lg text-xs font-medium">
                         <Check size={12} /> Save
                       </button>
-                      <button onClick={() => setEditingId(null)} className="flex items-center gap-1 px-2 py-1 text-gray-400 text-xs">
+                      <button onClick={() => setEditingId(null)} className="flex items-center gap-1 px-2 py-2 text-gray-400 text-xs">
                         <X size={12} /> Cancel
                       </button>
                     </div>

@@ -380,7 +380,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                   <div className="flex bg-white border-2 border-[#40C8EF] rounded-lg overflow-hidden">
                     <button
                       onClick={() => onChangeMeasurementSystem('imperial')}
-                      className={`flex-1 py-3 px-4 transition-all touch-manipulation ${
+                      className={`flex-1 py-3.5 px-4 transition-all touch-manipulation ${
                         measurementSystem === 'imperial'
                           ? 'bg-[#40C8EF] text-white'
                           : 'bg-gray-100 text-[#999] hover:bg-[#F5FCFF]'
@@ -392,7 +392,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                     <div className="w-px bg-[#40C8EF]" />
                     <button
                       onClick={() => onChangeMeasurementSystem('metric')}
-                      className={`flex-1 py-3 px-4 transition-all touch-manipulation ${
+                      className={`flex-1 py-3.5 px-4 transition-all touch-manipulation ${
                         measurementSystem === 'metric'
                           ? 'bg-[#40C8EF] text-white'
                           : 'bg-gray-100 text-[#999] hover:bg-[#F5FCFF]'
@@ -414,14 +414,14 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                   </div>
                   <button
                     onClick={handleExportData}
-                    className="w-full py-3 px-4 rounded-lg border-2 border-[#40C8EF] text-[#40C8EF] hover:bg-[#F5FCFF] transition-all flex items-center justify-center gap-2 touch-manipulation"
+                    className="w-full py-3.5 px-4 rounded-lg border-2 border-[#40C8EF] text-[#40C8EF] hover:bg-[#F5FCFF] transition-all flex items-center justify-center gap-2 touch-manipulation"
                   >
                     <Download size={16} />
                     <span className="text-sm uppercase font-display font-medium tracking-[-0.36px]">Export All Data</span>
                   </button>
                   <button
                     onClick={handleImportData}
-                    className="w-full py-3 px-4 rounded-lg border-2 border-[#40C8EF] text-[#40C8EF] hover:bg-[#F5FCFF] transition-all flex items-center justify-center gap-2 touch-manipulation"
+                    className="w-full py-3.5 px-4 rounded-lg border-2 border-[#40C8EF] text-[#40C8EF] hover:bg-[#F5FCFF] transition-all flex items-center justify-center gap-2 touch-manipulation"
                   >
                     <Upload size={16} />
                     <span className="text-sm uppercase font-display font-medium tracking-[-0.36px]">Import Data</span>
@@ -441,21 +441,21 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                   </div>
                   <button
                     onClick={() => handleClearData('notes')}
-                    className="w-full py-2.5 px-4 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 transition-all flex items-center justify-center gap-2 touch-manipulation text-sm"
+                    className="w-full py-3 px-4 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 transition-all flex items-center justify-center gap-2 touch-manipulation text-sm"
                   >
                     <Trash2 size={14} />
                     Clear All Notes
                   </button>
                   <button
                     onClick={() => handleClearData('resupplies')}
-                    className="w-full py-2.5 px-4 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 transition-all flex items-center justify-center gap-2 touch-manipulation text-sm"
+                    className="w-full py-3 px-4 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 transition-all flex items-center justify-center gap-2 touch-manipulation text-sm"
                   >
                     <Trash2 size={14} />
                     Clear All Resupplies
                   </button>
                   <button
                     onClick={() => handleClearData('all')}
-                    className="w-full py-2.5 px-4 rounded-lg border-2 border-[#FF6B35] text-[#FF6B35] hover:bg-[#FF6B35] hover:text-white transition-all flex items-center justify-center gap-2 touch-manipulation"
+                    className="w-full py-3 px-4 rounded-lg border-2 border-[#FF6B35] text-[#FF6B35] hover:bg-[#FF6B35] hover:text-white transition-all flex items-center justify-center gap-2 touch-manipulation"
                   >
                     <RotateCcw size={14} />
                     <span className="text-sm uppercase font-display font-medium tracking-[-0.36px]">Reset All Data</span>
@@ -484,13 +484,13 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
             <div className="flex gap-3">
               <button
                 onClick={() => { setShowClearConfirm(false); setClearTarget(null); }}
-                className="flex-1 py-3 px-4 rounded-lg border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition-all touch-manipulation"
+                className="flex-1 py-3.5 px-4 rounded-lg border-2 border-gray-300 text-gray-700 hover:bg-gray-50 transition-all touch-manipulation"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmClearData}
-                className="flex-1 py-3 px-4 rounded-lg bg-[#FF6B35] text-white hover:bg-[#E55A25] transition-all touch-manipulation uppercase font-display font-medium tracking-[-0.36px]"
+                className="flex-1 py-3.5 px-4 rounded-lg bg-[#FF6B35] text-white hover:bg-[#E55A25] transition-all touch-manipulation uppercase font-display font-medium tracking-[-0.36px]"
               >
                 Delete
               </button>

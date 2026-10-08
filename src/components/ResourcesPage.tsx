@@ -53,7 +53,7 @@ export function ResourcesPage({ resources, onClose }: ResourcesPageProps) {
             <button
               key={tab.key}
               onClick={() => setActiveFilter(tab.key as typeof activeFilter)}
-              className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors ${
+              className={`px-3 py-2 rounded-full text-xs font-semibold transition-colors ${
                 activeFilter === tab.key ? 'bg-[#231F20] text-white' : 'bg-white/60 text-[#231F20]'
               }`}
             >
