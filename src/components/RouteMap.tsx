@@ -308,18 +308,16 @@ export function RouteMap({ towns, measurementSystem, onOpenTown }: RouteMapProps
               <p className="text-[12px] text-black/60 uppercase tracking-[0.04em] tabular-nums">
                 {formatMilepost(waypoint.mile, measurementSystem)} · {formatElevation(waypoint.town.elevation, measurementSystem)}
               </p>
-              <p className="font-display font-bold text-[18px] uppercase tracking-tight text-black truncate mt-1">
+              <button
+                onClick={() => onOpenTown(waypoint.town.id)}
+                aria-label={`Open ${waypoint.town.name} in the itinerary`}
+                className="max-w-full font-display font-bold text-[18px] uppercase tracking-tight text-black truncate mt-1 underline decoration-[#40c8ef] decoration-2 underline-offset-[5px] hover:text-[#00B6EB] transition-colors"
+              >
                 {waypoint.town.name}, {waypoint.town.state}
-              </p>
+              </button>
               <p className="text-[13px] text-black/70 tabular-nums mt-1">
                 {following ? `${formatDistance(following.mile - waypoint.mile, measurementSystem)} to ${following.town.name}` : 'Finish line'}
               </p>
-              <button
-                onClick={() => onOpenTown(waypoint.town.id)}
-                className="mt-3 bg-[#40c8ef] text-white px-4 py-2.5 rounded text-[12px] font-display font-medium uppercase tracking-[-0.2px] hover:bg-[#00B6EB] transition-colors"
-              >
-                View town
-              </button>
             </div>
             <button
               onClick={() => stepTo(activeIndex + 1)}
