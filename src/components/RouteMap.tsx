@@ -34,6 +34,8 @@ type LocationState =
 type MapSelection = { kind: 'cell'; col: number; row: number } | { kind: 'state'; state: MapState } | null;
 
 interface RouteMapProps {
+  /** Which picture to show above the waypoint card */
+  view?: 'map' | 'elevation';
   towns: Town[];
   measurementSystem: MeasurementSystem;
   onOpenTown: (townId: string) => void;
@@ -58,7 +60,7 @@ function pointInPolygon([x, y]: [number, number], poly: [number, number][]) {
 
 const toPoints = (poly: [number, number][]) => poly.map(([x, y]) => `${x},${y}`).join(' ');
 
-export function RouteMap({ towns, measurementSystem, onOpenTown }: RouteMapProps) {
+export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }: RouteMapProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const [location, setLocation] = useState<LocationState>({ status: 'idle' });
   const [demoMile, setDemoMile] = useState(1215);
@@ -189,8 +191,15 @@ export function RouteMap({ towns, measurementSystem, onOpenTown }: RouteMapProps
 
   return (
     <div className="w-full max-w-[360px] mx-auto space-y-4">
+      {/* Elevation profile: artwork still to come */}
+      {view === 'elevation' && (
+        <div className="w-full aspect-[3/2] border border-dashed border-[#40c8ef] flex items-center justify-center text-center px-6">
+          <p className="text-[13px] text-black/60">Elevation profile coming soon. The live dot and waypoints will work here too.</p>
+        </div>
+      )}
+
       {/* Map */}
-      <div className="relative w-full select-none">
+      <div className={`relative w-full select-none ${view === 'map' ? '' : 'hidden'}`}>
         <svg
           ref={svgRef}
           viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
