@@ -21,6 +21,7 @@ export const ROUTE_POIS: RoutePoi[] = [
   { id: 'red-meadow', name: 'Red Meadow', mile: 337, elevationFt: 5630 },
   { id: 'bug-creek', name: 'Bug Creek', mile: 418, elevationFt: 4940 },
   { id: 'richmond-peak', name: 'Richmond Peak', mile: 494, elevationFt: 6700 },
+  { id: 'huckleberry-pass', name: 'Huckleberry Pass', mile: 557, elevationFt: 5960 },
   { id: 'lava-mountain', name: 'Lava Mountain', mile: 659, elevationFt: 7470 },
   { id: 'fleecer-ridge', name: 'Fleecer Ridge', mile: 752, elevationFt: 7840 },
   { id: 'union-pass', name: 'Union Pass', mile: 1152, elevationFt: 9210, published: true },
