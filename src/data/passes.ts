@@ -34,6 +34,7 @@ export const ROUTE_POIS: RoutePoi[] = [
   { id: 'polvadera', name: 'Polvadera', mile: 2143, elevationFt: 10328, source: 'MTB Project Polvadera Mesa high point' },
   { id: 'mangas-road-climb', name: 'Mangas Road Climb', mile: 2414, elevationFt: 8340, source: 'profile' },
   { id: 'star-mesa', name: 'Star Mesa High Point', mile: 2513, elevationFt: 8030, source: 'profile' },
+  { id: 'hachita-peak', name: 'Hachita Peak', mile: 2660, elevationFt: 5140, source: 'profile' },
 ];
 
 /**
