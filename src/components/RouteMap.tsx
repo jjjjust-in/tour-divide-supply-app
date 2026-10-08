@@ -207,7 +207,8 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
 
   // Label pinned above the selected square or state, in % of the map box
   const { route } = MAP_LAYOUT;
-  const viewBox = view === 'elevation' ? ELEVATION_LAYOUT.viewBox : MAP_LAYOUT.viewBox;
+  // Both views share one frame so the grid stays put; artwork may break past it
+  const viewBox = MAP_LAYOUT.viewBox;
   const label = (() => {
     const pct = (x: number, y: number) => ({
       left: Math.min(98, Math.max(2, ((x - viewBox.x) / viewBox.width) * 100)),
@@ -242,14 +243,15 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
 
   return (
     <div className="w-full max-w-[360px] mx-auto space-y-4">
+      {/* Grid area is a little narrower than the card so artwork can break out to the right */}
       {/* Map */}
-      <div className="relative w-full select-none">
+      <div className="relative w-full max-w-[318px] mx-auto select-none">
         {view === 'elevation' ? (
           <svg
             ref={svgRef}
             viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
             fill="none"
-            className="w-full h-auto block cursor-pointer"
+            className="w-full h-auto block cursor-pointer overflow-visible"
             role="img"
             aria-label="Elevation profile from Banff (top) to Antelope Wells (bottom). Each grid row is 100 route miles."
             onClick={handleMapClick}
@@ -322,7 +324,7 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
           ref={svgRef}
           viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
           fill="none"
-          className="w-full h-auto block cursor-pointer"
+          className="w-full h-auto block cursor-pointer overflow-visible"
           role="img"
           aria-label="Map of the Tour Divide route from Banff to Antelope Wells. Tap a state or a grid square for details."
           onClick={handleMapClick}

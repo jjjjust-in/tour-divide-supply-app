@@ -31,13 +31,13 @@ export function MapPage({ towns, measurementSystem, onOpenTown }: MapPageProps) 
   }, [view]);
 
   return (
-    <div className="relative w-full h-full bg-white overflow-auto">
+    <div className="relative w-full h-full bg-white overflow-y-auto overflow-x-hidden">
       <div className="flex flex-col items-center gap-5 px-[20px] md:px-[85px] pt-[40px] pb-[150px] md:pt-[96px] md:pb-[206px]">
         {/* Map / Elevation: one switch with a sliding highlight, styled like the main nav */}
         <div
           role="radiogroup"
           aria-label="Route view"
-          className="relative grid grid-cols-2 p-1 border-2 border-[#40C8EF] rounded-lg bg-white shadow-lg mb-2"
+          className="relative grid grid-cols-2 p-1 border-2 border-[#40C8EF] rounded-lg bg-white mb-2"
         >
           <span
             aria-hidden="true"
