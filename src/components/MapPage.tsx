@@ -3,6 +3,7 @@ import type { Town } from '../types';
 import type { MeasurementSystem } from '../utils/measurements';
 import { RouteMap } from './RouteMap';
 import { PageLayout } from './PageLayout';
+import { TOTAL_CLIMBING_FT } from '../data/passes';
 
 interface MapPageProps {
   towns: Town[];
@@ -68,7 +69,11 @@ export function MapPage({ towns, measurementSystem, onOpenTown }: MapPageProps) 
   return (
     <PageLayout
       title="Route"
-      meta={`Banff to Antelope Wells · ${measurementSystem === 'metric' ? '4,345 km' : '2,700 mi'}`}
+      meta={
+        measurementSystem === 'metric'
+          ? `4,345 km · ${(Math.round((TOTAL_CLIMBING_FT * 0.3048) / 1000) * 1000).toLocaleString('en-US')} m elevation`
+          : `2,700 miles · ${TOTAL_CLIMBING_FT.toLocaleString('en-US')} feet elevation`
+      }
       control={viewSwitch}
     >
       <div className="w-full">

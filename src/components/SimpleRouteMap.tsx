@@ -594,13 +594,10 @@ export function SimpleRouteMap({ towns, measurementSystem, focusTownId, onFocusH
     onFocusHandled?.();
   }, [focusTownId, mappedStops, onFocusHandled]);
 
-  const totalMiles = mappedStops[mappedStops.length - 1].mileage;
-  const townCount = mappedStops.filter((st) => st.linkedTownId).length;
-
   return (
     <PageLayout
       title="Itinerary"
-      meta={`${townCount} towns · ${measurementSystem === 'metric' ? `${milesToKm(totalMiles).toLocaleString('en-US')} km` : `${totalMiles.toLocaleString('en-US')} mi`}`}
+      meta="Banff to Antelope Wells"
     >
           {/* Itinerary List */}
           <div className="content-stretch flex flex-col items-start relative shrink-0 w-[298px] border border-[#40C8EF]">
