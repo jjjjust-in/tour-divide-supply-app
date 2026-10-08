@@ -269,6 +269,17 @@ export function RouteMap({ towns, measurementSystem, onOpenTown }: RouteMapProps
           </g>
         </svg>
 
+        {!DEMO_LOCATION && (
+          <button
+            onClick={locate}
+            disabled={location.status === 'locating'}
+            aria-label="Find my location"
+            className="absolute right-1 bottom-1 w-11 h-11 flex items-center justify-center rounded-full bg-[#febc12] text-[#231F20] shadow-lg hover:bg-[#feca3d] transition-colors disabled:opacity-60 touch-manipulation"
+          >
+            {location.status === 'locating' ? <Loader2 size={20} className="animate-spin" /> : <LocateFixed size={20} />}
+          </button>
+        )}
+
         {/* Label for the selected square or state */}
         {label && (
           <div
@@ -322,46 +333,14 @@ export function RouteMap({ towns, measurementSystem, onOpenTown }: RouteMapProps
         </div>
       )}
 
-      {/* Where you are */}
-      <div className="flex items-center justify-between gap-3 bg-white border border-[#40c8ef] px-4 py-3">
-        <div className="min-w-0" aria-live="polite">
-          {position ? (
-            position.onRoute ? (
-              <>
-                <p className="font-display font-bold text-[16px] text-black">You’re at {formatMilepost(position.mile, measurementSystem).toLowerCase()}</p>
-                <p className="text-[12px] text-black/60">
-                  {nextIndex >= 0
-                    ? `${formatDistance(waypoints[nextIndex].mile - position.mile, measurementSystem)} to ${waypoints[nextIndex].town.name}`
-                    : 'Antelope Wells. You made it.'}
-                </p>
-              </>
-            ) : (
-              <>
-                <p className="font-display font-bold text-[16px] text-black">Off route</p>
-                <p className="text-[12px] text-black/60">
-                  {formatDistance(position.milesFromRoute, measurementSystem)} from the route, nearest {formatMilepost(position.mile, measurementSystem).toLowerCase()}
-                </p>
-              </>
-            )
-          ) : location.status === 'locating' ? (
-            <p className="text-[13px] text-black/70">Finding you…</p>
-          ) : location.status === 'error' ? (
-            <p className="text-[13px] text-black/70">{location.message}</p>
-          ) : (
-            <p className="text-[13px] text-black/70">Tap locate to see where you are on the route.</p>
-          )}
-        </div>
-        {!DEMO_LOCATION && (
-          <button
-            onClick={locate}
-            disabled={location.status === 'locating'}
-            aria-label="Find my location"
-            className="shrink-0 w-11 h-11 flex items-center justify-center rounded-full bg-[#febc12] text-[#231F20] hover:bg-[#feca3d] transition-colors disabled:opacity-60 touch-manipulation"
-          >
-            {location.status === 'locating' ? <Loader2 size={20} className="animate-spin" /> : <LocateFixed size={20} />}
-          </button>
-        )}
-      </div>
+      {/* Only speak up when something needs attention */}
+      {position && !position.onRoute ? (
+        <p className="text-[13px] text-black/70 text-center px-2" aria-live="polite">
+          Off route: {formatDistance(position.milesFromRoute, measurementSystem)} from the nearest point, {formatMilepost(position.mile, measurementSystem).toLowerCase()}.
+        </p>
+      ) : location.status === 'error' ? (
+        <p className="text-[13px] text-black/70 text-center px-2" aria-live="polite">{location.message}</p>
+      ) : null}
 
       {DEMO_LOCATION && (
         <div className="space-y-2 px-1">
