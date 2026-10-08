@@ -29,18 +29,31 @@ const LAYERS = {
 // The grid is 16 x 27 squares, each one 100 x 100 miles
 const GRID = { cols: 16, rows: 27, x0: 0.5, y0: 0.5, cellW: 18.625, cellH: 17.7778 };
 
-// The grid is drawn at the same height as the Itinerary list (27 rows of
-// 24px plus its 1px border), keeping its true shape, and centered on screen.
-// It's wider than a phone, so its edges and anything breaking past it fall
-// off the sides.
+// The grid is centered on screen and keeps its true shape. On a phone it
+// scales down so the whole 16 x 27 grid fits the width with a 16px gutter;
+// on wider screens it stops growing at the Itinerary list's height (27 rows
+// of 24px plus its border). Artwork that breaks past the grid can still run
+// off the screen edges.
 const ITINERARY_LIST_PX = 27 * 24 + 2;
 const GRID_UNITS_TALL = 481;
-const MAP_SCALE = ITINERARY_LIST_PX / GRID_UNITS_TALL;
-const MAP_PX_WIDTH = MAP_LAYOUT.viewBox.width * MAP_SCALE;
-const MAP_PX_HEIGHT = MAP_LAYOUT.viewBox.height * MAP_SCALE;
-// Offset that puts the grid's center (x 149.8) at the center of the screen
+const GRID_UNITS_WIDE = 298;
 const GRID_CENTER_X = 149.8;
-const MAP_PX_LEFT_OF_CENTER = (GRID_CENTER_X - MAP_LAYOUT.viewBox.x) * MAP_SCALE;
+const SCREEN_GUTTER_PX = 16;
+const MAX_MAP_SCALE = ITINERARY_LIST_PX / GRID_UNITS_TALL;
+
+function useMapScale() {
+  const fit = () =>
+    typeof window === 'undefined'
+      ? MAX_MAP_SCALE
+      : Math.min(MAX_MAP_SCALE, (window.innerWidth - SCREEN_GUTTER_PX * 2) / GRID_UNITS_WIDE);
+  const [scale, setScale] = useState(fit);
+  useEffect(() => {
+    const onResize = () => setScale(fit());
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+  return scale;
+}
 
 // The prototype build can't use GPS, so it gets a slider to preview positions
 const DEMO_LOCATION = import.meta.env.VITE_DEMO_LOCATION === 'true';
@@ -105,6 +118,11 @@ const toPoints = (poly: [number, number][]) => poly.map(([x, y]) => `${x},${y}`)
 
 export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }: RouteMapProps) {
   const svgRef = useRef<SVGSVGElement>(null);
+  const mapScale = useMapScale();
+  const MAP_PX_WIDTH = MAP_LAYOUT.viewBox.width * mapScale;
+  const MAP_PX_HEIGHT = MAP_LAYOUT.viewBox.height * mapScale;
+  // Offset that puts the grid's center at the center of the screen
+  const MAP_PX_LEFT_OF_CENTER = (GRID_CENTER_X - MAP_LAYOUT.viewBox.x) * mapScale;
   const [location, setLocation] = useState<LocationState>({ status: 'idle' });
   const [demoMile, setDemoMile] = useState(1215);
   const [selection, setSelection] = useState<MapSelection>(null);
