@@ -15,7 +15,7 @@ import { sampleJournalEntries } from './data/sampleJournalEntries';
 import type { Note, Resupply, JournalEntry } from './types';
 import type { MeasurementSystem } from './utils/measurements';
 import { loadCollection, saveCollection, requestPersistentStorage, STORAGE_KEYS } from './utils/storage';
-import { Plus, Clock, BookOpen, ListOrdered, Route as RouteIcon } from 'lucide-react';
+import { Plus, Clock, BookOpen, ListOrdered, MapIcon } from 'lucide-react';
 import { MapPage } from './components/MapPage';
 import { AnimatePresence } from 'motion/react';
 import navBgPattern from 'figma:asset/53e87b274f9e9eae37a672b63e5feb2e3c44276d.png';
@@ -293,7 +293,7 @@ export default function App() {
             }`}
             aria-label="Route"
           >
-            <RouteIcon size={16} className={showMap ? 'text-white' : 'text-[#40C8EF]'} />
+            <MapIcon size={16} className={showMap ? 'text-white' : 'text-[#40C8EF]'} />
             <span className="uppercase font-display font-medium tracking-[-0.36px] text-[13px] md:text-sm">
               Route
             </span>
