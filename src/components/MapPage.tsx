@@ -33,8 +33,18 @@ export function MapPage({ towns, measurementSystem, onOpenTown }: MapPageProps) 
   return (
     <div className="relative w-full h-full bg-white overflow-auto">
       <div className="flex flex-col items-center gap-5 px-[20px] md:px-[85px] pt-[40px] pb-[150px] md:pt-[96px] md:pb-[206px]">
-        {/* Map / Elevation: one choice, styled like the main nav buttons */}
-        <div role="radiogroup" aria-label="Route view" className="flex gap-2 pb-2">
+        {/* Map / Elevation: one switch with a sliding highlight, styled like the main nav */}
+        <div
+          role="radiogroup"
+          aria-label="Route view"
+          className="relative grid grid-cols-2 p-1 border-2 border-[#40C8EF] rounded-lg bg-white shadow-lg mb-2"
+        >
+          <span
+            aria-hidden="true"
+            className={`absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-md bg-[#40C8EF] motion-safe:transition-transform motion-safe:duration-200 ease-out ${
+              view === 'elevation' ? 'translate-x-full' : 'translate-x-0'
+            }`}
+          />
           {([
             { key: 'map', label: 'Map', Icon: MapIcon },
             { key: 'elevation', label: 'Elevation', Icon: Mountain },
@@ -46,10 +56,8 @@ export function MapPage({ towns, measurementSystem, onOpenTown }: MapPageProps) 
                 role="radio"
                 aria-checked={active}
                 onClick={() => setView(key)}
-                className={`border-2 px-4 py-2.5 rounded-lg transition-all flex items-center gap-2 ${
-                  active
-                    ? 'bg-[#40C8EF] text-white border-[#40C8EF] shadow-lg'
-                    : 'bg-white text-[#40C8EF] border-[#40C8EF] hover:bg-[#F5FCFF]'
+                className={`relative z-10 flex items-center justify-center gap-2 px-4 py-2 rounded-md transition-colors ${
+                  active ? 'text-white' : 'text-[#40C8EF] hover:text-[#00B6EB]'
                 }`}
               >
                 <Icon size={16} />
