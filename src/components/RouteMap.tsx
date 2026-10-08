@@ -5,7 +5,7 @@ import outlineSvg from '../assets/map/states-outline.svg?raw';
 import stateLinesSvg from '../assets/map/state-lines.svg?raw';
 import routeSvg from '../assets/map/route.svg?raw';
 import elevationSvg from '../assets/map/elevation-profile.svg?raw';
-import { ELEVATION_LAYOUT, ELEVATION_LINE, ELEVATION_POLYGON } from '../data/elevationGeometry';
+import { ELEVATION_LAYOUT, ELEVATION_LINE, ELEVATION_POLYGON, ELEVATION_SCALE_X } from '../data/elevationGeometry';
 import { MAP_LAYOUT, TOWN_ANCHORS } from '../data/mapGeometry';
 import { MAP_STATES, STATES_OUTLINE, type MapState } from '../data/mapStates';
 import { ROUTE_POIS, type RoutePoi } from '../data/passes';
@@ -27,14 +27,17 @@ const LAYERS = {
 const GRID = { cols: 16, rows: 27, x0: 0.5, y0: 0.5, cellW: 18.625, cellH: 17.7778 };
 
 // The grid is drawn at the same height as the Itinerary list (27 rows of
-// 24px plus its 1px border), keeping its true shape. That makes it wider than
-// a phone, so the map scrolls sideways there.
+// 24px plus its 1px border), keeping its true shape, and centered on screen.
+// It's wider than a phone, so its edges and anything breaking past it fall
+// off the sides.
 const ITINERARY_LIST_PX = 27 * 24 + 2;
 const GRID_UNITS_TALL = 481;
 const MAP_SCALE = ITINERARY_LIST_PX / GRID_UNITS_TALL;
 const MAP_PX_WIDTH = MAP_LAYOUT.viewBox.width * MAP_SCALE;
-// Room on the right for artwork that breaks past the grid
-const BREAKOUT_PX = 32 * MAP_SCALE;
+const MAP_PX_HEIGHT = MAP_LAYOUT.viewBox.height * MAP_SCALE;
+// Offset that puts the grid's center (x 149.8) at the center of the screen
+const GRID_CENTER_X = 149.8;
+const MAP_PX_LEFT_OF_CENTER = (GRID_CENTER_X - MAP_LAYOUT.viewBox.x) * MAP_SCALE;
 
 // The prototype build can't use GPS, so it gets a slider to preview positions
 const DEMO_LOCATION = import.meta.env.VITE_DEMO_LOCATION === 'true';
@@ -81,16 +84,17 @@ function mileToElevationPoint(mile: number): [number, number] {
   const { top, bottom, totalMiles } = ELEVATION_LAYOUT;
   const y = top + ((bottom - top) * Math.max(0, Math.min(totalMiles, mile))) / totalMiles;
   const line = ELEVATION_LINE;
-  if (y <= line[0][1]) return [line[0][0], y];
+  const fit = (x: number) => ELEVATION_LAYOUT.artLeft + (x - ELEVATION_LAYOUT.artLeft) * ELEVATION_SCALE_X;
+  if (y <= line[0][1]) return [fit(line[0][0]), y];
   for (let i = 1; i < line.length; i++) {
     if (y <= line[i][1]) {
       const [x0, y0] = line[i - 1];
       const [x1, y1] = line[i];
       const t = y1 === y0 ? 0 : (y - y0) / (y1 - y0);
-      return [x0 + t * (x1 - x0), y];
+      return [fit(x0 + t * (x1 - x0)), y];
     }
   }
-  return [line[line.length - 1][0], y];
+  return [fit(line[line.length - 1][0]), y];
 }
 
 const toPoints = (poly: [number, number][]) => poly.map(([x, y]) => `${x},${y}`).join(' ');
@@ -178,7 +182,8 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
 
   // Elevation view: grid squares outside the profile shape
   const hitTestElevation = (p: [number, number]): MapSelection => {
-    if (pointInPolygon(p, ELEVATION_POLYGON)) return null;
+    const artX = ELEVATION_LAYOUT.artLeft + (p[0] - ELEVATION_LAYOUT.artLeft) / ELEVATION_SCALE_X;
+    if (pointInPolygon([artX, p[1]], ELEVATION_POLYGON)) return null;
     const col = Math.floor((p[0] - GRID.x0) / GRID.cellW);
     const row = Math.floor((p[1] - GRID.y0) / GRID.cellH);
     if (col >= 0 && col < GRID.cols && row >= 0 && row < GRID.rows) return { kind: 'cell', col, row };
@@ -228,7 +233,13 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
       // Each row of the elevation grid is 100 route miles
       const from = Math.round(toUnits(shownCell.row * 100, measurementSystem));
       const to = Math.round(toUnits((shownCell.row + 1) * 100, measurementSystem));
-      return { ...pct(cellRect.x + GRID.cellW / 2, cellRect.y), text: `${unit(measurementSystem) === 'km' ? 'Km' : 'Miles'} ${from.toLocaleString('en-US')}–${to.toLocaleString('en-US')}` };
+      // Each column is one slice of 1,500' to 12,000'
+      const feetPerCol = (ELEVATION_LAYOUT.maxFeet - ELEVATION_LAYOUT.minFeet) / GRID.cols;
+      const lowFt = ELEVATION_LAYOUT.minFeet + shownCell.col * feetPerCol;
+      const band = measurementSystem === 'metric'
+        ? `${Math.round((lowFt * 0.3048) / 10) * 10}–${Math.round(((lowFt + feetPerCol) * 0.3048) / 10) * 10} m`
+        : `${(Math.round(lowFt / 50) * 50).toLocaleString('en-US')}–${(Math.round((lowFt + feetPerCol) / 50) * 50).toLocaleString('en-US')}'`;
+      return { ...pct(cellRect.x + GRID.cellW / 2, cellRect.y), text: `${band} · ${unit(measurementSystem) === 'km' ? 'km' : 'mi'} ${from.toLocaleString('en-US')}–${to.toLocaleString('en-US')}` };
     }
     if (cellRect) {
       const side = Math.round(toUnits(100, measurementSystem));
@@ -254,11 +265,9 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
   return (
     <div className="w-full space-y-4">
       {/* Map */}
-      {/* Full-width strip that scrolls sideways on narrow screens */}
-      <div className="relative w-screen max-w-[100vw] left-1/2 -translate-x-1/2">
-      <div className="overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-      <div className="mx-auto px-4" style={{ width: MAP_PX_WIDTH + BREAKOUT_PX + 32 }}>
-      <div className="relative select-none" style={{ width: MAP_PX_WIDTH }}>
+      {/* Full-width strip; the grid is centered and the rest falls off the sides */}
+      <div className="relative w-screen max-w-[100vw] left-1/2 -translate-x-1/2 overflow-hidden" style={{ height: MAP_PX_HEIGHT }}>
+      <div className="absolute top-0 select-none" style={{ width: MAP_PX_WIDTH, left: `calc(50% - ${MAP_PX_LEFT_OF_CENTER}px)` }}>
         {view === 'elevation' ? (
           <svg
             ref={svgRef}
@@ -275,7 +284,20 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
             {cellRect && (
               <rect x={cellRect.x} y={cellRect.y} width={GRID.cellW} height={GRID.cellH} fill="#40C8EF" opacity={0.45} pointerEvents="none" />
             )}
-            <g fill="none" pointerEvents="none" dangerouslySetInnerHTML={{ __html: LAYERS.elevation }} />
+            <g
+              fill="none"
+              pointerEvents="none"
+              transform={`translate(${ELEVATION_LAYOUT.artLeft} 0) scale(${ELEVATION_SCALE_X} 1) translate(${-ELEVATION_LAYOUT.artLeft} 0)`}
+              dangerouslySetInnerHTML={{ __html: LAYERS.elevation }}
+            />
+
+            {/* Elevation scale along the top of the grid */}
+            <text x={7} y={-3} fontSize={6.5} fill="#40C8EF" className="font-display" fontWeight={500}>
+              {measurementSystem === 'metric' ? '457 m' : "1,500'"}
+            </text>
+            <text x={292} y={-3} fontSize={6.5} fill="#40C8EF" textAnchor="end" className="font-display" fontWeight={500}>
+              {measurementSystem === 'metric' ? '3,658 m' : "12,000'"}
+            </text>
 
             {/* Towns */}
             {waypoints.map(({ town, mile }, i) => {
@@ -426,8 +448,6 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
             {label.text}
           </div>
         )}
-      </div>
-      </div>
       </div>
         {!DEMO_LOCATION && (
           <button
