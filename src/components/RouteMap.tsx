@@ -191,10 +191,14 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
     return null;
   };
 
-  // Elevation view: the grid is a scale only; the profile shape shows total climbing
+  // Elevation view: squares carry an elevation band and mile range; the profile shape shows total climbing
   const hitTestElevation = (p: [number, number]): MapSelection => {
     const artX = ELEVATION_LAYOUT.artLeft + (p[0] - ELEVATION_LAYOUT.artLeft) / ELEVATION_SCALE_X;
-    return pointInPolygon([artX, p[1]], ELEVATION_POLYGON) ? { kind: 'climb', at: p } : null;
+    if (pointInPolygon([artX, p[1]], ELEVATION_POLYGON)) return { kind: 'climb', at: p };
+    const col = Math.floor((p[0] - GRID.x0) / GRID.cellW);
+    const row = Math.floor((p[1] - GRID.y0) / GRID.cellH);
+    if (col >= 0 && col < GRID.cols && row >= 0 && row < GRID.rows) return { kind: 'cell', col, row };
+    return null;
   };
   const hitFor = (p: [number, number]) => (view === 'elevation' ? hitTestElevation(p) : hitTest(p));
 
@@ -237,6 +241,22 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
       left: Math.min(98, Math.max(2, ((x - viewBox.x) / viewBox.width) * 100)),
       top: ((y - viewBox.y) / viewBox.height) * 100,
     });
+    if (cellRect && shownCell && view === 'elevation') {
+      // Columns are slices of 1,500' to 12,000'; rows are 100 route miles
+      const feetPerCol = (ELEVATION_LAYOUT.maxFeet - ELEVATION_LAYOUT.minFeet) / GRID.cols;
+      const lowFt = ELEVATION_LAYOUT.minFeet + shownCell.col * feetPerCol;
+      const band =
+        measurementSystem === 'metric'
+          ? `${(Math.round((lowFt * 0.3048) / 10) * 10).toLocaleString('en-US')}–${(Math.round(((lowFt + feetPerCol) * 0.3048) / 10) * 10).toLocaleString('en-US')} m`
+          : `${(Math.round(lowFt / 50) * 50).toLocaleString('en-US')}–${(Math.round((lowFt + feetPerCol) / 50) * 50).toLocaleString('en-US')}'`;
+      const from = Math.round(toUnits(shownCell.row * 100, measurementSystem)).toLocaleString('en-US');
+      const to = Math.round(toUnits((shownCell.row + 1) * 100, measurementSystem)).toLocaleString('en-US');
+      return {
+        ...pct(cellRect.x + GRID.cellW / 2, cellRect.y),
+        text: band,
+        detail: `${measurementSystem === 'metric' ? 'Km' : 'Miles'} ${from}–${to}`,
+      };
+    }
     if (cellRect) {
       const side = Math.round(toUnits(100, measurementSystem));
       return { ...pct(cellRect.x + GRID.cellW / 2, cellRect.y), text: `${side} × ${side} ${unit(measurementSystem)}` };
@@ -306,13 +326,6 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
               dangerouslySetInnerHTML={{ __html: LAYERS.elevation }}
             />
 
-            {/* Elevation scale along the top of the grid */}
-            <text x={7} y={-3} fontSize={6.5} fill="#40C8EF" className="font-display" fontWeight={500}>
-              {measurementSystem === 'metric' ? '457 m' : "1,500'"}
-            </text>
-            <text x={292} y={-3} fontSize={6.5} fill="#40C8EF" textAnchor="end" className="font-display" fontWeight={500}>
-              {measurementSystem === 'metric' ? '3,658 m' : "12,000'"}
-            </text>
 
             {/* Passes and climbs: dots like the towns on the map; tap to show one in the card */}
             {ROUTE_POIS.map((poi, i) => {
