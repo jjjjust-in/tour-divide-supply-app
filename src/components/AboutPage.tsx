@@ -163,7 +163,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
               <div className="p-6 space-y-5 text-[#1a1a1a] leading-relaxed">
                 <p className="text-[12px]">
                   TourDivideSupply.com was created by{' '}
-                  <span className="font-display font-bold text-[#40C8EF]">JJJJustin</span>,
+                  <span className="font-display font-medium text-[#40C8EF]">JJJJustin</span>,
                   an avid bikepacker and product designer who has ridden over 5000 miles on the Tour Divide route.
                 </p>
                 <p className="text-[12px]">
@@ -203,7 +203,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                         <table className="w-full">
                           <thead>
                             <tr className="bg-[#40C8EF]">
-                              <th colSpan={3} className="text-left p-3 font-display font-bold text-sm uppercase tracking-tight text-white">
+                              <th colSpan={3} className="text-left p-3 font-display font-medium text-sm uppercase tracking-tight text-white">
                                 Official Tour Divide Route from Topofusion
                               </th>
                             </tr>
@@ -214,7 +214,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                                 key={resource.id}
                                 className={`${index !== topofusionFiles.length - 1 ? 'border-b border-[#40C8EF]/30' : ''} hover:bg-[#F5FCFF] transition-colors`}
                               >
-                                <td className="p-3 font-display font-bold text-sm uppercase tracking-tight text-[#231f20]">
+                                <td className="p-3 font-display font-medium text-sm uppercase tracking-tight text-[#231f20]">
                                   {resource.fileName}
                                 </td>
                                 <td className="p-3 text-xs text-[#231f20]/60">{resource.fileSize}</td>
@@ -235,7 +235,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                         <table className="w-full">
                           <thead>
                             <tr className="bg-[#40C8EF]">
-                              <th colSpan={3} className="text-left p-3 font-display font-bold text-sm uppercase tracking-tight text-white">
+                              <th colSpan={3} className="text-left p-3 font-display font-medium text-sm uppercase tracking-tight text-white">
                                 Great Divide Mountain Bike Route from ACA
                               </th>
                             </tr>
@@ -246,7 +246,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                                 key={resource.id}
                                 className={`${index !== acaFiles.length - 1 ? 'border-b border-[#40C8EF]/30' : ''} hover:bg-[#F5FCFF] transition-colors`}
                               >
-                                <td className="p-3 font-display font-bold text-sm uppercase tracking-tight text-[#231f20]">
+                                <td className="p-3 font-display font-medium text-sm uppercase tracking-tight text-[#231f20]">
                                   {resource.fileName}
                                 </td>
                                 <td className="p-3 text-xs text-[#231f20]/60">{resource.fileSize}</td>
@@ -289,7 +289,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                                     {resource.title}
                                   </h3>
                                   {resource.isPushed && (
-                                    <span className="bg-[#EF4444] text-white text-xs px-2 py-1 rounded uppercase font-display font-bold tracking-tight shrink-0">
+                                    <span className="bg-[#EF4444] text-white text-xs px-2 py-1 rounded uppercase font-display font-medium tracking-tight shrink-0">
                                       Alert
                                     </span>
                                   )}
@@ -340,7 +340,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                           : 'bg-gray-100 text-[#999] hover:bg-[#F5FCFF]'
                       }`}
                     >
-                      <div className="text-sm uppercase font-display font-bold tracking-[-0.36px]">Imperial</div>
+                      <div className="text-sm uppercase font-display font-medium tracking-[-0.36px]">Imperial</div>
                       <div className="text-xs opacity-80">Miles & Feet</div>
                     </button>
                     <div className="w-px bg-[#40C8EF]" />
@@ -352,7 +352,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                           : 'bg-gray-100 text-[#999] hover:bg-[#F5FCFF]'
                       }`}
                     >
-                      <div className="text-sm uppercase font-display font-bold tracking-[-0.36px]">Metric</div>
+                      <div className="text-sm uppercase font-display font-medium tracking-[-0.36px]">Metric</div>
                       <div className="text-xs opacity-80">Km & Meters</div>
                     </button>
                   </div>
@@ -371,14 +371,14 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                     className="w-full py-3 px-4 rounded-lg border-2 border-[#40C8EF] text-[#40C8EF] hover:bg-[#F5FCFF] transition-all flex items-center justify-center gap-2 touch-manipulation"
                   >
                     <Download size={16} />
-                    <span className="text-sm uppercase font-display font-bold tracking-[-0.36px]">Export All Data</span>
+                    <span className="text-sm uppercase font-display font-medium tracking-[-0.36px]">Export All Data</span>
                   </button>
                   <button
                     onClick={handleImportData}
                     className="w-full py-3 px-4 rounded-lg border-2 border-[#40C8EF] text-[#40C8EF] hover:bg-[#F5FCFF] transition-all flex items-center justify-center gap-2 touch-manipulation"
                   >
                     <Upload size={16} />
-                    <span className="text-sm uppercase font-display font-bold tracking-[-0.36px]">Import Data</span>
+                    <span className="text-sm uppercase font-display font-medium tracking-[-0.36px]">Import Data</span>
                   </button>
                   <p className="text-xs text-gray-500 text-center">
                     Backup your notes and resupplies to restore them later or on another device
@@ -412,7 +412,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                     className="w-full py-2.5 px-4 rounded-lg border-2 border-[#FF6B35] text-[#FF6B35] hover:bg-[#FF6B35] hover:text-white transition-all flex items-center justify-center gap-2 touch-manipulation"
                   >
                     <RotateCcw size={14} />
-                    <span className="text-sm uppercase font-display font-bold tracking-[-0.36px]">Reset All Data</span>
+                    <span className="text-sm uppercase font-display font-medium tracking-[-0.36px]">Reset All Data</span>
                   </button>
                   <p className="text-xs text-gray-500 text-center">
                     ⚠️ This action cannot be undone. ⚠️<br />Export your data first!
@@ -444,7 +444,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
               </button>
               <button
                 onClick={confirmClearData}
-                className="flex-1 py-3 px-4 rounded-lg bg-[#FF6B35] text-white hover:bg-[#E55A25] transition-all touch-manipulation uppercase font-display font-bold tracking-[-0.36px]"
+                className="flex-1 py-3 px-4 rounded-lg bg-[#FF6B35] text-white hover:bg-[#E55A25] transition-all touch-manipulation uppercase font-display font-medium tracking-[-0.36px]"
               >
                 Delete
               </button>

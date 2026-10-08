@@ -262,7 +262,7 @@ export default function App() {
             aria-label="The Route"
           >
             <MapIcon size={16} className={showRoute ? 'text-white' : 'text-[#40C8EF]'} />
-            <span className="uppercase font-display font-bold tracking-[-0.36px] text-sm md:text-base">
+            <span className="uppercase font-display font-medium tracking-[-0.36px] text-sm md:text-base">
               Route
             </span>
           </button>
@@ -276,7 +276,7 @@ export default function App() {
             aria-label="Journal"
           >
             <BookOpen size={16} className={showJournal ? 'text-white' : 'text-[#40C8EF]'} />
-            <span className="uppercase font-display font-bold tracking-[-0.36px] text-sm md:text-base">
+            <span className="uppercase font-display font-medium tracking-[-0.36px] text-sm md:text-base">
               Journal
             </span>
           </button>
@@ -299,7 +299,7 @@ export default function App() {
                 <path d={svgPaths.pee90000} fill="var(--fill-0, #40C8EF)" />
               </svg>
             </div>
-            <p className="font-display font-bold leading-[normal] not-italic relative shrink-0 text-[#40c8ef] text-[11px] text-nowrap tracking-[-0.22px] uppercase whitespace-pre">
+            <p className="font-display font-medium leading-[normal] not-italic relative shrink-0 text-[#40c8ef] text-[11px] text-nowrap tracking-[-0.22px] uppercase whitespace-pre">
               tourdividesupp<span className="tracking-[-1.37px]">l</span>
               <span className="tracking-[-2.64px]">y</span>
               <span className="tracking-[-1.56px]">.</span>com

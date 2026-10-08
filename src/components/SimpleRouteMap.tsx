@@ -170,7 +170,7 @@ function ItineraryRow({
   return (
     <>
       <div
-        className={`content-stretch flex h-[28px] items-center min-h-px min-w-px relative shrink-0 w-full ${
+        className={`content-stretch flex h-[24px] items-center min-h-px min-w-px relative shrink-0 w-full ${
           isClickable ? 'cursor-pointer hover:bg-[#40c8ef]/5 active:bg-[#40c8ef]/10 transition-colors' : ''
         }`}
         onClick={handleClick}
@@ -190,7 +190,7 @@ function ItineraryRow({
               }`}
             >
               <p className={`flex-1 font-display font-medium leading-[normal] min-h-px min-w-px not-italic relative shrink-0 text-black text-[12px] uppercase ${
-                isClickable ? "hover:font-bold" : ''
+                ''
               }`}>
                 {location}
               </p>
@@ -219,7 +219,7 @@ function ItineraryRow({
             {/* Stats Grid */}
             <div className="grid grid-cols-3 gap-2">
               <div>
-                <div className="text-black uppercase font-display font-bold tracking-[-0.36px] text-[12px] mb-1">
+                <div className="text-black uppercase font-display font-medium tracking-[-0.36px] text-[12px] mb-1">
                   ELEV
                 </div>
                 <div className="text-black text-[14px] font-display font-medium leading-[120%]">
@@ -228,7 +228,7 @@ function ItineraryRow({
               </div>
               {town.population && (
                 <div>
-                  <div className="text-black uppercase font-display font-bold tracking-[-0.36px] text-[12px] mb-1">
+                  <div className="text-black uppercase font-display font-medium tracking-[-0.36px] text-[12px] mb-1">
                     POP
                   </div>
                   <div className="text-black text-[14px] font-display font-medium leading-[120%]">
@@ -238,7 +238,7 @@ function ItineraryRow({
               )}
               {mileageToNext !== null && (
                 <div>
-                  <div className="text-black uppercase font-display font-bold tracking-[-0.36px] text-[12px] mb-1">
+                  <div className="text-black uppercase font-display font-medium tracking-[-0.36px] text-[12px] mb-1">
                     TO NEXT
                   </div>
                   <div className="text-black text-[14px] font-display font-medium leading-[120%]">
@@ -271,7 +271,7 @@ function ItineraryRow({
                     setShowNoteForm(false);
                     setShowResupplyForm(false);
                   }}
-                  className={`flex-1 px-2 py-1 text-[14px] font-display font-bold uppercase tracking-[-0.2px] rounded transition-colors flex items-center justify-center gap-1 ${
+                  className={`flex-1 px-2 py-1 text-[14px] font-display font-medium uppercase tracking-[-0.2px] rounded transition-colors flex items-center justify-center gap-1 ${
                     activeTab === 'notes'
                       ? 'bg-[#40c8ef] text-white'
                       : 'bg-gray-200 text-black hover:bg-gray-300'
@@ -285,7 +285,7 @@ function ItineraryRow({
                     setShowNoteForm(false);
                     setShowResupplyForm(false);
                   }}
-                  className={`flex-1 px-2 py-1 text-[14px] font-display font-bold uppercase tracking-[-0.2px] rounded transition-colors flex items-center justify-center gap-1 ${
+                  className={`flex-1 px-2 py-1 text-[14px] font-display font-medium uppercase tracking-[-0.2px] rounded transition-colors flex items-center justify-center gap-1 ${
                     activeTab === 'resupplies'
                       ? 'bg-[#40c8ef] text-white'
                       : 'bg-gray-200 text-black hover:bg-gray-300'
@@ -314,14 +314,14 @@ function ItineraryRow({
                             <div className="flex gap-1">
                               <button
                                 onClick={handleCancelEditNote}
-                                className="flex-1 bg-gray-300 text-black py-1 px-1.5 rounded hover:bg-gray-400 transition-colors text-[13px] font-display font-bold uppercase"
+                                className="flex-1 bg-gray-300 text-black py-1 px-1.5 rounded hover:bg-gray-400 transition-colors text-[13px] font-display font-medium uppercase"
                               >
                                 Cancel
                               </button>
                               <button
                                 onClick={handleSaveNote}
                                 disabled={!editNoteContent.trim()}
-                                className="flex-1 bg-[#40c8ef] text-white py-1 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[13px] font-display font-bold uppercase"
+                                className="flex-1 bg-[#40c8ef] text-white py-1 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[13px] font-display font-medium uppercase"
                               >
                                 Save
                               </button>
@@ -355,7 +355,7 @@ function ItineraryRow({
                   {!showNoteForm ? (
                     <button
                       onClick={() => setShowNoteForm(true)}
-                      className="w-full bg-[#40c8ef] text-white py-1.5 px-2 rounded hover:bg-[#00B6EB] transition-colors flex items-center justify-center gap-1 text-[13px] font-display font-bold uppercase tracking-[-0.2px]"
+                      className="w-full bg-[#40c8ef] text-white py-1.5 px-2 rounded hover:bg-[#00B6EB] transition-colors flex items-center justify-center gap-1 text-[13px] font-display font-medium uppercase tracking-[-0.2px]"
                     >
                       <Plus size={10} />
                       Add Note
@@ -377,14 +377,14 @@ function ItineraryRow({
                             setShowNoteForm(false);
                             setNewNote('');
                           }}
-                          className="flex-1 bg-gray-300 text-black py-1 px-1.5 rounded hover:bg-gray-400 transition-colors text-[13px] font-display font-bold uppercase"
+                          className="flex-1 bg-gray-300 text-black py-1 px-1.5 rounded hover:bg-gray-400 transition-colors text-[13px] font-display font-medium uppercase"
                         >
                           Cancel
                         </button>
                         <button
                           type="submit"
                           disabled={!newNote.trim()}
-                          className="flex-1 bg-[#40c8ef] text-white py-1 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[13px] font-display font-bold uppercase"
+                          className="flex-1 bg-[#40c8ef] text-white py-1 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[13px] font-display font-medium uppercase"
                         >
                           Add
                         </button>
@@ -435,14 +435,14 @@ function ItineraryRow({
                             <div className="flex gap-1">
                               <button
                                 onClick={handleCancelEditResupply}
-                                className="flex-1 bg-gray-300 text-black py-1 px-1.5 rounded hover:bg-gray-400 transition-colors text-[13px] font-display font-bold uppercase"
+                                className="flex-1 bg-gray-300 text-black py-1 px-1.5 rounded hover:bg-gray-400 transition-colors text-[13px] font-display font-medium uppercase"
                               >
                                 Cancel
                               </button>
                               <button
                                 onClick={handleSaveResupply}
                                 disabled={!editResupply.name.trim()}
-                                className="flex-1 bg-[#40c8ef] text-white py-1 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[13px] font-display font-bold uppercase"
+                                className="flex-1 bg-[#40c8ef] text-white py-1 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[13px] font-display font-medium uppercase"
                               >
                                 Save
                               </button>
@@ -456,17 +456,17 @@ function ItineraryRow({
                               </h4>
                               {resupply.hours && (
                                 <p className="text-[10px] text-black leading-[120%] mt-1">
-                                  <span className="font-display font-bold text-black">Hours:</span> {resupply.hours}
+                                  <span className="font-display font-medium text-black">Hours:</span> {resupply.hours}
                                 </p>
                               )}
                               {resupply.phone && (
                                 <p className="text-[10px] text-black leading-[120%] mt-1">
-                                  <span className="font-display font-bold text-black">Phone:</span> {resupply.phone}
+                                  <span className="font-display font-medium text-black">Phone:</span> {resupply.phone}
                                 </p>
                               )}
                               {resupply.address && (
                                 <p className="text-[10px] text-black leading-[120%] mt-1">
-                                  <span className="font-display font-bold text-black">Address:</span>{' '}
+                                  <span className="font-display font-medium text-black">Address:</span>{' '}
                                   <a
                                     href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(resupply.address)}`}
                                     target="_blank"
@@ -503,7 +503,7 @@ function ItineraryRow({
                   {!showResupplyForm ? (
                     <button
                       onClick={() => setShowResupplyForm(true)}
-                      className="w-full bg-[#40c8ef] text-white py-1.5 px-2 rounded hover:bg-[#00B6EB] transition-colors flex items-center justify-center gap-1 text-[13px] font-display font-bold uppercase tracking-[-0.2px]"
+                      className="w-full bg-[#40c8ef] text-white py-1.5 px-2 rounded hover:bg-[#00B6EB] transition-colors flex items-center justify-center gap-1 text-[13px] font-display font-medium uppercase tracking-[-0.2px]"
                     >
                       <Plus size={10} />
                       Add Resupply
@@ -547,14 +547,14 @@ function ItineraryRow({
                             setShowResupplyForm(false);
                             setNewResupply({ name: '', hours: '', phone: '', address: '' });
                           }}
-                          className="flex-1 bg-gray-300 text-black py-1 px-1.5 rounded hover:bg-gray-400 transition-colors text-[13px] font-display font-bold uppercase"
+                          className="flex-1 bg-gray-300 text-black py-1 px-1.5 rounded hover:bg-gray-400 transition-colors text-[13px] font-display font-medium uppercase"
                         >
                           Cancel
                         </button>
                         <button
                           type="submit"
                           disabled={!newResupply.name.trim()}
-                          className="flex-1 bg-[#40c8ef] text-white py-1 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[13px] font-display font-bold uppercase"
+                          className="flex-1 bg-[#40c8ef] text-white py-1 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[13px] font-display font-medium uppercase"
                         >
                           Add
                         </button>
