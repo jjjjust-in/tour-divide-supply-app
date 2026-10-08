@@ -359,6 +359,10 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
           onPointerLeave={() => setHoverCell(null)}
         >
           <defs>
+            <pattern id="map-dots" patternUnits="userSpaceOnUse" width={222} height={222}>
+              <rect width={222} height={222} fill="#ffffff" />
+              <image href={navBgPattern} width={222} height={222} preserveAspectRatio="none" />
+            </pattern>
             <clipPath id="states-clip">
               <polygon points={toPoints(STATES_OUTLINE)} />
             </clipPath>
@@ -376,7 +380,7 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
           {/* Highlighted state */}
           {selection?.kind === 'state' && (
             <g transform={`translate(${MAP_LAYOUT.stateLines.x} ${MAP_LAYOUT.stateLines.y})`} pointerEvents="none">
-              <polygon points={toPoints(selection.state.polygon)} fill="#40C8EF" opacity={0.18} clipPath="url(#states-clip)" />
+              <polygon points={toPoints(selection.state.polygon)} fill="url(#map-dots)" clipPath="url(#states-clip)" />
             </g>
           )}
 
