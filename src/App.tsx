@@ -382,6 +382,7 @@ export default function App() {
           notes={[]}
           journalEntries={journalEntries}
           towns={towns}
+          resupplies={resupplies}
           measurementSystem={measurementSystem}
           onDeleteNote={handleDeleteNote}
           onDeleteJournalEntry={handleDeleteJournalEntry}
