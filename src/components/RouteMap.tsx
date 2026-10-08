@@ -491,7 +491,8 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
 
       {/* Waypoint card: towns on the map, passes and climbs on the elevation profile */}
       {(isElevation ? pass : waypoint) && (
-        <div className="bg-white border border-[#40c8ef] max-w-[360px] mx-auto">
+        // Pinned just above the bottom nav so it's always there for stepping through waypoints
+        <div className="sticky bottom-[127px] md:bottom-[144px] z-20 bg-white border border-[#40c8ef] max-w-[360px] mx-auto shadow-[0_6px_24px_rgba(35,31,32,0.12)]">
           <div className="flex items-stretch">
             <button
               onClick={() => stepTo(cardIndex - 1)}
