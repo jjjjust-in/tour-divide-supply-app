@@ -154,14 +154,9 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
 
           {/* About Section */}
           <div className="w-full">
-            <div className="flex gap-[10px] items-center justify-center pb-[24px]">
-              <p className="font-display font-bold text-[#40c8ef] text-[18px] tracking-[-0.36px] uppercase whitespace-nowrap">
-                What is Tour Divide Supply?
-              </p>
-            </div>
             <div className="space-y-5 text-[#1a1a1a]">
               <p className="font-display font-semibold text-[22px] leading-[1.25] tracking-[-0.02em] text-balance">
-                Built by{' '}
+                Tour Divide Supply is built by{' '}
                 <span className="text-[#40C8EF]">JJJJustin</span>,
                 a bikepacker and product designer with over 5,000 miles on the Tour Divide route.
               </p>
@@ -180,7 +175,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
 
           {/* Social Section */}
           <div className="w-full">
-            <div className="flex gap-[10px] items-center justify-center pb-[24px]">
+            <div className="flex gap-[10px] items-center justify-center pb-[12px]">
               <p className="font-display font-bold text-[#40c8ef] text-[18px] tracking-[-0.36px] uppercase whitespace-nowrap">
                 Social
               </p>
@@ -225,7 +220,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
 
           {/* Resources Section */}
           <div className="w-full">
-            <div className="flex gap-[10px] items-center justify-center pb-[24px]">
+            <div className="flex gap-[10px] items-center justify-center pb-[12px]">
               <p className="font-display font-bold text-[#40c8ef] text-[18px] tracking-[-0.36px] uppercase whitespace-nowrap">
                 Resources
               </p>
@@ -353,7 +348,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
 
           {/* Settings Section */}
           <div className="w-full">
-            <div className="flex gap-[10px] items-center justify-center pb-[24px]">
+            <div className="flex gap-[10px] items-center justify-center pb-[12px]">
               <p className="font-display font-bold text-[#40c8ef] text-[18px] tracking-[-0.36px] uppercase whitespace-nowrap">
                 Settings
               </p>

@@ -78,40 +78,42 @@ export function QuickAddNote({ towns, onClose, onAddResupply, onAddJournalEntry 
         className="w-full max-w-lg bg-white rounded-t-2xl shadow-2xl"
         onClick={e => e.stopPropagation()}
       >
-        {/* Handle */}
-        <div className="flex justify-center pt-3 pb-1">
-          <div className="w-10 h-1 bg-gray-300 rounded-full" />
-        </div>
-
-        {/* Header */}
+        {/* Header: handle, title and tabs share one patterned band */}
         <div
-          className="px-4 pt-3 pb-0"
-          style={navBgPattern ? { backgroundImage: `url(${navBgPattern})`, backgroundSize: '300px 300px' } : { backgroundColor: '#febc12' }}
+          className="rounded-t-2xl"
+          style={{ backgroundImage: `url(${navBgPattern})`, backgroundSize: '300px 300px' }}
         >
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-display font-bold text-base text-[#231F20] uppercase tracking-tight">Add</h2>
-            <button onClick={onClose} className="p-1 rounded-full hover:bg-black/10">
-              <X size={16} className="text-[#231F20]" />
+          <div className="flex justify-center pt-3 pb-2">
+            <div className="w-10 h-1 bg-[#231F20]/20 rounded-full" />
+          </div>
+          <div className="flex items-center justify-between px-4 pb-3">
+            <h2 className="font-display font-bold text-[16px] text-[#231F20] uppercase tracking-tight">Add</h2>
+            <button
+              onClick={onClose}
+              aria-label="Close"
+              className="w-9 h-9 flex items-center justify-center rounded-full bg-white/80 hover:bg-white transition-colors touch-manipulation"
+            >
+              <X size={18} className="text-[#231F20]" />
             </button>
           </div>
-        </div>
 
-        {/* Tabs — flush against content */}
-        <div className="flex px-4 pt-0 -mb-[2px] relative z-10">
-          {tabs.map(tab => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold transition-colors rounded-t-lg border-2 mr-1 ${
-                activeTab === tab.key
-                  ? 'border-[#40C8EF] border-b-white bg-white text-[#40C8EF]'
-                  : 'border-[#40C8EF] bg-[#E6F7FD] text-[#40C8EF]/70 hover:bg-[#d0f0fb]'
-              }`}
-            >
-              {tab.icon}
-              {tab.label}
-            </button>
-          ))}
+          {/* Tabs sit on the band and connect to the content box below */}
+          <div className="flex px-4 -mb-[2px] relative z-10">
+            {tabs.map(tab => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold transition-colors rounded-t-lg border-2 mr-1 ${
+                  activeTab === tab.key
+                    ? 'border-[#40C8EF] border-b-white bg-white text-[#40C8EF]'
+                    : 'border-[#40C8EF] bg-[#E6F7FD] text-[#40C8EF]/70 hover:bg-[#d0f0fb]'
+                }`}
+              >
+                {tab.icon}
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Content */}
