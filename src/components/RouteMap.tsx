@@ -130,14 +130,8 @@ export function RouteMap({ towns, measurementSystem, onOpenTown }: RouteMapProps
                   }}
                 >
                   <circle cx={x} cy={y} r={7} fill="transparent" />
-                  <circle
-                    cx={x}
-                    cy={y}
-                    r={isSelected ? 3.2 : 2.2}
-                    fill={isSelected ? '#231F20' : '#ffffff'}
-                    stroke={isSelected ? '#231F20' : '#00B6EB'}
-                    strokeWidth={1.2}
-                  />
+                  {isSelected && <circle cx={x} cy={y} r={4.6} fill="none" stroke="#231F20" strokeWidth={1} />}
+                  <circle cx={x} cy={y} r={2.4} fill="#231F20" />
                 </g>
               );
             })}

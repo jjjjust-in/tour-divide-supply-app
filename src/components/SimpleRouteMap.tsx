@@ -4,11 +4,13 @@ import type { MeasurementSystem } from '../utils/measurements';
 import { formatDistance, formatElevation, milesToKm } from '../utils/measurements';
 import { ChevronDown, ChevronUp, Plus, Trash2, Edit2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { RouteMap } from './RouteMap';
 import type { Note, Resupply } from '../types';
 
 interface SimpleRouteMapProps {
   towns: Town[];
+  /** Town to open and scroll to, e.g. after "View town" on the Map page */
+  focusTownId?: string | null;
+  onFocusHandled?: () => void;
   selectedTownId: string | null;
   onTownSelect: (townId: string) => void;
   notesCount: Record<string, number>;
@@ -576,40 +578,20 @@ function ItineraryRow({
   );
 }
 
-export function SimpleRouteMap({ towns, measurementSystem, notes, resupplies, onAddNote, onDeleteNote, onEditNote, onAddResupply, onDeleteResupply, onEditResupply }: SimpleRouteMapProps) {
+export function SimpleRouteMap({ towns, measurementSystem, focusTownId, onFocusHandled, notes, resupplies, onAddNote, onDeleteNote, onEditNote, onAddResupply, onDeleteResupply, onEditResupply }: SimpleRouteMapProps) {
   const mappedStops = itinerary;
   // Only one town can be open at a time
   const [expandedStopId, setExpandedStopId] = useState<string | null>(null);
-  const [view, setView] = useState<'list' | 'map'>(() => {
-    try {
-      return localStorage.getItem('tour-divide-route-view') === 'map' ? 'map' : 'list';
-    } catch {
-      return 'list';
-    }
-  });
-  const [scrollToTownId, setScrollToTownId] = useState<string | null>(null);
-
+  // Opening a town from the Map page: expand it and bring it into view
   useEffect(() => {
-    try {
-      localStorage.setItem('tour-divide-route-view', view);
-    } catch {
-      // not critical
-    }
-  }, [view]);
-
-  // After "View town" on the map, bring that town's row into view
-  useEffect(() => {
-    if (view !== 'list' || !scrollToTownId) return;
-    document.getElementById(`town-row-${scrollToTownId}`)?.scrollIntoView({ block: 'start', behavior: 'smooth' });
-    setScrollToTownId(null);
-  }, [view, scrollToTownId]);
-
-  const openTownFromMap = (townId: string) => {
-    const stop = mappedStops.find((s) => s.linkedTownId === townId);
+    if (!focusTownId) return;
+    const stop = mappedStops.find((st) => st.linkedTownId === focusTownId);
     if (stop) setExpandedStopId(stop.id);
-    setView('list');
-    setScrollToTownId(townId);
-  };
+    requestAnimationFrame(() => {
+      document.getElementById(`town-row-${focusTownId}`)?.scrollIntoView({ block: 'start' });
+    });
+    onFocusHandled?.();
+  }, [focusTownId, mappedStops, onFocusHandled]);
 
   return (
     <div className="relative w-full h-full flex items-center justify-start bg-white overflow-auto">
@@ -618,33 +600,9 @@ export function SimpleRouteMap({ towns, measurementSystem, notes, resupplies, on
           {/* Title */}
           <div className="flex flex-col gap-5 items-center justify-center pb-4 relative shrink-0 w-full">
             <p className="font-display font-bold leading-[normal] not-italic relative shrink-0 text-black text-[20px] text-nowrap tracking-[-0.36px] uppercase whitespace-pre">The Route</p>
-
-            {/* List / Map */}
-            <div className="flex w-[298px] border border-[#40C8EF] rounded overflow-hidden" role="tablist" aria-label="Route view">
-              {(['list', 'map'] as const).map((v) => (
-                <button
-                  key={v}
-                  role="tab"
-                  aria-selected={view === v}
-                  onClick={() => setView(v)}
-                  className={`flex-1 py-2 text-[12px] font-display font-medium uppercase tracking-[-0.2px] transition-colors ${
-                    view === v ? 'bg-[#40c8ef] text-white' : 'bg-white text-black hover:bg-[#F5FCFF]'
-                  }`}
-                >
-                  {v === 'list' ? 'List' : 'Map'}
-                </button>
-              ))}
-            </div>
           </div>
 
-          {view === 'map' && (
-            <div className="w-[298px] md:w-[360px]">
-              <RouteMap towns={towns} measurementSystem={measurementSystem} onOpenTown={openTownFromMap} />
-            </div>
-          )}
-
           {/* Itinerary List */}
-          {view === 'list' && (
           <div className="content-stretch flex flex-col items-start relative shrink-0 w-[298px] border border-[#40C8EF]">
             {mappedStops.map((stop) => {
               const linkedTown = stop.linkedTownId ? towns.find(t => t.id === stop.linkedTownId) : undefined;
@@ -672,7 +630,6 @@ export function SimpleRouteMap({ towns, measurementSystem, notes, resupplies, on
               );
             })}
           </div>
-          )}
         </div>
       </div>
     </div>

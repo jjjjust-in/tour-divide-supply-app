@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { SimpleRouteMap } from './components/SimpleRouteMap';
 import { NotesPanel } from './components/NotesPanel';
 import { TownsList } from './components/TownsList';
@@ -15,7 +15,8 @@ import { sampleJournalEntries } from './data/sampleJournalEntries';
 import type { Note, Resupply, JournalEntry } from './types';
 import type { MeasurementSystem } from './utils/measurements';
 import { loadCollection, saveCollection, requestPersistentStorage, STORAGE_KEYS } from './utils/storage';
-import { Plus, MapIcon, Clock, BookOpen } from 'lucide-react';
+import { Plus, MapIcon, Clock, BookOpen, Route as RouteIcon } from 'lucide-react';
+import { MapPage } from './components/MapPage';
 import { AnimatePresence } from 'motion/react';
 import navBgPattern from 'figma:asset/53e87b274f9e9eae37a672b63e5feb2e3c44276d.png';
 import svgPaths from './imports/svg-do3t78tvh5';
@@ -66,7 +67,7 @@ export default function App() {
     return () => { cancelled = true; };
   }, []);
   // Single active page — enforces one-page-at-a-time
-  type ActivePage = 'route' | 'journal' | 'towns' | 'notes' | null;
+  type ActivePage = 'route' | 'map' | 'journal' | 'towns' | 'notes' | null;
   const [activePage, setActivePage] = useState<ActivePage>('route');
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
@@ -77,6 +78,9 @@ export default function App() {
   const showList = activePage === 'towns';
   const showAllNotes = activePage === 'notes';
   const showJournal = activePage === 'journal';
+  const showMap = activePage === 'map';
+  const [routeFocusTownId, setRouteFocusTownId] = useState<string | null>(null);
+  const clearRouteFocus = useCallback(() => setRouteFocusTownId(null), []);
 
   // Check if this is first time opening the app
   useEffect(() => {
@@ -211,6 +215,8 @@ export default function App() {
           onTownSelect={handleTownSelect}
           notesCount={notesCount}
           measurementSystem={measurementSystem}
+          focusTownId={routeFocusTownId}
+          onFocusHandled={clearRouteFocus}
           onClose={undefined}
           onOpenTimer={() => setShowStopwatch(true)}
           notes={notes}
@@ -221,6 +227,17 @@ export default function App() {
           onAddResupply={handleAddResupply}
           onDeleteResupply={handleDeleteResupply}
           onEditResupply={handleEditResupply}
+        />
+      )}
+
+      {showMap && (
+        <MapPage
+          towns={towns}
+          measurementSystem={measurementSystem}
+          onOpenTown={(townId) => {
+            setRouteFocusTownId(townId);
+            setActivePage('route');
+          }}
         />
       )}
 
@@ -262,9 +279,23 @@ export default function App() {
             }`}
             aria-label="The Route"
           >
-            <MapIcon size={16} className={showRoute ? 'text-white' : 'text-[#40C8EF]'} />
+            <RouteIcon size={16} className={showRoute ? 'text-white' : 'text-[#40C8EF]'} />
             <span className="uppercase font-display font-medium tracking-[-0.36px] text-[13px] md:text-sm">
               Route
+            </span>
+          </button>
+          <button
+            onClick={() => setActivePage('map')}
+            className={`border-2 px-3 md:px-4 py-2.5 rounded-lg transition-all shadow-lg flex items-center gap-2 ${
+              showMap
+                ? 'bg-[#40C8EF] text-white border-[#40C8EF]'
+                : 'bg-white text-[#40C8EF] border-[#40C8EF] hover:bg-[#F5FCFF]'
+            }`}
+            aria-label="Map"
+          >
+            <MapIcon size={16} className={showMap ? 'text-white' : 'text-[#40C8EF]'} />
+            <span className="uppercase font-display font-medium tracking-[-0.36px] text-[13px] md:text-sm">
+              Map
             </span>
           </button>
           <button
