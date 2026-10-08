@@ -32,7 +32,7 @@ const LAYERS = {
 const GRID = { cols: 16, rows: 27, x0: 0.5, y0: 0.5, cellW: 18.625, cellH: 17.7778 };
 
 // The grid is centered on screen and keeps its true shape. On a phone it
-// scales down so the whole 16 x 27 grid fits the width with a 16px gutter;
+// scales down so the whole 16 x 27 grid fits the width with a 32px gutter;
 // on wider screens it stops growing at the Itinerary list's height (27 rows
 // of 24px plus its border). Artwork that breaks past the grid can still run
 // off the screen edges.
@@ -40,7 +40,7 @@ const ITINERARY_LIST_PX = 27 * 24 + 2;
 const GRID_UNITS_TALL = 481;
 const GRID_UNITS_WIDE = 298;
 const GRID_CENTER_X = 149.8;
-const SCREEN_GUTTER_PX = 16;
+const SCREEN_GUTTER_PX = 32;
 const MAX_MAP_SCALE = ITINERARY_LIST_PX / GRID_UNITS_TALL;
 
 function useMapScale() {
