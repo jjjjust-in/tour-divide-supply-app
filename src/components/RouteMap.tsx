@@ -1,12 +1,13 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { LocateFixed, Loader2 } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ChevronLeft, ChevronRight, LocateFixed, Loader2 } from 'lucide-react';
 import gridSvg from '../assets/map/grid.svg?raw';
 import outlineSvg from '../assets/map/states-outline.svg?raw';
 import stateLinesSvg from '../assets/map/state-lines.svg?raw';
 import routeSvg from '../assets/map/route.svg?raw';
 import { MAP_LAYOUT, TOWN_ANCHORS } from '../data/mapGeometry';
+import { MAP_STATES, STATES_OUTLINE, type MapState } from '../data/mapStates';
 import type { Town } from '../types';
-import type { MeasurementSystem } from '../utils/measurements';
+import { formatElevation, type MeasurementSystem } from '../utils/measurements';
 import { locateOnRoute, mileToRoutePoint, type RoutePosition } from '../utils/routeLocation';
 
 // Strip the outer <svg> so each layer can be placed inside one composed map
@@ -18,14 +19,20 @@ const LAYERS = {
   route: innerSvg(routeSvg),
 };
 
+// The grid is 16 x 27 squares, each one 100 x 100 miles
+const GRID = { cols: 16, rows: 27, x0: 0.5, y0: 0.5, cellW: 18.625, cellH: 17.7778 };
+const TOTAL_MILES = TOWN_ANCHORS[TOWN_ANCHORS.length - 1].mile;
+
 // The prototype build can't use GPS, so it gets a slider to preview positions
 const DEMO_LOCATION = import.meta.env.VITE_DEMO_LOCATION === 'true';
 
 type LocationState =
   | { status: 'idle' }
   | { status: 'locating' }
-  | { status: 'found'; position: RoutePosition; accuracyMiles?: number }
+  | { status: 'found'; position: RoutePosition }
   | { status: 'error'; message: string };
+
+type MapSelection = { kind: 'cell'; col: number; row: number } | { kind: 'state'; state: MapState } | null;
 
 interface RouteMapProps {
   towns: Town[];
@@ -33,17 +40,34 @@ interface RouteMapProps {
   onOpenTown: (townId: string) => void;
 }
 
-const formatRouteDistance = (miles: number, system: MeasurementSystem) => {
-  const value = system === 'metric' ? miles * 1.60934 : miles;
-  return `${Math.round(value).toLocaleString('en-US')} ${system === 'metric' ? 'km' : 'mi'}`;
-};
+const toUnits = (miles: number, system: MeasurementSystem) => (system === 'metric' ? miles * 1.60934 : miles);
+const unit = (system: MeasurementSystem) => (system === 'metric' ? 'km' : 'mi');
+const formatDistance = (miles: number, system: MeasurementSystem) =>
+  `${Math.round(toUnits(miles, system)).toLocaleString('en-US')} ${unit(system)}`;
+const formatMilepost = (miles: number, system: MeasurementSystem) =>
+  `${system === 'metric' ? 'Km' : 'Mile'} ${Math.round(toUnits(miles, system)).toLocaleString('en-US')}`;
+
+function pointInPolygon([x, y]: [number, number], poly: [number, number][]) {
+  let inside = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const [xi, yi] = poly[i];
+    const [xj, yj] = poly[j];
+    if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+
+const toPoints = (poly: [number, number][]) => poly.map(([x, y]) => `${x},${y}`).join(' ');
 
 export function RouteMap({ towns, measurementSystem, onOpenTown }: RouteMapProps) {
+  const svgRef = useRef<SVGSVGElement>(null);
   const [location, setLocation] = useState<LocationState>({ status: 'idle' });
-  const [selectedTownId, setSelectedTownId] = useState<string | null>(null);
   const [demoMile, setDemoMile] = useState(1215);
+  const [selection, setSelection] = useState<MapSelection>(null);
+  const [hoverCell, setHoverCell] = useState<{ col: number; row: number } | null>(null);
+  const [waypointIndex, setWaypointIndex] = useState<number | null>(null);
 
-  const townMarkers = useMemo(
+  const waypoints = useMemo(
     () =>
       TOWN_ANCHORS.map((anchor) => {
         const town = towns.find((t) => t.id === anchor.townId);
@@ -60,20 +84,15 @@ export function RouteMap({ towns, measurementSystem, onOpenTown }: RouteMapProps
     }
     setLocation({ status: 'locating' });
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      (pos) => setLocation({ status: 'found', position: locateOnRoute(pos.coords.latitude, pos.coords.longitude) }),
+      (err) =>
         setLocation({
-          status: 'found',
-          position: locateOnRoute(pos.coords.latitude, pos.coords.longitude),
-          accuracyMiles: pos.coords.accuracy / 1609.34,
-        });
-      },
-      (err) => {
-        const message =
-          err.code === err.PERMISSION_DENIED
-            ? 'Location is off for this app. Turn it on in Settings to see yourself on the map.'
-            : 'Couldn’t get a GPS fix. Try again with a clear view of the sky.';
-        setLocation({ status: 'error', message });
-      },
+          status: 'error',
+          message:
+            err.code === err.PERMISSION_DENIED
+              ? 'Location is off for this app. Turn it on in Settings to see yourself on the map.'
+              : 'Couldn’t get a GPS fix. Try again with a clear view of the sky.',
+        }),
       // GPS works without cell signal; accept a fix up to a minute old to save battery
       { enableHighAccuracy: true, timeout: 20000, maximumAge: 60000 },
     );
@@ -84,7 +103,6 @@ export function RouteMap({ towns, measurementSystem, onOpenTown }: RouteMapProps
     if (!DEMO_LOCATION) locate();
   }, [locate]);
 
-  // Prototype: position comes from the preview slider
   const position: RoutePosition | null = DEMO_LOCATION
     ? (() => {
         const [x, y] = mileToRoutePoint(demoMile);
@@ -94,47 +112,139 @@ export function RouteMap({ towns, measurementSystem, onOpenTown }: RouteMapProps
       ? location.position
       : null;
 
-  const nextTown = position ? townMarkers.find((m) => m.mile > position.mile + 0.5) : null;
-  const selected = townMarkers.find((m) => m.town.id === selectedTownId) ?? null;
+  // Until the rider picks a waypoint, show the next town ahead of them
+  const nextIndex = position ? waypoints.findIndex((w) => w.mile > position.mile + 0.5) : -1;
+  const activeIndex = waypointIndex ?? (nextIndex >= 0 ? nextIndex : position ? waypoints.length - 1 : 0);
+  const waypoint = waypoints[activeIndex];
+  const following = waypoints[activeIndex + 1];
+
+  // Map coordinates of a pointer event
+  const toMapPoint = (clientX: number, clientY: number): [number, number] | null => {
+    const svg = svgRef.current;
+    const ctm = svg?.getScreenCTM();
+    if (!svg || !ctm) return null;
+    const pt = new DOMPoint(clientX, clientY).matrixTransform(ctm.inverse());
+    return [pt.x, pt.y];
+  };
+
+  // What's under a map point: a state, or a grid square outside the states
+  const hitTest = (p: [number, number]): MapSelection => {
+    const sl: [number, number] = [p[0] - MAP_LAYOUT.stateLines.x, p[1] - MAP_LAYOUT.stateLines.y];
+    if (pointInPolygon(sl, STATES_OUTLINE)) {
+      const state = MAP_STATES.find((s) => pointInPolygon(sl, s.polygon));
+      return state ? { kind: 'state', state } : null;
+    }
+    const col = Math.floor((p[0] - GRID.x0) / GRID.cellW);
+    const row = Math.floor((p[1] - GRID.y0) / GRID.cellH);
+    if (col >= 0 && col < GRID.cols && row >= 0 && row < GRID.rows) return { kind: 'cell', col, row };
+    return null;
+  };
+
+  const handleMapClick = (e: React.MouseEvent<SVGSVGElement>) => {
+    const p = toMapPoint(e.clientX, e.clientY);
+    const hit = p ? hitTest(p) : null;
+    const same =
+      hit && selection && hit.kind === selection.kind &&
+      (hit.kind === 'state'
+        ? selection.kind === 'state' && selection.state.name === hit.state.name
+        : selection.kind === 'cell' && selection.col === hit.col && selection.row === hit.row);
+    setSelection(same ? null : hit);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<SVGSVGElement>) => {
+    if (e.pointerType !== 'mouse') return;
+    const p = toMapPoint(e.clientX, e.clientY);
+    const hit = p ? hitTest(p) : null;
+    setHoverCell(hit?.kind === 'cell' ? { col: hit.col, row: hit.row } : null);
+  };
+
+  const shownCell = selection?.kind === 'cell' ? selection : hoverCell;
+  const cellRect = shownCell && {
+    x: GRID.x0 + shownCell.col * GRID.cellW,
+    y: GRID.y0 + shownCell.row * GRID.cellH,
+  };
+
+  // Label pinned above the selected square or state, in % of the map box
   const { viewBox, route } = MAP_LAYOUT;
+  const label = (() => {
+    const pct = (x: number, y: number) => ({
+      left: Math.min(84, Math.max(16, ((x - viewBox.x) / viewBox.width) * 100)),
+      top: ((y - viewBox.y) / viewBox.height) * 100,
+    });
+    if (cellRect) {
+      const side = Math.round(toUnits(100, measurementSystem));
+      return { ...pct(cellRect.x + GRID.cellW / 2, cellRect.y), text: `${side} × ${side} ${unit(measurementSystem)}` };
+    }
+    if (selection?.kind === 'state') {
+      const [lx, ly] = selection.state.labelAt;
+      return {
+        ...pct(lx + MAP_LAYOUT.stateLines.x, ly + MAP_LAYOUT.stateLines.y),
+        text: `${selection.state.name} · ${formatDistance(selection.state.routeMiles, measurementSystem)} of route`,
+      };
+    }
+    return null;
+  })();
+
   const dot = position ? (position.onRoute ? position.snapped : position.actual) : null;
+  const stepTo = (i: number) => setWaypointIndex(Math.max(0, Math.min(waypoints.length - 1, i)));
 
   return (
     <div className="w-full max-w-[360px] mx-auto space-y-4">
       {/* Map */}
-      <div className="relative w-full">
+      <div className="relative w-full select-none">
         <svg
+          ref={svgRef}
           viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
           fill="none"
-          className="w-full h-auto block"
+          className="w-full h-auto block cursor-pointer"
           role="img"
-          aria-label="Map of the Tour Divide route from Banff to Antelope Wells"
-          onClick={() => setSelectedTownId(null)}
+          aria-label="Map of the Tour Divide route from Banff to Antelope Wells. Tap a state or a grid square for details."
+          onClick={handleMapClick}
+          onPointerMove={handlePointerMove}
+          onPointerLeave={() => setHoverCell(null)}
         >
+          <defs>
+            <clipPath id="states-clip">
+              <polygon points={toPoints(STATES_OUTLINE)} />
+            </clipPath>
+          </defs>
+
           <g fill="none" transform={`translate(${MAP_LAYOUT.grid.x} ${MAP_LAYOUT.grid.y})`} dangerouslySetInnerHTML={{ __html: LAYERS.grid }} />
+
+          {/* Highlighted 100-mile square */}
+          {cellRect && (
+            <rect x={cellRect.x} y={cellRect.y} width={GRID.cellW} height={GRID.cellH} fill="#40C8EF" opacity={0.45} pointerEvents="none" />
+          )}
+
           <g fill="none" transform={`translate(${MAP_LAYOUT.statesOutline.x} ${MAP_LAYOUT.statesOutline.y})`} dangerouslySetInnerHTML={{ __html: LAYERS.outline }} />
+
+          {/* Highlighted state */}
+          {selection?.kind === 'state' && (
+            <g transform={`translate(${MAP_LAYOUT.stateLines.x} ${MAP_LAYOUT.stateLines.y})`} pointerEvents="none">
+              <polygon points={toPoints(selection.state.polygon)} fill="#40C8EF" opacity={0.18} clipPath="url(#states-clip)" />
+            </g>
+          )}
+
           <g fill="none" transform={`translate(${MAP_LAYOUT.stateLines.x} ${MAP_LAYOUT.stateLines.y})`} dangerouslySetInnerHTML={{ __html: LAYERS.stateLines }} />
+
           <g transform={`translate(${route.x} ${route.y}) scale(${route.scaleX} ${route.scaleY})`}>
-            <g fill="none" dangerouslySetInnerHTML={{ __html: LAYERS.route }} />
+            <g fill="none" pointerEvents="none" dangerouslySetInnerHTML={{ __html: LAYERS.route }} />
 
             {/* Towns */}
-            {townMarkers.map(({ town, x, y }) => {
-              const isSelected = town.id === selectedTownId;
-              return (
-                <g
-                  key={town.id}
-                  className="cursor-pointer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedTownId(isSelected ? null : town.id);
-                  }}
-                >
-                  <circle cx={x} cy={y} r={7} fill="transparent" />
-                  {isSelected && <circle cx={x} cy={y} r={4.6} fill="none" stroke="#231F20" strokeWidth={1} />}
-                  <circle cx={x} cy={y} r={2.4} fill="#231F20" />
-                </g>
-              );
-            })}
+            {waypoints.map(({ town, x, y }, i) => (
+              <g
+                key={town.id}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelection(null);
+                  setWaypointIndex(i);
+                }}
+              >
+                <circle cx={x} cy={y} r={7} fill="transparent" />
+                {i === activeIndex && <circle cx={x} cy={y} r={4.6} fill="none" stroke="#231F20" strokeWidth={1} />}
+                <circle cx={x} cy={y} r={2.4} fill="#231F20" />
+              </g>
+            ))}
 
             {/* Off route: a dashed line back to the nearest point on the route */}
             {position && !position.onRoute && (
@@ -146,6 +256,7 @@ export function RouteMap({ towns, measurementSystem, onOpenTown }: RouteMapProps
                 stroke="#231F20"
                 strokeWidth={0.8}
                 strokeDasharray="2 2"
+                pointerEvents="none"
               />
             )}
 
@@ -158,25 +269,82 @@ export function RouteMap({ towns, measurementSystem, onOpenTown }: RouteMapProps
             )}
           </g>
         </svg>
+
+        {/* Label for the selected square or state */}
+        {label && (
+          <div
+            className="absolute pointer-events-none -translate-x-1/2 -translate-y-[calc(100%+6px)] whitespace-nowrap bg-[#231F20] text-white text-[11px] font-display font-medium uppercase tracking-[0.02em] px-2.5 py-1.5 rounded"
+            style={{ left: `${label.left}%`, top: `${label.top}%` }}
+            role="status"
+          >
+            {label.text}
+          </div>
+        )}
       </div>
 
-      {/* Selected town */}
-      {selected && (
-        <div className="flex items-center justify-between gap-3 bg-white border border-[#40c8ef] px-4 py-3">
-          <div className="min-w-0">
-            <p className="font-display font-medium text-[13px] uppercase tracking-tight text-black truncate">
-              {selected.town.name}, {selected.town.state}
-            </p>
-            <p className="text-[12px] text-black/60">
-              {measurementSystem === 'metric' ? 'Km' : 'Mile'} {Math.round(measurementSystem === 'metric' ? selected.mile * 1.60934 : selected.mile).toLocaleString('en-US')}
-            </p>
+      {/* Waypoint: step through the towns */}
+      {waypoint && (
+        <div className="bg-white border border-[#40c8ef]">
+          <div className="flex items-stretch">
+            <button
+              onClick={() => stepTo(activeIndex - 1)}
+              disabled={activeIndex === 0}
+              aria-label="Previous waypoint"
+              className="w-12 shrink-0 flex items-center justify-center text-black hover:bg-[#F5FCFF] disabled:opacity-25 transition-colors border-r border-[#40c8ef]/40 touch-manipulation"
+            >
+              <ChevronLeft size={22} />
+            </button>
+            <div className="flex-1 min-w-0 px-4 py-3 text-center" aria-live="polite">
+              <p className="text-[11px] text-black/50 uppercase tracking-[0.06em] tabular-nums">
+                Waypoint {activeIndex + 1} of {waypoints.length}
+              </p>
+              <p className="font-display font-bold text-[18px] uppercase tracking-tight text-black truncate mt-1">
+                {waypoint.town.name}, {waypoint.town.state}
+              </p>
+              <p className="text-[13px] text-black/70 tabular-nums mt-0.5">
+                {formatMilepost(waypoint.mile, measurementSystem)} · {formatElevation(waypoint.town.elevation, measurementSystem)}
+              </p>
+            </div>
+            <button
+              onClick={() => stepTo(activeIndex + 1)}
+              disabled={activeIndex === waypoints.length - 1}
+              aria-label="Next waypoint"
+              className="w-12 shrink-0 flex items-center justify-center text-black hover:bg-[#F5FCFF] disabled:opacity-25 transition-colors border-l border-[#40c8ef]/40 touch-manipulation"
+            >
+              <ChevronRight size={22} />
+            </button>
           </div>
-          <button
-            onClick={() => onOpenTown(selected.town.id)}
-            className="shrink-0 bg-[#40c8ef] text-white px-4 py-2.5 rounded text-[12px] font-display font-medium uppercase tracking-[-0.2px] hover:bg-[#00B6EB] transition-colors"
-          >
-            View town
-          </button>
+
+          {/* Progress along the whole route */}
+          <div className="px-4 pt-1 pb-3">
+            <div className="relative h-3" aria-hidden="true">
+              <div className="absolute left-0 right-0 top-1/2 h-px bg-[#40c8ef]" />
+              {waypoints.map((w, i) => (
+                <div
+                  key={w.town.id}
+                  className={`absolute top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full ${i === activeIndex ? 'w-2.5 h-2.5 bg-black' : 'w-1 h-1 bg-black/40'}`}
+                  style={{ left: `${(w.mile / TOTAL_MILES) * 100}%` }}
+                />
+              ))}
+              {position && (
+                <div
+                  className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-[#febc12] border border-[#231F20]"
+                  style={{ left: `${(Math.min(position.mile, TOTAL_MILES) / TOTAL_MILES) * 100}%` }}
+                />
+              )}
+            </div>
+            <div className="flex items-center justify-between mt-2 gap-3">
+              <p className="text-[12px] text-black/60 truncate">
+                {following ? `${formatDistance(following.mile - waypoint.mile, measurementSystem)} to ${following.town.name}` : 'Finish line'}
+              </p>
+              <button
+                onClick={() => onOpenTown(waypoint.town.id)}
+                className="shrink-0 bg-[#40c8ef] text-white px-4 py-2.5 rounded text-[12px] font-display font-medium uppercase tracking-[-0.2px] hover:bg-[#00B6EB] transition-colors"
+              >
+                View town
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -186,12 +354,10 @@ export function RouteMap({ towns, measurementSystem, onOpenTown }: RouteMapProps
           {position ? (
             position.onRoute ? (
               <>
-                <p className="font-display font-bold text-[16px] text-black">
-                  {measurementSystem === 'metric' ? 'Km' : 'Mile'} {Math.round(measurementSystem === 'metric' ? position.mile * 1.60934 : position.mile).toLocaleString('en-US')}
-                </p>
+                <p className="font-display font-bold text-[16px] text-black">You’re at {formatMilepost(position.mile, measurementSystem).toLowerCase()}</p>
                 <p className="text-[12px] text-black/60">
-                  {nextTown
-                    ? `${formatRouteDistance(nextTown.mile - position.mile, measurementSystem)} to ${nextTown.town.name}`
+                  {nextIndex >= 0
+                    ? `${formatDistance(waypoints[nextIndex].mile - position.mile, measurementSystem)} to ${waypoints[nextIndex].town.name}`
                     : 'Antelope Wells. You made it.'}
                 </p>
               </>
@@ -199,8 +365,7 @@ export function RouteMap({ towns, measurementSystem, onOpenTown }: RouteMapProps
               <>
                 <p className="font-display font-bold text-[16px] text-black">Off route</p>
                 <p className="text-[12px] text-black/60">
-                  {formatRouteDistance(position.milesFromRoute, measurementSystem)} from the route, nearest {measurementSystem === 'metric' ? 'km' : 'mile'}{' '}
-                  {Math.round(measurementSystem === 'metric' ? position.mile * 1.60934 : position.mile).toLocaleString('en-US')}
+                  {formatDistance(position.milesFromRoute, measurementSystem)} from the route, nearest {formatMilepost(position.mile, measurementSystem).toLowerCase()}
                 </p>
               </>
             )
@@ -236,7 +401,10 @@ export function RouteMap({ towns, measurementSystem, onOpenTown }: RouteMapProps
             max={2700}
             step={1}
             value={demoMile}
-            onChange={(e) => setDemoMile(Number(e.target.value))}
+            onChange={(e) => {
+              setDemoMile(Number(e.target.value));
+              setWaypointIndex(null);
+            }}
             className="w-full accent-[#40c8ef]"
           />
         </div>
