@@ -597,7 +597,7 @@ export function SimpleRouteMap({ towns, measurementSystem, focusTownId, onFocusH
   return (
     <PageLayout
       title="Itinerary"
-      meta="Banff to Antelope Wells"
+      meta="Banff → Antelope Wells"
     >
           {/* Itinerary List */}
           <div className="content-stretch flex flex-col items-start relative shrink-0 w-[298px] border border-[#40C8EF]">
