@@ -154,18 +154,18 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, direct
 
           {/* About Section */}
           <div className="w-full">
-            <div className="space-y-5 text-[#1a1a1a] pr-8">
-              <p className="font-display font-bold text-[20px] leading-[1.4] tracking-[-0.01em]">
+            <div className="space-y-6 text-[#1a1a1a]">
+              <p className="font-display font-bold text-[26px] leading-[1.3] tracking-[-0.02em]">
                 <span className="uppercase tracking-[0.02em]">Tour Divide Supply</span> is built by{' '}
                 <span className="text-[#40C8EF]">JJJJustin</span>,
                 a bikepacker and product designer with over 5000 miles on the Tour Divide route.
               </p>
-              <p className="text-[16px] leading-relaxed">
+              <p className="text-[18px] leading-relaxed">
                 After planning and riding the 2745 miles from Canada to Mexico, Justin built this app to help
                 future riders organize their notes and track resupply points. It isn&apos;t a replacement for
                 RideWithGPS or your Garmin. It&apos;s a starting place to fill with your own notes and memories.
               </p>
-              <p className="text-[16px] leading-relaxed">
+              <p className="text-[18px] leading-relaxed">
                 The app features interactive maps, elevation profiles, and a collaborative notes system where riders can
                 document their experiences at each town along the route. All data is stored locally in your browser for
                 offline access during your ride.
@@ -278,10 +278,10 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, direct
             </div>
             <div className="bg-white relative w-full">
               <div aria-hidden="true" className="absolute border border-[#40c8ef] inset-0 pointer-events-none" />
-              <div className="p-6 space-y-8">
+              <div className="px-6 divide-y divide-[#40C8EF]/20">
 
                 {/* Ride Direction */}
-                <div className="space-y-4">
+                <div className="py-6 space-y-4">
                   <div className="flex items-center gap-2">
                     <Compass size={16} className="text-[#40C8EF]" />
                     <h3 className="uppercase font-display font-bold tracking-[-0.36px] text-[#40C8EF] text-sm">
@@ -316,7 +316,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, direct
                 </div>
 
                 {/* Measurement System */}
-                <div className="space-y-4 pt-3 border-t border-[#40C8EF]/20">
+                <div className="py-6 space-y-4">
                   <div className="flex items-center gap-2">
                     <Ruler size={16} className="text-[#40C8EF]" />
                     <h3 className="uppercase font-display font-bold tracking-[-0.36px] text-[#40C8EF] text-sm">
@@ -351,7 +351,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, direct
                 </div>
 
                 {/* Data Management */}
-                <div className="space-y-4 pt-3 border-t border-[#40C8EF]/20">
+                <div className="py-6 space-y-3">
                   <div className="flex items-center gap-2">
                     <Download size={16} className="text-[#40C8EF]" />
                     <h3 className="uppercase font-display font-bold tracking-[-0.36px] text-[#40C8EF] text-sm">
@@ -372,13 +372,10 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, direct
                     <Upload size={16} />
                     <span className="text-sm uppercase font-display font-medium tracking-[-0.36px]">Import Data</span>
                   </button>
-                  <p className="text-xs text-gray-500 text-center">
-                    Back up your journal and resupplies to restore them later or on another device
-                  </p>
                 </div>
 
                 {/* Clear Data */}
-                <div className="space-y-4">
+                <div className="py-6 space-y-3">
                   <button
                     onClick={() => handleClearData('notes')}
                     className="w-full py-3 px-4 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 transition-all flex items-center justify-center gap-2 touch-manipulation text-sm"
