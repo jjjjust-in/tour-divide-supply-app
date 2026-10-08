@@ -29,6 +29,7 @@ export const ROUTE_POIS: RoutePoi[] = [
   { id: 'lynx-pass', name: 'Lynx Pass', mile: 1594, elevationFt: 8937, published: true },
   { id: 'boreas-pass', name: 'Boreas Pass', mile: 1699, elevationFt: 11482, published: true },
   { id: 'marshall-pass', name: 'Marshall Pass', mile: 1814, elevationFt: 10842, published: true },
+  { id: 'carnero-pass', name: 'Carnero Pass', mile: 1905, elevationFt: 10166, published: true },
   { id: 'indiana-pass', name: 'Indiana Pass', mile: 1964, elevationFt: 11910, published: true },
   { id: 'polvadera', name: 'Polvadera', mile: 2143, elevationFt: 10290 },
 ];
