@@ -177,7 +177,7 @@ function ItineraryRow({
       >
         <div className="content-stretch flex gap-[10px] h-full items-center justify-center relative shrink-0">
           <div aria-hidden="true" className="absolute border border-[#40c8ef] border-solid inset-0 pointer-events-none" />
-          <div className="flex flex-col font-['Coordinates:Medium',sans-serif] h-[15px] justify-center leading-[0] not-italic relative shrink-0 text-[#40c8ef] text-[10px] text-center uppercase w-[60px]">
+          <div className="flex flex-col font-['Coordinates:Medium',sans-serif] h-[15px] justify-center leading-[0] not-italic relative shrink-0 text-black text-[12px] text-center uppercase w-[60px]">
             <p className="leading-[normal]">{mileage}</p>
           </div>
         </div>
@@ -189,7 +189,7 @@ function ItineraryRow({
                 isClickable ? 'cursor-pointer transition-colors' : ''
               }`}
             >
-              <p className={`flex-1 font-['Coordinates:Medium',sans-serif] leading-[normal] min-h-px min-w-px not-italic relative shrink-0 text-[#40c8ef] text-[10px] uppercase ${
+              <p className={`flex-1 font-['Coordinates:Medium',sans-serif] leading-[normal] min-h-px min-w-px not-italic relative shrink-0 text-black text-[12px] uppercase ${
                 isClickable ? "hover:font-['Coordinates:Bold',sans-serif]" : ''
               }`}>
                 {location}
@@ -219,29 +219,29 @@ function ItineraryRow({
             {/* Stats Grid */}
             <div className="grid grid-cols-3 gap-2">
               <div>
-                <div className="text-[#40C8EF]/60 uppercase font-['Coordinates:Bold',sans-serif] tracking-[-0.36px] text-[10px] mb-0.5">
+                <div className="text-black uppercase font-['Coordinates:Bold',sans-serif] tracking-[-0.36px] text-[12px] mb-0.5">
                   ELEV
                 </div>
-                <div className="text-[#333] text-[12px] font-['Coordinates:Medium',sans-serif] leading-[120%]">
+                <div className="text-black text-[14px] font-['Coordinates:Medium',sans-serif] leading-[120%]">
                   {formatElevation(town.elevation, measurementSystem)}
                 </div>
               </div>
               {town.population && (
                 <div>
-                  <div className="text-[#40C8EF]/60 uppercase font-['Coordinates:Bold',sans-serif] tracking-[-0.36px] text-[10px] mb-0.5">
+                  <div className="text-black uppercase font-['Coordinates:Bold',sans-serif] tracking-[-0.36px] text-[12px] mb-0.5">
                     POP
                   </div>
-                  <div className="text-[#333] text-[12px] font-['Coordinates:Medium',sans-serif] leading-[120%]">
+                  <div className="text-black text-[14px] font-['Coordinates:Medium',sans-serif] leading-[120%]">
                     {town.population.toLocaleString()}
                   </div>
                 </div>
               )}
               {mileageToNext !== null && (
                 <div>
-                  <div className="text-[#40C8EF]/60 uppercase font-['Coordinates:Bold',sans-serif] tracking-[-0.36px] text-[10px] mb-0.5">
+                  <div className="text-black uppercase font-['Coordinates:Bold',sans-serif] tracking-[-0.36px] text-[12px] mb-0.5">
                     TO NEXT
                   </div>
-                  <div className="text-[#333] text-[12px] font-['Coordinates:Medium',sans-serif] leading-[120%]">
+                  <div className="text-black text-[14px] font-['Coordinates:Medium',sans-serif] leading-[120%]">
                     {formatDistance(mileageToNext, measurementSystem)}
                   </div>
                 </div>
@@ -253,8 +253,8 @@ function ItineraryRow({
               <div className="pt-2 border-t border-[#40c8ef]/20">
                 <div className="space-y-1">
                   {town.funFacts.map((fact, index) => (
-                    <div key={index} className="text-[11px] text-[#666] flex items-start gap-1.5">
-                      <span className="text-[#40C8EF] flex-shrink-0 text-[11px] leading-[120%]">•</span>
+                    <div key={index} className="text-[13px] text-black flex items-start gap-1.5">
+                      <span className="text-black flex-shrink-0 text-[13px] leading-[120%]">•</span>
                       <span className="flex-1 leading-[120%]">{fact}</span>
                     </div>
                   ))}
@@ -271,10 +271,10 @@ function ItineraryRow({
                     setShowNoteForm(false);
                     setShowResupplyForm(false);
                   }}
-                  className={`flex-1 px-2 py-1 text-[12px] font-['Coordinates:Bold',sans-serif] uppercase tracking-[-0.2px] rounded transition-colors flex items-center justify-center gap-1 ${
+                  className={`flex-1 px-2 py-1 text-[14px] font-['Coordinates:Bold',sans-serif] uppercase tracking-[-0.2px] rounded transition-colors flex items-center justify-center gap-1 ${
                     activeTab === 'notes'
                       ? 'bg-[#40c8ef] text-white'
-                      : 'bg-gray-200 text-[#666] hover:bg-gray-300'
+                      : 'bg-gray-200 text-black hover:bg-gray-300'
                   }`}
                 >
                   Notes ({townNotes.length})
@@ -285,10 +285,10 @@ function ItineraryRow({
                     setShowNoteForm(false);
                     setShowResupplyForm(false);
                   }}
-                  className={`flex-1 px-2 py-1 text-[12px] font-['Coordinates:Bold',sans-serif] uppercase tracking-[-0.2px] rounded transition-colors flex items-center justify-center gap-1 ${
+                  className={`flex-1 px-2 py-1 text-[14px] font-['Coordinates:Bold',sans-serif] uppercase tracking-[-0.2px] rounded transition-colors flex items-center justify-center gap-1 ${
                     activeTab === 'resupplies'
                       ? 'bg-[#40c8ef] text-white'
-                      : 'bg-gray-200 text-[#666] hover:bg-gray-300'
+                      : 'bg-gray-200 text-black hover:bg-gray-300'
                   }`}
                 >
                   Resupplies ({townResupplies.length})
@@ -299,7 +299,7 @@ function ItineraryRow({
               {activeTab === 'notes' && (
                 <div className="space-y-1.5">
                   {townNotes.length === 0 ? (
-                    <p className="text-[11px] text-[#999] italic leading-[120%]">No notes yet</p>
+                    <p className="text-[13px] text-black italic leading-[120%]">No notes yet</p>
                   ) : (
                     townNotes.map(note => (
                       <div key={note.id} className="bg-white/50 border border-[#40c8ef]/20 rounded p-1.5 group">
@@ -308,20 +308,20 @@ function ItineraryRow({
                             <textarea
                               value={editNoteContent}
                               onChange={(e) => setEditNoteContent(e.target.value)}
-                              className="w-full border border-[#40c8ef] rounded px-1.5 py-1 focus:outline-none focus:ring-1 focus:ring-[#40c8ef]/50 resize-none text-[11px] leading-[120%]"
+                              className="w-full border border-[#40c8ef] rounded px-1.5 py-1 focus:outline-none focus:ring-1 focus:ring-[#40c8ef]/50 resize-none text-[13px] leading-[120%]"
                               rows={2}
                             />
                             <div className="flex gap-1">
                               <button
                                 onClick={handleCancelEditNote}
-                                className="flex-1 bg-gray-300 text-[#666] py-1 px-1.5 rounded hover:bg-gray-400 transition-colors text-[11px] font-['Coordinates:Bold',sans-serif] uppercase"
+                                className="flex-1 bg-gray-300 text-black py-1 px-1.5 rounded hover:bg-gray-400 transition-colors text-[13px] font-['Coordinates:Bold',sans-serif] uppercase"
                               >
                                 Cancel
                               </button>
                               <button
                                 onClick={handleSaveNote}
                                 disabled={!editNoteContent.trim()}
-                                className="flex-1 bg-[#40c8ef] text-white py-1 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[11px] font-['Coordinates:Bold',sans-serif] uppercase"
+                                className="flex-1 bg-[#40c8ef] text-white py-1 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[13px] font-['Coordinates:Bold',sans-serif] uppercase"
                               >
                                 Save
                               </button>
@@ -329,7 +329,7 @@ function ItineraryRow({
                           </div>
                         ) : (
                           <div className="flex justify-between items-start gap-1">
-                            <p className="flex-1 text-[11px] text-[#333] leading-[120%]">{note.content}</p>
+                            <p className="flex-1 text-[13px] text-black leading-[120%]">{note.content}</p>
                             <div className="flex gap-0.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                               <button
                                 onClick={() => handleEditNote(note)}
@@ -355,7 +355,7 @@ function ItineraryRow({
                   {!showNoteForm ? (
                     <button
                       onClick={() => setShowNoteForm(true)}
-                      className="w-full bg-[#40c8ef] text-white py-1.5 px-2 rounded hover:bg-[#00B6EB] transition-colors flex items-center justify-center gap-1 text-[11px] font-['Coordinates:Bold',sans-serif] uppercase tracking-[-0.2px]"
+                      className="w-full bg-[#40c8ef] text-white py-1.5 px-2 rounded hover:bg-[#00B6EB] transition-colors flex items-center justify-center gap-1 text-[13px] font-['Coordinates:Bold',sans-serif] uppercase tracking-[-0.2px]"
                     >
                       <Plus size={10} />
                       Add Note
@@ -366,7 +366,7 @@ function ItineraryRow({
                         value={newNote}
                         onChange={(e) => setNewNote(e.target.value)}
                         placeholder="Enter your note..."
-                        className="w-full border border-[#40c8ef] rounded px-1.5 py-1 focus:outline-none focus:ring-1 focus:ring-[#40c8ef]/50 resize-none text-[11px] leading-[120%]"
+                        className="w-full border border-[#40c8ef] rounded px-1.5 py-1 focus:outline-none focus:ring-1 focus:ring-[#40c8ef]/50 resize-none text-[13px] leading-[120%]"
                         rows={2}
                         autoFocus
                       />
@@ -377,14 +377,14 @@ function ItineraryRow({
                             setShowNoteForm(false);
                             setNewNote('');
                           }}
-                          className="flex-1 bg-gray-300 text-[#666] py-1 px-1.5 rounded hover:bg-gray-400 transition-colors text-[11px] font-['Coordinates:Bold',sans-serif] uppercase"
+                          className="flex-1 bg-gray-300 text-black py-1 px-1.5 rounded hover:bg-gray-400 transition-colors text-[13px] font-['Coordinates:Bold',sans-serif] uppercase"
                         >
                           Cancel
                         </button>
                         <button
                           type="submit"
                           disabled={!newNote.trim()}
-                          className="flex-1 bg-[#40c8ef] text-white py-1 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[11px] font-['Coordinates:Bold',sans-serif] uppercase"
+                          className="flex-1 bg-[#40c8ef] text-white py-1 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[13px] font-['Coordinates:Bold',sans-serif] uppercase"
                         >
                           Add
                         </button>
@@ -398,7 +398,7 @@ function ItineraryRow({
               {activeTab === 'resupplies' && (
                 <div className="space-y-1.5">
                   {townResupplies.length === 0 ? (
-                    <p className="text-[11px] text-[#999] italic leading-[120%]">No resupplies yet</p>
+                    <p className="text-[13px] text-black italic leading-[120%]">No resupplies yet</p>
                   ) : (
                     townResupplies.map(resupply => (
                       <div key={resupply.id} className="bg-[#FFFAEB] border border-[#febc12]/40 rounded p-1.5 group">
@@ -409,40 +409,40 @@ function ItineraryRow({
                               value={editResupply.name}
                               onChange={(e) => setEditResupply({ ...editResupply, name: e.target.value })}
                               placeholder="Store name *"
-                              className="w-full border border-[#40c8ef] rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-[#40c8ef]/50 text-[11px]"
+                              className="w-full border border-[#40c8ef] rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-[#40c8ef]/50 text-[13px]"
                             />
                             <input
                               type="text"
                               value={editResupply.hours}
                               onChange={(e) => setEditResupply({ ...editResupply, hours: e.target.value })}
                               placeholder="Hours (optional)"
-                              className="w-full border border-[#40c8ef] rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-[#40c8ef]/50 text-[11px]"
+                              className="w-full border border-[#40c8ef] rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-[#40c8ef]/50 text-[13px]"
                             />
                             <input
                               type="text"
                               value={editResupply.phone}
                               onChange={(e) => setEditResupply({ ...editResupply, phone: e.target.value })}
                               placeholder="Phone (optional)"
-                              className="w-full border border-[#40c8ef] rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-[#40c8ef]/50 text-[11px]"
+                              className="w-full border border-[#40c8ef] rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-[#40c8ef]/50 text-[13px]"
                             />
                             <input
                               type="text"
                               value={editResupply.address}
                               onChange={(e) => setEditResupply({ ...editResupply, address: e.target.value })}
                               placeholder="Address (optional)"
-                              className="w-full border border-[#40c8ef] rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-[#40c8ef]/50 text-[11px]"
+                              className="w-full border border-[#40c8ef] rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-[#40c8ef]/50 text-[13px]"
                             />
                             <div className="flex gap-1">
                               <button
                                 onClick={handleCancelEditResupply}
-                                className="flex-1 bg-gray-300 text-[#666] py-1 px-1.5 rounded hover:bg-gray-400 transition-colors text-[11px] font-['Coordinates:Bold',sans-serif] uppercase"
+                                className="flex-1 bg-gray-300 text-black py-1 px-1.5 rounded hover:bg-gray-400 transition-colors text-[13px] font-['Coordinates:Bold',sans-serif] uppercase"
                               >
                                 Cancel
                               </button>
                               <button
                                 onClick={handleSaveResupply}
                                 disabled={!editResupply.name.trim()}
-                                className="flex-1 bg-[#40c8ef] text-white py-1 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[11px] font-['Coordinates:Bold',sans-serif] uppercase"
+                                className="flex-1 bg-[#40c8ef] text-white py-1 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[13px] font-['Coordinates:Bold',sans-serif] uppercase"
                               >
                                 Save
                               </button>
@@ -451,27 +451,27 @@ function ItineraryRow({
                         ) : (
                           <div className="flex justify-between items-start gap-1">
                             <div className="flex-1">
-                              <h4 className="text-[#febc12] font-['Coordinates:Bold',sans-serif] uppercase text-[11px] leading-[120%]">
+                              <h4 className="text-black font-['Coordinates:Bold',sans-serif] uppercase text-[13px] leading-[120%]">
                                 {resupply.name}
                               </h4>
                               {resupply.hours && (
-                                <p className="text-[8px] text-[#666] leading-[120%] mt-0.5">
-                                  <span className="font-['Coordinates:Bold',sans-serif] text-[#febc12]">Hours:</span> {resupply.hours}
+                                <p className="text-[10px] text-black leading-[120%] mt-0.5">
+                                  <span className="font-['Coordinates:Bold',sans-serif] text-black">Hours:</span> {resupply.hours}
                                 </p>
                               )}
                               {resupply.phone && (
-                                <p className="text-[8px] text-[#666] leading-[120%] mt-0.5">
-                                  <span className="font-['Coordinates:Bold',sans-serif] text-[#febc12]">Phone:</span> {resupply.phone}
+                                <p className="text-[10px] text-black leading-[120%] mt-0.5">
+                                  <span className="font-['Coordinates:Bold',sans-serif] text-black">Phone:</span> {resupply.phone}
                                 </p>
                               )}
                               {resupply.address && (
-                                <p className="text-[8px] text-[#666] leading-[120%] mt-0.5">
-                                  <span className="font-['Coordinates:Bold',sans-serif] text-[#febc12]">Address:</span>{' '}
+                                <p className="text-[10px] text-black leading-[120%] mt-0.5">
+                                  <span className="font-['Coordinates:Bold',sans-serif] text-black">Address:</span>{' '}
                                   <a
                                     href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(resupply.address)}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="text-[#febc12] hover:underline"
+                                    className="text-black hover:underline"
                                   >
                                     {resupply.address}
                                   </a>
@@ -503,7 +503,7 @@ function ItineraryRow({
                   {!showResupplyForm ? (
                     <button
                       onClick={() => setShowResupplyForm(true)}
-                      className="w-full bg-[#40c8ef] text-white py-1.5 px-2 rounded hover:bg-[#00B6EB] transition-colors flex items-center justify-center gap-1 text-[11px] font-['Coordinates:Bold',sans-serif] uppercase tracking-[-0.2px]"
+                      className="w-full bg-[#40c8ef] text-white py-1.5 px-2 rounded hover:bg-[#00B6EB] transition-colors flex items-center justify-center gap-1 text-[13px] font-['Coordinates:Bold',sans-serif] uppercase tracking-[-0.2px]"
                     >
                       <Plus size={10} />
                       Add Resupply
@@ -515,7 +515,7 @@ function ItineraryRow({
                         value={newResupply.name}
                         onChange={(e) => setNewResupply({ ...newResupply, name: e.target.value })}
                         placeholder="Store name *"
-                        className="w-full border border-[#40c8ef] rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-[#40c8ef]/50 text-[11px]"
+                        className="w-full border border-[#40c8ef] rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-[#40c8ef]/50 text-[13px]"
                         required
                         autoFocus
                       />
@@ -524,21 +524,21 @@ function ItineraryRow({
                         value={newResupply.hours}
                         onChange={(e) => setNewResupply({ ...newResupply, hours: e.target.value })}
                         placeholder="Hours (optional)"
-                        className="w-full border border-[#40c8ef] rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-[#40c8ef]/50 text-[11px]"
+                        className="w-full border border-[#40c8ef] rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-[#40c8ef]/50 text-[13px]"
                       />
                       <input
                         type="text"
                         value={newResupply.phone}
                         onChange={(e) => setNewResupply({ ...newResupply, phone: e.target.value })}
                         placeholder="Phone (optional)"
-                        className="w-full border border-[#40c8ef] rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-[#40c8ef]/50 text-[11px]"
+                        className="w-full border border-[#40c8ef] rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-[#40c8ef]/50 text-[13px]"
                       />
                       <input
                         type="text"
                         value={newResupply.address}
                         onChange={(e) => setNewResupply({ ...newResupply, address: e.target.value })}
                         placeholder="Address (optional)"
-                        className="w-full border border-[#40c8ef] rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-[#40c8ef]/50 text-[11px]"
+                        className="w-full border border-[#40c8ef] rounded px-1.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-[#40c8ef]/50 text-[13px]"
                       />
                       <div className="flex gap-1">
                         <button
@@ -547,14 +547,14 @@ function ItineraryRow({
                             setShowResupplyForm(false);
                             setNewResupply({ name: '', hours: '', phone: '', address: '' });
                           }}
-                          className="flex-1 bg-gray-300 text-[#666] py-1 px-1.5 rounded hover:bg-gray-400 transition-colors text-[11px] font-['Coordinates:Bold',sans-serif] uppercase"
+                          className="flex-1 bg-gray-300 text-black py-1 px-1.5 rounded hover:bg-gray-400 transition-colors text-[13px] font-['Coordinates:Bold',sans-serif] uppercase"
                         >
                           Cancel
                         </button>
                         <button
                           type="submit"
                           disabled={!newResupply.name.trim()}
-                          className="flex-1 bg-[#40c8ef] text-white py-1 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[11px] font-['Coordinates:Bold',sans-serif] uppercase"
+                          className="flex-1 bg-[#40c8ef] text-white py-1 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[13px] font-['Coordinates:Bold',sans-serif] uppercase"
                         >
                           Add
                         </button>
@@ -580,7 +580,7 @@ export function SimpleRouteMap({ towns, measurementSystem, notes, resupplies, on
         <div className="box-border content-stretch flex flex-col gap-[10px] items-center justify-center px-[20px] md:px-[85px] py-[40px] pb-[150px] md:py-[96px] md:pb-[206px] relative">
           {/* Title */}
           <div className="box-border content-stretch flex flex-col gap-[10px] items-center justify-center pb-[24px] pt-0 px-0 relative shrink-0 w-full h-[94px]">
-            <p className="font-['Coordinates:Bold',sans-serif] leading-[normal] not-italic relative shrink-0 text-[#40c8ef] text-[18px] text-nowrap tracking-[-0.36px] uppercase whitespace-pre">The Route</p>
+            <p className="font-['Coordinates:Bold',sans-serif] leading-[normal] not-italic relative shrink-0 text-black text-[20px] text-nowrap tracking-[-0.36px] uppercase whitespace-pre">The Route</p>
           </div>
 
           {/* Itinerary List */}
