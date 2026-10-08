@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import navBgPattern from 'figma:asset/53e87b274f9e9eae37a672b63e5feb2e3c44276d.png';
 import type { Town, Note, Resupply } from '../types';
-import { formatDistance, formatElevation } from '../utils/measurements';
+import { formatDistance, formatElevation, formatNumber } from '../utils/measurements';
 import type { MeasurementSystem } from '../utils/measurements';
 import { X, Clock, Search, Plus, Trash2, Edit2, Check, ShoppingCart } from 'lucide-react';
 
@@ -130,7 +130,7 @@ export function TownsList({
                     <span className="text-xs text-gray-400">·</span>
                     <span className="text-xs text-gray-500">{formatElevation(town.elevation, measurementSystem)}</span>
                     <span className="text-xs text-gray-400">·</span>
-                    <span className="text-xs text-gray-500">Pop. {town.population.toLocaleString()}</span>
+                    <span className="text-xs text-gray-500">Pop. {formatNumber(town.population)}</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5 ml-2 flex-shrink-0">

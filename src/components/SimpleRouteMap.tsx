@@ -1,7 +1,7 @@
 import type { Town } from '../types';
 import { itinerary } from '../data/itinerary';
 import type { MeasurementSystem } from '../utils/measurements';
-import { formatDistance, formatElevation, milesToKm } from '../utils/measurements';
+import { formatDistance, formatElevation, milesToKm, formatNumber } from '../utils/measurements';
 import { ChevronDown, ChevronUp, Plus, Trash2, Edit2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { PageLayout } from './PageLayout';
@@ -240,7 +240,7 @@ function ItineraryRow({
                     POP
                   </div>
                   <div className="text-black text-[14px] font-display font-medium leading-[120%]">
-                    {town.population.toLocaleString()}
+                    {formatNumber(town.population)}
                   </div>
                 </div>
               )}

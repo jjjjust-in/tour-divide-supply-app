@@ -1,3 +1,4 @@
+import { formatNumber } from '../utils/measurements';
 import { useState } from 'react';
 import type { JournalEntry, Town, Note } from '../types';
 
@@ -135,7 +136,7 @@ export default function StoryExport({ towns, journalEntries, notes, onClose }: S
         <div>
           <h2 className="font-bold text-base text-[#231F20]">Export Story</h2>
           <p className="text-xs text-[#231F20]/70 mt-1">
-            {wordCount.toLocaleString()} words · {lineCount} lines
+            {formatNumber(wordCount)} words · {lineCount} lines
           </p>
         </div>
         <button

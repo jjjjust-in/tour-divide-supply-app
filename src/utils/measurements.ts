@@ -1,5 +1,14 @@
 export type MeasurementSystem = 'metric' | 'imperial';
 
+/**
+ * The app's one number format: whole numbers, no comma up to four digits
+ * (1300, 7985), commas from five digits up (11,958 and 200,000).
+ */
+export function formatNumber(value: number): string {
+  const n = Math.round(value);
+  return Math.abs(n) < 10000 ? String(n) : n.toLocaleString('en-US');
+}
+
 function roundToNearest5(num: number): number {
   return Math.round(num / 5) * 5;
 }
@@ -14,16 +23,16 @@ export function feetToMeters(feet: number): number {
 
 export function formatDistance(miles: number, system: MeasurementSystem): string {
   if (system === 'metric') {
-    return `${milesToKm(miles)} km`;
+    return `${formatNumber(milesToKm(miles))} km`;
   }
-  return `${roundToNearest5(miles)} mi`;
+  return `${formatNumber(roundToNearest5(miles))} mi`;
 }
 
 export function formatElevation(feet: number, system: MeasurementSystem): string {
   if (system === 'metric') {
-    return `${feetToMeters(feet)} m`;
+    return `${formatNumber(feetToMeters(feet))} m`;
   }
-  return `${roundToNearest5(feet)}'`;
+  return `${formatNumber(roundToNearest5(feet))}'`;
 }
 
 export function getDistanceLabel(system: MeasurementSystem): string {

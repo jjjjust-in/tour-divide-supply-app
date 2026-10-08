@@ -52,7 +52,7 @@ export const towns: Town[] = [
     position: { x: 24, y: 7 },
     population: 7750,
     funFacts: [
-      'Home to Whitefish Mountain Resort with over 3,000 acres of skiable terrain',
+      'Home to Whitefish Mountain Resort with over 3000 acres of skiable terrain',
       'The town maintains its historic downtown with buildings dating back to the early 1900s',
       'Whitefish Lake is a pristine alpine lake perfect for swimming and paddling in summer'
     ]

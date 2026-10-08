@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { Town } from '../types';
 import type { MeasurementSystem } from '../utils/measurements';
+import { formatNumber } from '../utils/measurements';
 import { RouteMap } from './RouteMap';
 import { PageLayout } from './PageLayout';
 import { TOTAL_CLIMBING_FT } from '../data/passes';
@@ -71,8 +72,8 @@ export function MapPage({ towns, measurementSystem, onOpenTown }: MapPageProps) 
       title="Route"
       meta={
         measurementSystem === 'metric'
-          ? `4,345 km · ${(Math.round((TOTAL_CLIMBING_FT * 0.3048) / 1000) * 1000).toLocaleString('en-US')} m elevation`
-          : `2,700 miles · ${TOTAL_CLIMBING_FT.toLocaleString('en-US')} feet elevation`
+          ? `${formatNumber(4345)} km · ${formatNumber((Math.round((TOTAL_CLIMBING_FT * 0.3048) / 1000) * 1000))} m elevation`
+          : `${formatNumber(2700)} miles · ${formatNumber(TOTAL_CLIMBING_FT)} feet elevation`
       }
       control={viewSwitch}
     >

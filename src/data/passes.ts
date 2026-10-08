@@ -17,7 +17,7 @@ export interface RoutePoi {
 export const ROUTE_POIS: RoutePoi[] = [
   { id: 'koko-claims', name: 'Koko Claims', mile: 105, elevationFt: 6730, source: 'profile' },
   { id: 'cabin-pass', name: 'Cabin Pass', mile: 218, elevationFt: 5600, source: 'profile' },
-  { id: 'galton-pass', name: 'Galton Pass', mile: 254, elevationFt: 6070, source: 'komoot: 1,850 m' },
+  { id: 'galton-pass', name: 'Galton Pass', mile: 254, elevationFt: 6070, source: 'komoot: 1850 m' },
   { id: 'red-meadow', name: 'Red Meadow', mile: 337, elevationFt: 5630, source: 'bikepacking.com Red Meadow Pass route' },
   { id: 'bug-creek', name: 'Bug Creek', mile: 418, elevationFt: 4940, source: 'profile' },
   { id: 'richmond-peak', name: 'Richmond Peak', mile: 494, elevationFt: 6700, source: 'profile' },

@@ -13,6 +13,7 @@ import { ROUTE_POIS, TOTAL_CLIMBING_FT, type RoutePoi } from '../data/passes';
 import { ELEVATION_POLYGON } from '../data/elevationGeometry';
 import type { Town } from '../types';
 import type { MeasurementSystem } from '../utils/measurements';
+import { formatNumber } from '../utils/measurements';
 import { locateOnRoute, mileToRoutePoint, type RoutePosition } from '../utils/routeLocation';
 
 // Strip the outer <svg> so each layer can be placed inside one composed map
@@ -82,9 +83,9 @@ interface RouteMapProps {
 const toUnits = (miles: number, system: MeasurementSystem) => (system === 'metric' ? miles * 1.60934 : miles);
 const unit = (system: MeasurementSystem) => (system === 'metric' ? 'km' : 'mi');
 const formatDistance = (miles: number, system: MeasurementSystem) =>
-  `${Math.round(toUnits(miles, system)).toLocaleString('en-US')} ${unit(system)}`;
+  `${formatNumber(Math.round(toUnits(miles, system)))} ${unit(system)}`;
 const formatMilepost = (miles: number, system: MeasurementSystem) =>
-  `${system === 'metric' ? 'Km' : 'Mile'} ${Math.round(toUnits(miles, system)).toLocaleString('en-US')}`;
+  `${system === 'metric' ? 'Km' : 'Mile'} ${formatNumber(Math.round(toUnits(miles, system)))}`;
 
 function pointInPolygon([x, y]: [number, number], poly: [number, number][]) {
   let inside = false;
@@ -262,15 +263,15 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
       top: ((y - viewBox.y) / viewBox.height) * 100,
     });
     if (cellRect && shownCell && view === 'elevation') {
-      // Columns are slices of 1,500' to 12,000'; rows are 100 route miles
+      // Columns are slices of 1500' to 12,000'; rows are 100 route miles
       const feetPerCol = (ELEVATION_LAYOUT.maxFeet - ELEVATION_LAYOUT.minFeet) / GRID.cols;
       const lowFt = ELEVATION_LAYOUT.minFeet + shownCell.col * feetPerCol;
       const band =
         measurementSystem === 'metric'
-          ? `${(Math.round((lowFt * 0.3048) / 10) * 10).toLocaleString('en-US')}–${(Math.round(((lowFt + feetPerCol) * 0.3048) / 10) * 10).toLocaleString('en-US')} m`
-          : `${(Math.round(lowFt / 50) * 50).toLocaleString('en-US')}–${(Math.round((lowFt + feetPerCol) / 50) * 50).toLocaleString('en-US')}'`;
-      const from = Math.round(toUnits(shownCell.row * 100, measurementSystem)).toLocaleString('en-US');
-      const to = Math.round(toUnits((shownCell.row + 1) * 100, measurementSystem)).toLocaleString('en-US');
+          ? `${formatNumber((Math.round((lowFt * 0.3048) / 10) * 10))}–${formatNumber((Math.round(((lowFt + feetPerCol) * 0.3048) / 10) * 10))} m`
+          : `${formatNumber((Math.round(lowFt / 50) * 50))}–${formatNumber((Math.round((lowFt + feetPerCol) / 50) * 50))}'`;
+      const from = formatNumber(Math.round(toUnits(shownCell.row * 100, measurementSystem)));
+      const to = formatNumber(Math.round(toUnits((shownCell.row + 1) * 100, measurementSystem)));
       return {
         ...pct(cellRect.x + GRID.cellW / 2, cellRect.y),
         text: band,
@@ -284,8 +285,8 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
     if (selection?.kind === 'climb') {
       const climb =
         measurementSystem === 'metric'
-          ? `${(Math.round((TOTAL_CLIMBING_FT * 0.3048) / 1000) * 1000).toLocaleString('en-US')} m`
-          : `${TOTAL_CLIMBING_FT.toLocaleString('en-US')}'`;
+          ? `${formatNumber((Math.round((TOTAL_CLIMBING_FT * 0.3048) / 1000) * 1000))} m`
+          : `${formatNumber(TOTAL_CLIMBING_FT)}'`;
       return { ...pct(selection.at[0], selection.at[1]), text: `Total climbing · about ${climb}` };
     }
     if (selection?.kind === 'state') {
@@ -309,7 +310,7 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
     else setWaypointIndex(next);
   };
   const passElevation = (ft: number) =>
-    measurementSystem === 'metric' ? `${Math.round(ft * 0.3048).toLocaleString('en-US')} m` : `${ft.toLocaleString('en-US')}'`;
+    measurementSystem === 'metric' ? `${formatNumber(Math.round(ft * 0.3048))} m` : `${formatNumber(ft)}'`;
 
   return (
     <div className="w-full space-y-4">

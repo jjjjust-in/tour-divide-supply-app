@@ -155,10 +155,10 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
               <p className="font-display font-bold text-[20px] leading-[1.4] tracking-[-0.01em]">
                 <span className="uppercase tracking-[0.02em]">Tour Divide Supply</span> is built by{' '}
                 <span className="text-[#40C8EF]">JJJJustin</span>,
-                a bikepacker and product designer with over 5,000 miles on the Tour Divide route.
+                a bikepacker and product designer with over 5000 miles on the Tour Divide route.
               </p>
               <p className="text-[16px] leading-relaxed">
-                After planning and riding the 2,745 miles from Canada to Mexico, Justin built this app to help
+                After planning and riding the 2745 miles from Canada to Mexico, Justin built this app to help
                 future riders organize their notes and track resupply points. It isn&apos;t a replacement for
                 RideWithGPS or your Garmin. It&apos;s a starting place to fill with your own notes and memories.
               </p>

@@ -172,7 +172,7 @@ export const sampleJournalEntries: JournalEntry[] = [
   {
     id: 'je-29',
     townId: '15',
-    content: 'Day 40. Antelope Wells. The border. The fence. The sign. I got here.\n\nI\'m not sure what I expected to feel. Mostly I feel quiet. The desert stretches in all directions and I\'m sitting on my bike at the edge of two countries thinking about Banff and the 2,745 miles between there and here.\n\nThank you. All of it.',
+    content: 'Day 40. Antelope Wells. The border. The fence. The sign. I got here.\n\nI\'m not sure what I expected to feel. Mostly I feel quiet. The desert stretches in all directions and I\'m sitting on my bike at the edge of two countries thinking about Banff and the 2745 miles between there and here.\n\nThank you. All of it.',
     timestamp: Date.now() - 86400000 * 1
   },
   // Extra entries for good measure

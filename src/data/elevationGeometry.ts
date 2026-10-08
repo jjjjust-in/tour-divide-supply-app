@@ -1,13 +1,13 @@
 // Elevation profile artwork (elevation-profile.svg), drawn on the same grid
 // as the map. Distance runs top to bottom: y 0.5 is Banff, y 480.5 is
 // Antelope Wells, so each 17.78px grid row is 100 route miles. Elevation
-// runs left to right from the baseline at x 0.5 (1,500').
+// runs left to right from the baseline at x 0.5 (1500').
 
 export const ELEVATION_LAYOUT = {
   top: 0.5,
   bottom: 480.5,
   totalMiles: 2700,
-  // Grid columns measure elevation: 1,500' at the grid's left edge to
+  // Grid columns measure elevation: 1500' at the grid's left edge to
   // 12,000' at its right edge (16 columns, about 656 ft each). The artwork
   // spans that range over x 0.5 to 323.5, so it's narrowed to fit the grid.
   minFeet: 1500,
@@ -18,7 +18,7 @@ export const ELEVATION_LAYOUT = {
   gridRight: 298.5,
 };
 
-/** Horizontal scale that fits the artwork's 1,500' to 12,000' onto the grid. */
+/** Horizontal scale that fits the artwork's 1500' to 12,000' onto the grid. */
 export const ELEVATION_SCALE_X =
   (ELEVATION_LAYOUT.gridRight - ELEVATION_LAYOUT.gridLeft) / (ELEVATION_LAYOUT.artRight - ELEVATION_LAYOUT.artLeft);
 
