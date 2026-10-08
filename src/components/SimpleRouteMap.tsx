@@ -1,7 +1,7 @@
 import type { Town } from '../types';
 import { itinerary } from '../data/itinerary';
 import type { MeasurementSystem } from '../utils/measurements';
-import { formatDistance, formatElevation } from '../utils/measurements';
+import { formatDistance, formatElevation, milesToKm } from '../utils/measurements';
 import { ChevronDown, ChevronUp, Plus, Trash2, Edit2 } from 'lucide-react';
 import { useState } from 'react';
 import type { Note, Resupply } from '../types';
@@ -178,7 +178,7 @@ function ItineraryRow({
         <div className="content-stretch flex gap-[10px] h-full items-center justify-center relative shrink-0">
           <div aria-hidden="true" className="absolute border border-[#40c8ef] border-solid inset-0 pointer-events-none" />
           <div className="flex flex-col font-display font-medium h-[15px] justify-center leading-[0] not-italic relative shrink-0 text-black text-[12px] text-center uppercase w-[60px]">
-            <p className="leading-[normal]">{mileage}</p>
+            <p className="leading-[normal]">{measurementSystem === 'metric' ? milesToKm(mileage) : mileage}</p>
           </div>
         </div>
         <div className="h-full min-h-px min-w-px relative shrink-0 flex-1">

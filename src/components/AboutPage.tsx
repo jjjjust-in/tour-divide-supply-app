@@ -153,8 +153,8 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
           {/* About Section */}
           <div className="w-full">
             <div className="space-y-5 text-[#1a1a1a] pr-8">
-              <p className="text-[16px] leading-relaxed">
-                Tour Divide Supply is built by{' '}
+              <p className="font-display font-bold text-[18px] leading-[1.4] tracking-[-0.01em]">
+                <span className="uppercase tracking-[0.02em]">Tour Divide Supply</span> is built by{' '}
                 <span className="text-[#40C8EF]">JJJJustin</span>,
                 a bikepacker and product designer with over 5,000 miles on the Tour Divide route.
               </p>

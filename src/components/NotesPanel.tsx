@@ -2,6 +2,7 @@ import { useState } from 'react';
 import navBgPattern from 'figma:asset/53e87b274f9e9eae37a672b63e5feb2e3c44276d.png';
 import type { Note, Resupply, Town } from '../types';
 import type { MeasurementSystem } from '../utils/measurements';
+import { milesToKm } from '../utils/measurements';
 import { X, Plus, Trash2, Edit2, Check, ShoppingCart } from 'lucide-react';
 
 interface NotesPanelProps {
@@ -21,6 +22,7 @@ interface NotesPanelProps {
 
 export function NotesPanel({
   selectedTown,
+  measurementSystem,
   notes,
   resupplies,
   onAddNote,
@@ -84,7 +86,7 @@ export function NotesPanel({
         <div className="flex items-start justify-between">
           <div>
             <h2 className="font-display font-bold text-lg text-[#231F20] uppercase tracking-tight">{selectedTown.name}</h2>
-            <p className="text-xs text-[#231F20]/70">{selectedTown.state} · Mile {selectedTown.mileage}</p>
+            <p className="text-xs text-[#231F20]/70">{selectedTown.state} · {measurementSystem === 'metric' ? `Km ${milesToKm(selectedTown.mileage)}` : `Mile ${selectedTown.mileage}`}</p>
           </div>
           <button onClick={onClose} className="p-1.5 rounded-full hover:bg-black/10 transition-colors mt-1">
             <X size={16} className="text-[#231F20]" />
