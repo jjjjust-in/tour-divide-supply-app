@@ -244,27 +244,24 @@ export function Stopwatch({ onClose }: StopwatchProps) {
 
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="timer-title"
-        className="relative w-full max-w-lg bg-white rounded-t-2xl shadow-2xl max-h-[92vh] overflow-y-auto"
+        className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex justify-center pt-3">
-          <div className="w-10 h-1 bg-[#231F20]/20 rounded-full" />
-        </div>
         <button
           onClick={onClose}
           aria-label="Close"
-          className="absolute right-2 top-3 w-11 h-11 flex items-center justify-center text-black/60 hover:text-black transition-colors touch-manipulation"
+          className="absolute right-2 top-2 w-11 h-11 flex items-center justify-center text-black/60 hover:text-black transition-colors touch-manipulation"
         >
           <X size={22} />
         </button>
 
         {/* Header: same title, subheadline and switch as the Route page */}
-        <div className="flex flex-col items-center gap-1 text-center px-5 pt-4">
+        <div className="flex flex-col items-center gap-1 text-center px-12 pt-6">
           <h2 id="timer-title" className="font-display font-bold text-black text-[20px] tracking-[-0.36px] uppercase">{modeTitle}</h2>
           <p className="text-[13px] text-black/60">{infoMessage}</p>
         </div>
