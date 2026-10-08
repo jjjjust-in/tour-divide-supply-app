@@ -322,6 +322,18 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
     if (isElevation) setPassIndex(next);
     else setWaypointIndex(next);
   };
+  // On route, the card leads with how far the shown waypoint is from the rider.
+  // That matters more than the gap to the waypoint after it, so it replaces it.
+  const tracking = !!position && position.onRoute && positionRide !== null;
+  const distanceFromRider = (ride: number) => {
+    if (positionRide === null) return null;
+    const gap = ride - positionRide;
+    if (Math.abs(gap) < 0.5) return "You're here";
+    // Whole miles (or km), not the rounded-to-5 used for route stats
+    const n = Math.max(1, Math.round(toUnits(Math.abs(gap), measurementSystem)));
+    const d = `${formatNumber(n)} ${unit(measurementSystem)}`;
+    return gap > 0 ? `${d} ahead` : `${d} behind you`;
+  };
   const passElevation = (ft: number) =>
     measurementSystem === 'metric' ? `${formatNumber(Math.round(ft * 0.3048))} m` : `${formatNumber(ft)}'`;
 
@@ -525,9 +537,12 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
               {isElevation ? (
                 <>
                   <p className="font-display font-bold text-[15px] uppercase tracking-tight text-black truncate">{pass.name}</p>
+                  {tracking && (
+                    <p className="font-display font-semibold text-[13px] text-black tabular-nums truncate mt-0.5">{distanceFromRider(pass.ride)}</p>
+                  )}
                   <p className="text-[11px] text-black/60 tabular-nums truncate mt-0.5">
                     {formatMilepost(pass.ride, measurementSystem)} · {passElevation(pass.elevationFt)}
-                    {followingPass ? ` · ${formatDistance(followingPass.ride - pass.ride, measurementSystem)} to ${followingPass.name}` : ' · last big climb'}
+                    {tracking ? '' : followingPass ? ` · ${formatDistance(followingPass.ride - pass.ride, measurementSystem)} to ${followingPass.name}` : ' · last big climb'}
                   </p>
                 </>
               ) : (
@@ -539,9 +554,12 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
                   >
                     {waypoint.town.name}, {waypoint.town.state}
                   </button>
+                  {tracking && (
+                    <p className="font-display font-semibold text-[13px] text-black tabular-nums truncate mt-0.5">{distanceFromRider(waypoint.ride)}</p>
+                  )}
                   <p className="text-[11px] text-black/60 tabular-nums truncate mt-0.5">
                     {formatMilepost(waypoint.ride, measurementSystem)} · {passElevation(waypoint.town.elevation)}
-                    {following ? ` · ${formatDistance(following.ride - waypoint.ride, measurementSystem)} to ${following.town.name}` : ' · finish line'}
+                    {tracking ? '' : following ? ` · ${formatDistance(following.ride - waypoint.ride, measurementSystem)} to ${following.town.name}` : ' · finish line'}
                   </p>
                 </>
               )}
