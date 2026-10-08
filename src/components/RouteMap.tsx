@@ -114,7 +114,7 @@ export function RouteMap({ towns, measurementSystem, onOpenTown }: RouteMapProps
           <g fill="none" transform={`translate(${MAP_LAYOUT.grid.x} ${MAP_LAYOUT.grid.y})`} dangerouslySetInnerHTML={{ __html: LAYERS.grid }} />
           <g fill="none" transform={`translate(${MAP_LAYOUT.statesOutline.x} ${MAP_LAYOUT.statesOutline.y})`} dangerouslySetInnerHTML={{ __html: LAYERS.outline }} />
           <g fill="none" transform={`translate(${MAP_LAYOUT.stateLines.x} ${MAP_LAYOUT.stateLines.y})`} dangerouslySetInnerHTML={{ __html: LAYERS.stateLines }} />
-          <g transform={`translate(${route.x} ${route.y})`}>
+          <g transform={`translate(${route.x} ${route.y}) scale(${route.scaleX} ${route.scaleY})`}>
             <g fill="none" dangerouslySetInnerHTML={{ __html: LAYERS.route }} />
 
             {/* Towns */}

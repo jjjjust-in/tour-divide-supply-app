@@ -6,11 +6,13 @@
 
 /** Where each SVG layer sits in the composed map, matching the design file. */
 export const MAP_LAYOUT = {
-  viewBox: { x: -2, y: -2, width: 306, height: 498 },
+  viewBox: { x: -2, y: -8, width: 306, height: 504 },
   grid: { x: 0, y: 0 },
   statesOutline: { x: 12.5, y: 57 },
   stateLines: { x: 33.5, y: 57.3 },
-  route: { x: 56, y: 0 },
+  // The route is placed by real coordinates against the states outline
+  // (fit residual about 2px), so it ends at Antelope Wells on the NM border.
+  route: { x: 43.28, y: -5.69, scaleX: 0.9813, scaleY: 1.0314 },
 };
 
 /** Route projection: lat/lon to route.svg coordinates. */
