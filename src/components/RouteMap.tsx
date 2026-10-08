@@ -110,6 +110,7 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
   const [selection, setSelection] = useState<MapSelection>(null);
   const [hoverCell, setHoverCell] = useState<{ col: number; row: number } | null>(null);
   const [waypointIndex, setWaypointIndex] = useState<number | null>(null);
+  const [passIndex, setPassIndex] = useState<number | null>(null);
 
   const waypoints = useMemo(
     () =>
@@ -161,6 +162,12 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
   const activeIndex = waypointIndex ?? (nextIndex >= 0 ? nextIndex : position ? waypoints.length - 1 : 0);
   const waypoint = waypoints[activeIndex];
   const following = waypoints[activeIndex + 1];
+
+  // Elevation view steps through passes and climbs instead of towns
+  const nextPassIndex = position ? ROUTE_POIS.findIndex((p) => p.mile > position.mile + 0.5) : -1;
+  const activePassIndex = passIndex ?? (nextPassIndex >= 0 ? nextPassIndex : position ? ROUTE_POIS.length - 1 : 0);
+  const pass = ROUTE_POIS[activePassIndex];
+  const followingPass = ROUTE_POIS[activePassIndex + 1];
 
   // Map coordinates of a pointer event
   const toMapPoint = (clientX: number, clientY: number): [number, number] | null => {
@@ -245,14 +252,24 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
       const [lx, ly] = selection.state.labelAt;
       return {
         ...pct(lx + MAP_LAYOUT.stateLines.x, ly + MAP_LAYOUT.stateLines.y),
-        text: `${selection.state.name} · ${formatDistance(selection.state.routeMiles, measurementSystem)} of route`,
+        text: selection.state.name,
+        detail: `${formatDistance(selection.state.routeMiles, measurementSystem)} of route`,
       };
     }
     return null;
   })();
 
   const dot = position ? (position.onRoute ? position.snapped : position.actual) : null;
-  const stepTo = (i: number) => setWaypointIndex(Math.max(0, Math.min(waypoints.length - 1, i)));
+  const isElevation = view === 'elevation';
+  const cardCount = isElevation ? ROUTE_POIS.length : waypoints.length;
+  const cardIndex = isElevation ? activePassIndex : activeIndex;
+  const stepTo = (i: number) => {
+    const next = Math.max(0, Math.min(cardCount - 1, i));
+    if (isElevation) setPassIndex(next);
+    else setWaypointIndex(next);
+  };
+  const passElevation = (ft: number) =>
+    measurementSystem === 'metric' ? `${Math.round(ft * 0.3048).toLocaleString('en-US')} m` : `${ft.toLocaleString('en-US')}'`;
 
   return (
     <div className="w-full space-y-4">
@@ -297,40 +314,21 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
               {measurementSystem === 'metric' ? '3,658 m' : "12,000'"}
             </text>
 
-            {/* Passes and points of interest: marker on the peak, label to its left */}
-            {ROUTE_POIS.map((poi) => {
+            {/* Passes and climbs: dots like the towns on the map; tap to show one in the card */}
+            {ROUTE_POIS.map((poi, i) => {
               const [x, y] = mileToElevationPoint(poi.mile);
-              const elevation =
-                measurementSystem === 'metric'
-                  ? `${Math.round(poi.elevationFt * 0.3048).toLocaleString('en-US')} m`
-                  : `${poi.elevationFt.toLocaleString('en-US')}'`;
               return (
-                <g key={poi.id} pointerEvents="none">
-                  <text
-                    x={Math.min(x - 2, 284)}
-                    y={y}
-                    textAnchor="end"
-                    dominantBaseline="central"
-                    fontSize={5.6}
-                    fontWeight={700}
-                    fill="#231F20"
-                    stroke="#ffffff"
-                    strokeWidth={2.2}
-                    strokeLinejoin="round"
-                    paintOrder="stroke"
-                    className="font-display uppercase"
-                    letterSpacing={0.1}
-                  >
-                    {poi.name} · {elevation}
-                  </text>
-                  {/* small triangle pointing out from the peak */}
-                  <polygon
-                    points={`${x + 1.5},${y - 3} ${x + 6.5},${y} ${x + 1.5},${y + 3}`}
-                    fill="#ffffff"
-                    stroke="#231F20"
-                    strokeWidth={1}
-                    strokeLinejoin="round"
-                  />
+                <g
+                  key={poi.id}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelection(null);
+                    setPassIndex(i);
+                  }}
+                >
+                  <circle cx={x} cy={y} r={7} fill="transparent" />
+                  {i === activePassIndex && <circle cx={x} cy={y} r={4.6} fill="none" stroke="#231F20" strokeWidth={1} />}
+                  <circle cx={x} cy={y} r={2.4} fill="#231F20" />
                 </g>
               );
             })}
@@ -441,7 +439,10 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
             style={{ left: `${label.left}%`, top: `${label.top}%` }}
             role="status"
           >
-            {label.text}
+            <span className="block">{label.text}</span>
+            {'detail' in label && label.detail && (
+              <span className="block font-normal normal-case tracking-normal text-white/80 mt-0.5">{label.detail}</span>
+            )}
           </div>
         )}
       </div>
@@ -457,37 +458,53 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
         )}
       </div>
 
-      {/* Waypoint: step through the towns */}
-      {waypoint && (
+      {/* Waypoint card: towns on the map, passes and climbs on the elevation profile */}
+      {(isElevation ? pass : waypoint) && (
         <div className="bg-white border border-[#40c8ef] max-w-[360px] mx-auto">
           <div className="flex items-stretch">
             <button
-              onClick={() => stepTo(activeIndex - 1)}
-              disabled={activeIndex === 0}
-              aria-label="Previous waypoint"
+              onClick={() => stepTo(cardIndex - 1)}
+              disabled={cardIndex === 0}
+              aria-label={isElevation ? 'Previous pass' : 'Previous waypoint'}
               className="w-12 shrink-0 flex items-center justify-center text-black hover:bg-[#F5FCFF] disabled:opacity-25 transition-colors touch-manipulation"
             >
               <ChevronLeft size={22} />
             </button>
             <div className="flex-1 min-w-0 px-2 py-4 text-center" aria-live="polite">
-              <p className="text-[12px] text-black/60 uppercase tracking-[0.04em] tabular-nums">
-                {formatMilepost(waypoint.mile, measurementSystem)} · {formatElevation(waypoint.town.elevation, measurementSystem)}
-              </p>
-              <button
-                onClick={() => onOpenTown(waypoint.town.id)}
-                aria-label={`Open ${waypoint.town.name} in the itinerary`}
-                className="max-w-full font-display font-bold text-[18px] uppercase tracking-tight text-black truncate mt-1 underline decoration-[#40c8ef] decoration-2 underline-offset-[5px] hover:text-[#00B6EB] transition-colors"
-              >
-                {waypoint.town.name}, {waypoint.town.state}
-              </button>
-              <p className="text-[13px] text-black/70 tabular-nums mt-1">
-                {following ? `${formatDistance(following.mile - waypoint.mile, measurementSystem)} to ${following.town.name}` : 'Finish line'}
-              </p>
+              {isElevation ? (
+                <>
+                  <p className="text-[12px] text-black/60 uppercase tracking-[0.04em] tabular-nums">
+                    {formatMilepost(pass.mile, measurementSystem)} · {passElevation(pass.elevationFt)}
+                  </p>
+                  <p className="font-display font-bold text-[18px] uppercase tracking-tight text-black truncate mt-1">{pass.name}</p>
+                  <p className="text-[13px] text-black/70 tabular-nums mt-1">
+                    {followingPass
+                      ? `${formatDistance(followingPass.mile - pass.mile, measurementSystem)} to ${followingPass.name}`
+                      : 'Last big climb'}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="text-[12px] text-black/60 uppercase tracking-[0.04em] tabular-nums">
+                    {formatMilepost(waypoint.mile, measurementSystem)} · {formatElevation(waypoint.town.elevation, measurementSystem)}
+                  </p>
+                  <button
+                    onClick={() => onOpenTown(waypoint.town.id)}
+                    aria-label={`Open ${waypoint.town.name} in the itinerary`}
+                    className="max-w-full font-display font-bold text-[18px] uppercase tracking-tight text-black truncate mt-1 underline decoration-[#40c8ef] decoration-2 underline-offset-[5px] hover:text-[#00B6EB] transition-colors"
+                  >
+                    {waypoint.town.name}, {waypoint.town.state}
+                  </button>
+                  <p className="text-[13px] text-black/70 tabular-nums mt-1">
+                    {following ? `${formatDistance(following.mile - waypoint.mile, measurementSystem)} to ${following.town.name}` : 'Finish line'}
+                  </p>
+                </>
+              )}
             </div>
             <button
-              onClick={() => stepTo(activeIndex + 1)}
-              disabled={activeIndex === waypoints.length - 1}
-              aria-label="Next waypoint"
+              onClick={() => stepTo(cardIndex + 1)}
+              disabled={cardIndex === cardCount - 1}
+              aria-label={isElevation ? 'Next pass' : 'Next waypoint'}
               className="w-12 shrink-0 flex items-center justify-center text-black hover:bg-[#F5FCFF] disabled:opacity-25 transition-colors touch-manipulation"
             >
               <ChevronRight size={22} />
@@ -520,6 +537,7 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
             onChange={(e) => {
               setDemoMile(Number(e.target.value));
               setWaypointIndex(null);
+              setPassIndex(null);
             }}
             className="w-full accent-[#40c8ef]"
           />
