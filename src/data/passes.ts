@@ -25,6 +25,7 @@ export const ROUTE_POIS: RoutePoi[] = [
   { id: 'lava-mountain', name: 'Lava Mountain', mile: 659, elevationFt: 7470, source: 'profile' },
   { id: 'fleecer-ridge', name: 'Fleecer Ridge', mile: 752, elevationFt: 7840, source: 'profile' },
   { id: 'old-bannack-road', name: 'Old Bannack Road Pass', mile: 861, elevationFt: 7880, source: 'profile' },
+  { id: 'red-rock-pass', name: 'Red Rock Pass', mile: 968, elevationFt: 7152, source: 'Wikipedia: 7,152 ft (2,180 m)' },
   { id: 'union-pass', name: 'Union Pass', mile: 1152, elevationFt: 9212, source: 'TopoQuest (USGS)' },
   { id: 'lander-cutoff', name: 'Lander Cutoff', mile: 1274, elevationFt: 8240, source: 'profile (one rider log from Boulder to Atlantic City: 2480 m high point)' },
   { id: 'sand-mountain', name: 'Sand Mountain', mile: 1508, elevationFt: 9840, source: 'two CycleBlaze rider logs from Brush Mountain Lodge: 3000 m and 3002 m high point' },
