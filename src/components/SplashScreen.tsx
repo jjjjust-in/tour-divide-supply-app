@@ -1,5 +1,6 @@
 import Vector from "../imports/Vector";
 import { motion } from "motion/react";
+import { Wordmark } from "./Wordmark";
 
 function LogoLockup() {
   return (
@@ -7,11 +8,7 @@ function LogoLockup() {
       <div className="h-[143.993px] relative shrink-0 w-[143.999px]" data-name="Logo">
         <Vector />
       </div>
-      <p className="font-display font-bold leading-[normal] not-italic relative shrink-0 text-[#231f20] text-[18px] text-nowrap tracking-[-0.36px] uppercase whitespace-pre">
-        tourdividesupp<span className="tracking-[-2.24px]">l</span>
-        <span className="tracking-[-4.32px]">y</span>
-        <span className="tracking-[-2.56px]">.</span>com
-      </p>
+      <Wordmark className="w-[216px] h-auto text-[#231f20]" />
     </div>
   );
 }
