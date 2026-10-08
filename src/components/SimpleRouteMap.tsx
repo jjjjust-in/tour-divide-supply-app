@@ -39,8 +39,12 @@ function ItineraryRow({
   onEditNote,
   onAddResupply,
   onDeleteResupply,
-  onEditResupply
+  onEditResupply,
+  isExpanded,
+  onExpandedChange
 }: {
+  isExpanded: boolean;
+  onExpandedChange: (expanded: boolean) => void;
   mileage: number;
   location: string;
   isClickable: boolean;
@@ -57,7 +61,6 @@ function ItineraryRow({
   onDeleteResupply: (resupplyId: string) => void;
   onEditResupply: (resupplyId: string, resupply: Omit<Resupply, 'id' | 'townId' | 'timestamp'>) => void;
 }) {
-  const [isExpanded, setIsExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState<'notes' | 'resupplies'>('resupplies');
   const [showNoteForm, setShowNoteForm] = useState(false);
   const [showResupplyForm, setShowResupplyForm] = useState(false);
@@ -80,7 +83,7 @@ function ItineraryRow({
 
   const handleClick = () => {
     if (isClickable && linkedTownId) {
-      setIsExpanded(!isExpanded);
+      onExpandedChange(!isExpanded);
       if (!isExpanded) {
         setActiveTab('resupplies');
         setShowNoteForm(false);
@@ -91,7 +94,7 @@ function ItineraryRow({
 
   const handleToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsExpanded(!isExpanded);
+    onExpandedChange(!isExpanded);
     if (!isExpanded) {
       setActiveTab('resupplies');
       setShowNoteForm(false);
@@ -201,9 +204,9 @@ function ItineraryRow({
                   aria-label={isExpanded ? "Collapse details" : "Expand details"}
                 >
                   {isExpanded ? (
-                    <ChevronUp size={14} className="text-[#40c8ef]" />
+                    <ChevronUp size={14} className="text-black" />
                   ) : (
-                    <ChevronDown size={14} className="text-[#40c8ef]" />
+                    <ChevronDown size={14} className="text-black" />
                   )}
                 </button>
               )}
@@ -573,6 +576,8 @@ function ItineraryRow({
 
 export function SimpleRouteMap({ towns, measurementSystem, notes, resupplies, onAddNote, onDeleteNote, onEditNote, onAddResupply, onDeleteResupply, onEditResupply }: SimpleRouteMapProps) {
   const mappedStops = itinerary;
+  // Only one town can be open at a time
+  const [expandedStopId, setExpandedStopId] = useState<string | null>(null);
 
   return (
     <div className="relative w-full h-full flex items-center justify-start bg-white overflow-auto">
@@ -590,6 +595,8 @@ export function SimpleRouteMap({ towns, measurementSystem, notes, resupplies, on
               return (
                 <ItineraryRow
                   key={stop.id}
+                  isExpanded={expandedStopId === stop.id}
+                  onExpandedChange={(open) => setExpandedStopId(open ? stop.id : null)}
                   mileage={stop.mileage}
                   location={stop.location}
                   isClickable={stop.isClickable}
