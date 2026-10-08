@@ -131,7 +131,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
           >
             <ChevronLeft size={20} />
           </button>
-          <h1 className="text-[#40C8EF] uppercase font-display font-bold tracking-[-0.36px] text-lg md:text-xl flex-1 font-bold">
+          <h1 className="text-[#40C8EF] uppercase font-display font-bold tracking-[-0.36px] text-lg md:text-xl flex-1">
             Settings & About
           </h1>
         </div>
@@ -154,7 +154,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
           {/* About Section */}
           <div className="w-full">
             <div className="flex gap-[10px] items-center justify-center pb-[24px]">
-              <p className="font-display font-bold text-[#40c8ef] text-[18px] tracking-[-0.36px] uppercase whitespace-nowrap font-bold">
+              <p className="font-display font-bold text-[#40c8ef] text-[18px] tracking-[-0.36px] uppercase whitespace-nowrap">
                 What is Tour Divide Supply?
               </p>
             </div>
@@ -183,7 +183,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
           {/* Resources Section */}
           <div className="w-full">
             <div className="flex gap-[10px] items-center justify-center pb-[24px]">
-              <p className="font-display font-bold text-[#40c8ef] text-[18px] tracking-[-0.36px] uppercase whitespace-nowrap font-bold">
+              <p className="font-display font-bold text-[#40c8ef] text-[18px] tracking-[-0.36px] uppercase whitespace-nowrap">
                 Resources
               </p>
             </div>
@@ -193,7 +193,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                 {/* GPX Files */}
                 {(topofusionFiles.length > 0 || acaFiles.length > 0) && (
                   <div className="space-y-4">
-                    <h2 className="font-display font-bold text-[#231f20] text-sm uppercase tracking-tight flex items-center gap-2 font-bold">
+                    <h2 className="font-display font-bold text-[#231f20] text-sm uppercase tracking-tight flex items-center gap-2">
                       <FileText size={18} className="text-[#40C8EF]" />
                       Download GPX Files
                     </h2>
@@ -267,7 +267,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                 {/* Route Notes & Alerts */}
                 {noteResources.length > 0 && (
                   <div>
-                    <h2 className="font-display font-bold text-[#231f20] text-sm uppercase tracking-tight mb-3 flex items-center gap-2 font-bold">
+                    <h2 className="font-display font-bold text-[#231f20] text-sm uppercase tracking-tight mb-3 flex items-center gap-2">
                       <AlertTriangle size={18} className="text-[#febc12]" />
                       Route Updates
                     </h2>
@@ -285,7 +285,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                             <div className="flex items-start gap-3">
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-start justify-between gap-2">
-                                  <h3 className="font-display font-bold text-[#231f20] text-base font-bold">
+                                  <h3 className="font-display font-bold text-[#231f20] text-base">
                                     {resource.title}
                                   </h3>
                                   {resource.isPushed && (
@@ -315,7 +315,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
           {/* Settings Section */}
           <div className="w-full">
             <div className="flex gap-[10px] items-center justify-center pb-[24px]">
-              <p className="font-display font-bold text-[#40c8ef] text-[18px] tracking-[-0.36px] uppercase whitespace-nowrap font-bold">
+              <p className="font-display font-bold text-[#40c8ef] text-[18px] tracking-[-0.36px] uppercase whitespace-nowrap">
                 Settings
               </p>
             </div>
@@ -327,7 +327,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <Ruler size={16} className="text-[#40C8EF]" />
-                    <h3 className="uppercase font-display font-bold tracking-[-0.36px] text-[#40C8EF] text-sm font-bold">
+                    <h3 className="uppercase font-display font-bold tracking-[-0.36px] text-[#40C8EF] text-sm">
                       Measurement System
                     </h3>
                   </div>
@@ -362,7 +362,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                 <div className="space-y-3 pt-3 border-t border-[#40C8EF]/20">
                   <div className="flex items-center gap-2">
                     <Download size={16} className="text-[#40C8EF]" />
-                    <h3 className="uppercase font-display font-bold tracking-[-0.36px] text-[#40C8EF] text-sm font-bold">
+                    <h3 className="uppercase font-display font-bold tracking-[-0.36px] text-[#40C8EF] text-sm">
                       Data Management
                     </h3>
                   </div>
@@ -389,7 +389,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                 <div className="space-y-3 pt-3 border-t border-[#40C8EF]/20">
                   <div className="flex items-center gap-2">
                     <Trash2 size={16} className="text-[#FF6B35]" />
-                    <h3 className="uppercase font-display font-bold tracking-[-0.36px] text-[#FF6B35] text-sm font-bold">
+                    <h3 className="uppercase font-display font-bold tracking-[-0.36px] text-[#FF6B35] text-sm">
                       Clear Data
                     </h3>
                   </div>
@@ -429,7 +429,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
       {showClearConfirm && (
         <div className="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full border-4 border-[#FF6B35] shadow-2xl">
-            <h3 className="text-xl mb-4 uppercase font-display font-bold tracking-[-0.36px] text-[#FF6B35] font-bold">
+            <h3 className="text-xl mb-4 uppercase font-display font-bold tracking-[-0.36px] text-[#FF6B35]">
               Confirm Delete
             </h3>
             <p className="text-gray-700 mb-6">

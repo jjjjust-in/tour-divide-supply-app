@@ -451,7 +451,7 @@ function ItineraryRow({
                         ) : (
                           <div className="flex justify-between items-start gap-1">
                             <div className="flex-1">
-                              <h4 className="text-black font-display font-bold uppercase text-[13px] leading-[120%] font-bold">
+                              <h4 className="text-black font-display font-bold uppercase text-[13px] leading-[120%]">
                                 {resupply.name}
                               </h4>
                               {resupply.hours && (
@@ -580,7 +580,7 @@ export function SimpleRouteMap({ towns, measurementSystem, notes, resupplies, on
         <div className="box-border content-stretch flex flex-col gap-[10px] items-center justify-center px-[20px] md:px-[85px] py-[40px] pb-[150px] md:py-[96px] md:pb-[206px] relative">
           {/* Title */}
           <div className="box-border content-stretch flex flex-col gap-[10px] items-center justify-center pb-[24px] pt-0 px-0 relative shrink-0 w-full h-[94px]">
-            <p className="font-display font-bold leading-[normal] not-italic relative shrink-0 text-black text-[20px] text-nowrap tracking-[-0.36px] uppercase whitespace-pre font-bold">The Route</p>
+            <p className="font-display font-bold leading-[normal] not-italic relative shrink-0 text-black text-[20px] text-nowrap tracking-[-0.36px] uppercase whitespace-pre">The Route</p>
           </div>
 
           {/* Itinerary List */}

@@ -346,7 +346,6 @@ export default function App() {
             towns={towns}
             measurementSystem={measurementSystem}
             onClose={() => setShowQuickAdd(false)}
-            onAddNote={handleAddNote}
             onAddResupply={handleAddResupply}
             onAddJournalEntry={handleAddJournalEntry}
           />

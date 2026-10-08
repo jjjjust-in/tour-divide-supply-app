@@ -83,7 +83,7 @@ export function NotesPanel({
       >
         <div className="flex items-start justify-between">
           <div>
-            <h2 className="font-display font-bold text-lg text-[#231F20] uppercase tracking-tight font-bold">{selectedTown.name}</h2>
+            <h2 className="font-display font-bold text-lg text-[#231F20] uppercase tracking-tight">{selectedTown.name}</h2>
             <p className="text-xs text-[#231F20]/70">{selectedTown.state} · Mile {selectedTown.mileage}</p>
           </div>
           <button onClick={onClose} className="p-1.5 rounded-full hover:bg-black/10 transition-colors mt-0.5">

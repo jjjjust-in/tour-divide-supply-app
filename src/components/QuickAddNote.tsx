@@ -3,24 +3,24 @@ import navBgPattern from 'figma:asset/53e87b274f9e9eae37a672b63e5feb2e3c44276d.p
 import type { Town, Resupply } from '../types';
 import type { MeasurementSystem } from '../utils/measurements';
 import { resizeImageFile } from '../utils/storage';
-import { BookOpen, ShoppingCart, FileText, Image as ImageIcon, X } from 'lucide-react';
+import { BookOpen, ShoppingCart, Image as ImageIcon, X } from 'lucide-react';
 
 interface QuickAddNoteProps {
   towns: Town[];
   measurementSystem: MeasurementSystem;
   onClose: () => void;
-  onAddNote: (townId: string, content: string) => void;
   onAddResupply: (townId: string, resupply: Omit<Resupply, 'id' | 'townId' | 'timestamp'>) => void;
   onAddJournalEntry: (content: string, imageUrl?: string, townId?: string) => void;
 }
 
-type Tab = 'note' | 'resupply' | 'journal';
+// Notes and journal entries overlap, so adding from here is Resupply or Journal only.
+// Existing town notes still show and can be edited from the town panels.
+type Tab = 'resupply' | 'journal';
 
-export function QuickAddNote({ towns, onClose, onAddNote, onAddResupply, onAddJournalEntry }: QuickAddNoteProps) {
-  const [activeTab, setActiveTab] = useState<Tab>('note');
+export function QuickAddNote({ towns, onClose, onAddResupply, onAddJournalEntry }: QuickAddNoteProps) {
+  const [activeTab, setActiveTab] = useState<Tab>('journal');
   const [selectedTownId, setSelectedTownId] = useState(towns[0]?.id || '');
   const [journalTownId, setJournalTownId] = useState('');
-  const [content, setContent] = useState('');
   const [journalContent, setJournalContent] = useState('');
   const [imageUrl, setImageUrl] = useState<string | undefined>(undefined);
   const [imagePreview, setImagePreview] = useState<string | undefined>(undefined);
@@ -49,10 +49,7 @@ export function QuickAddNote({ towns, onClose, onAddNote, onAddResupply, onAddJo
   };
 
   const handleSubmit = () => {
-    if (activeTab === 'note' && selectedTownId && content.trim()) {
-      onAddNote(selectedTownId, content.trim());
-      onClose();
-    } else if (activeTab === 'resupply' && selectedTownId && resupply.name.trim()) {
+    if (activeTab === 'resupply' && selectedTownId && resupply.name.trim()) {
       onAddResupply(selectedTownId, {
         name: resupply.name.trim(),
         hours: resupply.hours.trim() || 'Hours unknown',
@@ -67,12 +64,10 @@ export function QuickAddNote({ towns, onClose, onAddNote, onAddResupply, onAddJo
   };
 
   const canSubmit =
-    (activeTab === 'note' && !!content.trim() && !!selectedTownId) ||
     (activeTab === 'resupply' && !!resupply.name.trim() && !!selectedTownId) ||
     (activeTab === 'journal' && !!journalContent.trim());
 
   const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
-    { key: 'note', label: 'Note', icon: <FileText size={13} /> },
     { key: 'resupply', label: 'Resupply', icon: <ShoppingCart size={13} /> },
     { key: 'journal', label: 'Journal', icon: <BookOpen size={13} /> },
   ];
@@ -94,7 +89,7 @@ export function QuickAddNote({ towns, onClose, onAddNote, onAddResupply, onAddJo
           style={navBgPattern ? { backgroundImage: `url(${navBgPattern})`, backgroundSize: '300px 300px' } : { backgroundColor: '#febc12' }}
         >
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-display font-bold text-base text-[#231F20] uppercase tracking-tight font-bold">Add</h2>
+            <h2 className="font-display font-bold text-base text-[#231F20] uppercase tracking-tight">Add</h2>
             <button onClick={onClose} className="p-1 rounded-full hover:bg-black/10">
               <X size={16} className="text-[#231F20]" />
             </button>
@@ -122,8 +117,8 @@ export function QuickAddNote({ towns, onClose, onAddNote, onAddResupply, onAddJo
         {/* Content */}
         <div className="mx-4 border-2 border-[#40C8EF] rounded-b-xl rounded-tr-xl overflow-hidden">
         <div className="p-4 space-y-3 max-h-[60vh] overflow-y-auto bg-white">
-          {/* Town selector (Note and Resupply) */}
-          {(activeTab === 'note' || activeTab === 'resupply') && (
+          {/* Town selector (Resupply) */}
+          {activeTab === 'resupply' && (
             <div>
               <label className="text-xs font-medium text-gray-500 uppercase tracking-wide block mb-1">Town</label>
               <select
@@ -138,18 +133,6 @@ export function QuickAddNote({ towns, onClose, onAddNote, onAddResupply, onAddJo
                 ))}
               </select>
             </div>
-          )}
-
-          {/* Note tab */}
-          {activeTab === 'note' && (
-            <textarea
-              value={content}
-              onChange={e => setContent(e.target.value)}
-              placeholder="What do you want to remember about this town?"
-              className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#40C8EF]"
-              rows={4}
-              autoFocus
-            />
           )}
 
           {/* Resupply tab */}
