@@ -21,7 +21,6 @@ const LAYERS = {
 
 // The grid is 16 x 27 squares, each one 100 x 100 miles
 const GRID = { cols: 16, rows: 27, x0: 0.5, y0: 0.5, cellW: 18.625, cellH: 17.7778 };
-const TOTAL_MILES = TOWN_ANCHORS[TOWN_ANCHORS.length - 1].mile;
 
 // The prototype build can't use GPS, so it gets a slider to preview positions
 const DEMO_LOCATION = import.meta.env.VITE_DEMO_LOCATION === 'true';
@@ -290,60 +289,35 @@ export function RouteMap({ towns, measurementSystem, onOpenTown }: RouteMapProps
               onClick={() => stepTo(activeIndex - 1)}
               disabled={activeIndex === 0}
               aria-label="Previous waypoint"
-              className="w-12 shrink-0 flex items-center justify-center text-black hover:bg-[#F5FCFF] disabled:opacity-25 transition-colors border-r border-[#40c8ef]/40 touch-manipulation"
+              className="w-12 shrink-0 flex items-center justify-center text-black hover:bg-[#F5FCFF] disabled:opacity-25 transition-colors touch-manipulation"
             >
               <ChevronLeft size={22} />
             </button>
-            <div className="flex-1 min-w-0 px-4 py-3 text-center" aria-live="polite">
-              <p className="text-[11px] text-black/50 uppercase tracking-[0.06em] tabular-nums">
-                Waypoint {activeIndex + 1} of {waypoints.length}
+            <div className="flex-1 min-w-0 px-2 py-4 text-center" aria-live="polite">
+              <p className="text-[12px] text-black/60 uppercase tracking-[0.04em] tabular-nums">
+                {formatMilepost(waypoint.mile, measurementSystem)} · {formatElevation(waypoint.town.elevation, measurementSystem)}
               </p>
               <p className="font-display font-bold text-[18px] uppercase tracking-tight text-black truncate mt-1">
                 {waypoint.town.name}, {waypoint.town.state}
               </p>
-              <p className="text-[13px] text-black/70 tabular-nums mt-0.5">
-                {formatMilepost(waypoint.mile, measurementSystem)} · {formatElevation(waypoint.town.elevation, measurementSystem)}
+              <p className="text-[13px] text-black/70 tabular-nums mt-1">
+                {following ? `${formatDistance(following.mile - waypoint.mile, measurementSystem)} to ${following.town.name}` : 'Finish line'}
               </p>
+              <button
+                onClick={() => onOpenTown(waypoint.town.id)}
+                className="mt-3 bg-[#40c8ef] text-white px-4 py-2.5 rounded text-[12px] font-display font-medium uppercase tracking-[-0.2px] hover:bg-[#00B6EB] transition-colors"
+              >
+                View town
+              </button>
             </div>
             <button
               onClick={() => stepTo(activeIndex + 1)}
               disabled={activeIndex === waypoints.length - 1}
               aria-label="Next waypoint"
-              className="w-12 shrink-0 flex items-center justify-center text-black hover:bg-[#F5FCFF] disabled:opacity-25 transition-colors border-l border-[#40c8ef]/40 touch-manipulation"
+              className="w-12 shrink-0 flex items-center justify-center text-black hover:bg-[#F5FCFF] disabled:opacity-25 transition-colors touch-manipulation"
             >
               <ChevronRight size={22} />
             </button>
-          </div>
-
-          {/* Progress along the whole route */}
-          <div className="px-4 pt-1 pb-3">
-            <div className="relative h-3" aria-hidden="true">
-              <div className="absolute left-0 right-0 top-1/2 h-px bg-[#40c8ef]" />
-              {waypoints.map((w, i) => (
-                <div
-                  key={w.town.id}
-                  className={`absolute top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full ${i === activeIndex ? 'w-2.5 h-2.5 bg-black' : 'w-1 h-1 bg-black/40'}`}
-                  style={{ left: `${(w.mile / TOTAL_MILES) * 100}%` }}
-                />
-              ))}
-              {position && (
-                <div
-                  className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 rounded-full bg-[#febc12] border border-[#231F20]"
-                  style={{ left: `${(Math.min(position.mile, TOTAL_MILES) / TOTAL_MILES) * 100}%` }}
-                />
-              )}
-            </div>
-            <div className="flex items-center justify-between mt-2 gap-3">
-              <p className="text-[12px] text-black/60 truncate">
-                {following ? `${formatDistance(following.mile - waypoint.mile, measurementSystem)} to ${following.town.name}` : 'Finish line'}
-              </p>
-              <button
-                onClick={() => onOpenTown(waypoint.town.id)}
-                className="shrink-0 bg-[#40c8ef] text-white px-4 py-2.5 rounded text-[12px] font-display font-medium uppercase tracking-[-0.2px] hover:bg-[#00B6EB] transition-colors"
-              >
-                View town
-              </button>
-            </div>
           </div>
         </div>
       )}
