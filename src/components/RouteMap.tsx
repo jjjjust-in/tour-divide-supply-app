@@ -334,6 +334,9 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
     const d = `${formatNumber(n)} ${unit(measurementSystem)}`;
     return gap > 0 ? `${d} ahead` : `${d} behind you`;
   };
+  // Mile marker (MM), or kilometer marker (KM) in metric
+  const markerLabel = (ride: number) =>
+    `${measurementSystem === 'metric' ? 'KM' : 'MM'} ${formatNumber(Math.round(toUnits(ride, measurementSystem)))}`;
   const passElevation = (ft: number) =>
     measurementSystem === 'metric' ? `${formatNumber(Math.round(ft * 0.3048))} m` : `${formatNumber(ft)}'`;
 
@@ -538,10 +541,10 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
                 <>
                   <p className="font-display font-bold text-[15px] uppercase tracking-tight text-black truncate">{pass.name}</p>
                   {tracking && (
-                    <p className="font-display font-semibold text-[13px] text-black tabular-nums truncate mt-0.5">{distanceFromRider(pass.ride)}</p>
+                    <p className="font-display font-semibold text-[13px] uppercase text-black tabular-nums truncate mt-0.5">{distanceFromRider(pass.ride)}</p>
                   )}
-                  <p className="text-[11px] text-black/60 tabular-nums truncate mt-0.5">
-                    {formatMilepost(pass.ride, measurementSystem)} · {passElevation(pass.elevationFt)}
+                  <p className="text-[11px] uppercase text-black/60 tabular-nums truncate mt-0.5">
+                    {markerLabel(pass.ride)} · Elevation {passElevation(pass.elevationFt)}
                     {tracking ? '' : followingPass ? ` · ${formatDistance(followingPass.ride - pass.ride, measurementSystem)} to ${followingPass.name}` : ' · last big climb'}
                   </p>
                 </>
@@ -555,10 +558,10 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
                     {waypoint.town.name}, {waypoint.town.state}
                   </button>
                   {tracking && (
-                    <p className="font-display font-semibold text-[13px] text-black tabular-nums truncate mt-0.5">{distanceFromRider(waypoint.ride)}</p>
+                    <p className="font-display font-semibold text-[13px] uppercase text-black tabular-nums truncate mt-0.5">{distanceFromRider(waypoint.ride)}</p>
                   )}
-                  <p className="text-[11px] text-black/60 tabular-nums truncate mt-0.5">
-                    {formatMilepost(waypoint.ride, measurementSystem)} · {passElevation(waypoint.town.elevation)}
+                  <p className="text-[11px] uppercase text-black/60 tabular-nums truncate mt-0.5">
+                    {markerLabel(waypoint.ride)} · Elevation {passElevation(waypoint.town.elevation)}
                     {tracking ? '' : following ? ` · ${formatDistance(following.ride - waypoint.ride, measurementSystem)} to ${following.town.name}` : ' · finish line'}
                   </p>
                 </>
