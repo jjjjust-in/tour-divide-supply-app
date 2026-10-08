@@ -10,7 +10,7 @@ export interface SocialLink {
 }
 
 export const socialLinks: SocialLink[] = [
-  { platform: 'instagram', label: 'Instagram', handle: '', url: '' },
+  { platform: 'instagram', label: 'Instagram', handle: '@tourdividesupply', url: 'https://instagram.com/tourdividesupply' },
   { platform: 'youtube', label: 'YouTube', handle: '', url: '' },
   { platform: 'website', label: 'Website', handle: 'tourdividesupply.com', url: 'https://tourdividesupply.com' },
 ];
