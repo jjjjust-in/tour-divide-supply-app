@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import '@fontsource-variable/inconsolata'
+import '@fontsource-variable/work-sans'
 import './styles/globals.css'
 import App from './App.tsx'
 
