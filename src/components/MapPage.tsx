@@ -37,11 +37,11 @@ export function MapPage({ towns, measurementSystem, onOpenTown }: MapPageProps) 
         <div
           role="radiogroup"
           aria-label="Route view"
-          className="relative grid grid-cols-2 p-1 border-2 border-[#40C8EF] rounded-lg bg-white mb-2"
+          className="relative grid grid-cols-2 border-2 border-[#40C8EF] rounded-lg bg-white overflow-hidden mb-2"
         >
           <span
             aria-hidden="true"
-            className={`absolute top-1 bottom-1 left-1 w-[calc(50%-4px)] rounded-md bg-[#40C8EF] motion-safe:transition-transform motion-safe:duration-200 ease-out ${
+            className={`absolute inset-y-0 left-0 w-1/2 bg-[#40C8EF] motion-safe:transition-transform motion-safe:duration-200 ease-out ${
               view === 'elevation' ? 'translate-x-full' : 'translate-x-0'
             }`}
           />
@@ -56,7 +56,7 @@ export function MapPage({ towns, measurementSystem, onOpenTown }: MapPageProps) 
                 role="radio"
                 aria-checked={active}
                 onClick={() => setView(key)}
-                className={`relative z-10 flex items-center justify-center gap-2 px-4 py-2 rounded-md transition-colors ${
+                className={`relative z-10 flex items-center justify-center gap-2 px-4 py-2.5 transition-colors ${
                   active ? 'text-white' : 'text-[#40C8EF] hover:text-[#00B6EB]'
                 }`}
               >
