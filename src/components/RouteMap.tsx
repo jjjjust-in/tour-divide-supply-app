@@ -509,7 +509,7 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
           Compact, the same width as the grid, and pinned just above the bottom nav. */}
       {(isElevation ? pass : waypoint) && (
         <div
-          className="sticky bottom-[127px] md:bottom-[144px] z-20 bg-white border border-[#40c8ef] shadow-[0_6px_24px_rgba(35,31,32,0.12)]"
+          className="sticky bottom-[127px] md:bottom-[144px] z-20 bg-white border-2 border-[#40C8EF] shadow-[0_6px_24px_rgba(35,31,32,0.12)]"
           style={{ width: GRID_PX_WIDTH, marginLeft: `calc(50% - ${GRID_PX_WIDTH / 2}px)` }}
         >
           <div className="flex items-stretch">

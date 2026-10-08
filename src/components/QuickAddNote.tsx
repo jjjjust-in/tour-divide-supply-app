@@ -1,9 +1,9 @@
 import { useState, useRef } from 'react';
-import navBgPattern from 'figma:asset/53e87b274f9e9eae37a672b63e5feb2e3c44276d.png';
 import type { Town, Resupply } from '../types';
 import type { MeasurementSystem } from '../utils/measurements';
 import { resizeImageFile } from '../utils/storage';
-import { BookOpen, ShoppingCart, Image as ImageIcon, X } from 'lucide-react';
+import { Image as ImageIcon, X } from 'lucide-react';
+import { PageSelect } from './PageLayout';
 
 interface QuickAddNoteProps {
   towns: Town[];
@@ -68,183 +68,198 @@ export function QuickAddNote({ towns, onClose, onAddResupply, onAddJournalEntry 
     (activeTab === 'resupply' && !!resupply.name.trim() && !!selectedTownId) ||
     (activeTab === 'journal' && !!journalContent.trim() && !!journalTownId);
 
-  const tabs: { key: Tab; label: string; icon: React.ReactNode }[] = [
-    { key: 'resupply', label: 'Resupply', icon: <ShoppingCart size={13} /> },
-    { key: 'journal', label: 'Journal', icon: <BookOpen size={13} /> },
-  ];
+  // Field styles shared with the Route page controls: blue 2px border, rounded-lg
+  const fieldClass =
+    'w-full bg-white border-2 border-[#40C8EF] rounded-lg px-4 py-2.5 text-[14px] text-black placeholder:text-black/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#40C8EF]/40';
+  const labelClass = 'block font-display font-medium text-[12px] uppercase tracking-[-0.2px] text-black mb-1.5';
 
   return (
     <div className="fixed inset-0 z-60 flex items-end justify-center bg-black/40" onClick={onClose}>
       <div
-        className="w-full max-w-lg bg-white rounded-t-2xl shadow-2xl"
-        onClick={e => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="add-sheet-title"
+        className="relative w-full max-w-lg bg-white rounded-t-2xl shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
       >
-        {/* Header: handle, title and tabs share one patterned band */}
-        <div
-          className="rounded-t-2xl"
-          style={{ backgroundImage: `url(${navBgPattern})`, backgroundSize: '300px 300px' }}
+        <div className="flex justify-center pt-3">
+          <div className="w-10 h-1 bg-[#231F20]/20 rounded-full" />
+        </div>
+        <button
+          onClick={onClose}
+          aria-label="Close"
+          className="absolute right-2 top-3 w-11 h-11 flex items-center justify-center text-black/60 hover:text-black transition-colors touch-manipulation"
         >
-          <div className="flex justify-center pt-3 pb-2">
-            <div className="w-10 h-1 bg-[#231F20]/20 rounded-full" />
-          </div>
-          <div className="flex items-center justify-between px-4 pb-3">
-            <h2 className="font-display font-bold text-[16px] text-[#231F20] uppercase tracking-tight">Add</h2>
-            <button
-              onClick={onClose}
-              aria-label="Close"
-              className="w-9 h-9 flex items-center justify-center rounded-full bg-white/80 hover:bg-white transition-colors touch-manipulation"
-            >
-              <X size={18} className="text-[#231F20]" />
-            </button>
-          </div>
+          <X size={22} />
+        </button>
 
-          {/* Tabs sit on the band and connect to the content box below */}
-          <div className="flex px-4 -mb-[2px] relative z-10">
-            {tabs.map(tab => (
+        {/* Header: same title, subheadline and switch as the Route page */}
+        <div className="flex flex-col items-center gap-1 text-center px-5 pt-4">
+          <h2 id="add-sheet-title" className="font-display font-bold text-black text-[20px] tracking-[-0.36px] uppercase">
+            {activeTab === 'journal' ? 'New Entry' : 'New Resupply'}
+          </h2>
+          <p className="text-[13px] text-black/60">
+            {activeTab === 'journal' ? 'Write about a town on the route' : 'Add a store, café or service'}
+          </p>
+        </div>
+
+        <div className="px-5 pt-5">
+          <div role="radiogroup" aria-label="What to add" className="relative grid grid-cols-2 border-2 border-[#40C8EF] rounded-lg bg-white overflow-hidden">
+            <span
+              aria-hidden="true"
+              className={`absolute inset-y-0 left-0 w-1/2 bg-[#40C8EF] motion-safe:transition-transform motion-safe:duration-200 ease-out ${
+                activeTab === 'journal' ? 'translate-x-full' : 'translate-x-0'
+              }`}
+            />
+            {([
+              { key: 'resupply', label: 'Resupply' },
+              { key: 'journal', label: 'Journal' },
+            ] as const).map(({ key, label }) => (
               <button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
-                className={`flex items-center gap-1.5 px-4 py-2.5 text-xs font-semibold transition-colors rounded-t-lg border-2 mr-1 ${
-                  activeTab === tab.key
-                    ? 'border-[#40C8EF] border-b-white bg-white text-[#40C8EF]'
-                    : 'border-[#40C8EF] bg-[#E6F7FD] text-[#40C8EF]/70 hover:bg-[#d0f0fb]'
+                key={key}
+                role="radio"
+                aria-checked={activeTab === key}
+                onClick={() => setActiveTab(key)}
+                className={`relative z-10 px-4 py-2.5 transition-colors ${
+                  activeTab === key ? 'text-white' : 'text-[#40C8EF] hover:text-[#00B6EB]'
                 }`}
               >
-                {tab.icon}
-                {tab.label}
+                <span className="uppercase font-display font-medium tracking-[-0.36px] text-[13px] md:text-sm">{label}</span>
               </button>
             ))}
           </div>
         </div>
 
-        {/* Content */}
-        <div className="mx-4 border-2 border-[#40C8EF] rounded-b-xl rounded-tr-xl overflow-hidden">
-        <div className="p-4 space-y-4 max-h-[60vh] overflow-y-auto bg-white">
-          {/* Town selector (Resupply) */}
-          {activeTab === 'resupply' && (
-            <div>
-              <label className="text-xs font-medium text-gray-500 uppercase tracking-wide block mb-1.5">Town</label>
-              <select
-                value={selectedTownId}
-                onChange={e => setSelectedTownId(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#40C8EF] bg-white"
-              >
-                {towns.map(town => (
-                  <option key={town.id} value={town.id}>
-                    {town.name}, {town.state}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          {/* Resupply tab */}
-          {activeTab === 'resupply' && (
-            <div className="space-y-3">
-              <input
-                value={resupply.name}
-                onChange={e => setResupply(r => ({ ...r, name: e.target.value }))}
-                placeholder="Store or service name *"
-                className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#40C8EF]"
-                autoFocus
-              />
-              <input
-                value={resupply.hours}
-                onChange={e => setResupply(r => ({ ...r, hours: e.target.value }))}
-                placeholder="Hours (e.g. Mon–Sat 8am–6pm)"
-                className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#40C8EF]"
-              />
-              <input
-                value={resupply.phone}
-                onChange={e => setResupply(r => ({ ...r, phone: e.target.value }))}
-                placeholder="Phone number"
-                className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#40C8EF]"
-                type="tel"
-              />
-              <input
-                value={resupply.address}
-                onChange={e => setResupply(r => ({ ...r, address: e.target.value }))}
-                placeholder="Address"
-                className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#40C8EF]"
-              />
-            </div>
-          )}
-
-          {/* Journal tab */}
-          {activeTab === 'journal' && (
-            <div className="space-y-3">
+        {/* Form */}
+        <div className="px-5 pt-5 pb-2 space-y-4 max-h-[52vh] overflow-y-auto">
+          {activeTab === 'resupply' ? (
+            <>
               <div>
-                <label className="text-xs font-medium text-gray-500 uppercase tracking-wide block mb-1.5">Town</label>
-                <select
-                  value={journalTownId}
-                  onChange={e => setJournalTownId(e.target.value)}
-                  className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#40C8EF] bg-white"
-                >
-                  <option value="" disabled>Choose a town</option>
-                  {towns.map(town => (
+                <span className={labelClass}>Town</span>
+                <PageSelect id="add-resupply-town" label="Town" value={selectedTownId} onChange={setSelectedTownId}>
+                  {towns.map((town) => (
                     <option key={town.id} value={town.id}>
                       {town.name}, {town.state}
                     </option>
                   ))}
-                </select>
+                </PageSelect>
               </div>
-              <textarea
-                value={journalContent}
-                onChange={e => setJournalContent(e.target.value)}
-                placeholder="Write your journal entry..."
-                className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#40C8EF]"
-                rows={4}
-                autoFocus
-              />
-              {/* Image upload */}
+              <div>
+                <label htmlFor="add-resupply-name" className={labelClass}>Name</label>
+                <input
+                  id="add-resupply-name"
+                  value={resupply.name}
+                  onChange={(e) => setResupply((r) => ({ ...r, name: e.target.value }))}
+                  placeholder="Ridley's Family Market"
+                  className={fieldClass}
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label htmlFor="add-resupply-hours" className={labelClass}>Hours</label>
+                <input
+                  id="add-resupply-hours"
+                  value={resupply.hours}
+                  onChange={(e) => setResupply((r) => ({ ...r, hours: e.target.value }))}
+                  placeholder="Mon–Sat 8am–6pm"
+                  className={fieldClass}
+                />
+              </div>
+              <div>
+                <label htmlFor="add-resupply-phone" className={labelClass}>Phone</label>
+                <input
+                  id="add-resupply-phone"
+                  value={resupply.phone}
+                  onChange={(e) => setResupply((r) => ({ ...r, phone: e.target.value }))}
+                  placeholder="(307) 367-4131"
+                  className={fieldClass}
+                  type="tel"
+                />
+              </div>
+              <div>
+                <label htmlFor="add-resupply-address" className={labelClass}>Address</label>
+                <input
+                  id="add-resupply-address"
+                  value={resupply.address}
+                  onChange={(e) => setResupply((r) => ({ ...r, address: e.target.value }))}
+                  placeholder="55 S Fremont Ave, Pinedale, WY"
+                  className={fieldClass}
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              <div>
+                <span className={labelClass}>Town</span>
+                <PageSelect id="add-journal-town" label="Town" value={journalTownId} onChange={setJournalTownId}>
+                  <option value="" disabled>
+                    Choose a town
+                  </option>
+                  {towns.map((town) => (
+                    <option key={town.id} value={town.id}>
+                      {town.name}, {town.state}
+                    </option>
+                  ))}
+                </PageSelect>
+              </div>
+              <div>
+                <label htmlFor="add-journal-text" className={labelClass}>Entry</label>
+                <textarea
+                  id="add-journal-text"
+                  value={journalContent}
+                  onChange={(e) => setJournalContent(e.target.value)}
+                  placeholder="What happened today?"
+                  className={`${fieldClass} resize-none leading-relaxed`}
+                  rows={5}
+                  autoFocus
+                />
+              </div>
               <div>
                 {imagePreview ? (
                   <div className="relative">
-                    <img src={imagePreview} alt="Preview" className="w-full h-32 object-cover rounded-xl border border-gray-200" />
+                    <img src={imagePreview} alt="Selected photo" className="w-full h-40 object-cover rounded-lg border-2 border-[#40C8EF]" />
                     <button
-                      onClick={() => { setImageUrl(undefined); setImagePreview(undefined); }}
-                      className="absolute top-2 right-2 bg-black/50 text-white rounded-full p-1 hover:bg-black/70"
+                      onClick={() => {
+                        setImageUrl(undefined);
+                        setImagePreview(undefined);
+                      }}
+                      aria-label="Remove photo"
+                      className="absolute top-2 right-2 bg-black/60 text-white rounded-full p-1.5 hover:bg-black/80"
                     >
-                      <X size={12} />
+                      <X size={14} />
                     </button>
                   </div>
                 ) : (
                   <button
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-full py-3 rounded-xl border-2 border-dashed border-gray-200 text-xs text-gray-400 flex items-center justify-center gap-2 hover:border-[#40C8EF] hover:text-[#40C8EF] transition-colors"
+                    className="w-full py-2.5 rounded-lg border-2 border-dashed border-[#40C8EF] text-[#40C8EF] flex items-center justify-center gap-2 hover:bg-[#F5FCFF] transition-colors"
                   >
-                    <ImageIcon size={14} />
-                    Add photo
+                    <ImageIcon size={16} />
+                    <span className="uppercase font-display font-medium tracking-[-0.36px] text-[13px]">Add photo</span>
                   </button>
                 )}
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleImageChange}
-                />
+                <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
               </div>
-            </div>
+            </>
           )}
         </div>
 
-        </div>
-
-        {/* Footer */}
-        <div className="flex gap-3 px-4 pb-6 pt-3 border-t border-gray-100">
+        {/* Buttons, styled like the main nav */}
+        <div className="flex gap-3 px-5 pt-3 pb-6">
           <button
             onClick={onClose}
-            className="flex-1 py-3 rounded-xl border border-gray-200 text-sm font-medium text-gray-600 hover:bg-gray-50"
+            className="flex-1 border-2 border-[#40C8EF] bg-white text-[#40C8EF] py-2.5 rounded-lg hover:bg-[#F5FCFF] transition-colors"
           >
-            Cancel
+            <span className="uppercase font-display font-medium tracking-[-0.36px] text-[13px] md:text-sm">Cancel</span>
           </button>
           <button
             onClick={handleSubmit}
             disabled={!canSubmit}
-            className="flex-1 py-3 rounded-xl bg-[#40C8EF] text-white text-sm font-bold disabled:opacity-40 hover:bg-[#00B6EB] transition-colors"
+            className="flex-1 border-2 border-[#40C8EF] bg-[#40C8EF] text-white py-2.5 rounded-lg hover:bg-[#00B6EB] hover:border-[#00B6EB] transition-colors disabled:opacity-40 disabled:hover:bg-[#40C8EF]"
           >
-            Add
+            <span className="uppercase font-display font-medium tracking-[-0.36px] text-[13px] md:text-sm">
+              {activeTab === 'journal' ? 'Add entry' : 'Add resupply'}
+            </span>
           </button>
         </div>
       </div>
