@@ -153,7 +153,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
           {/* About Section */}
           <div className="w-full">
             <div className="space-y-5 text-[#1a1a1a] pr-8">
-              <p className="font-display font-bold text-[18px] leading-[1.4] tracking-[-0.01em]">
+              <p className="font-display font-bold text-[20px] leading-[1.4] tracking-[-0.01em]">
                 <span className="uppercase tracking-[0.02em]">Tour Divide Supply</span> is built by{' '}
                 <span className="text-[#40C8EF]">JJJJustin</span>,
                 a bikepacker and product designer with over 5,000 miles on the Tour Divide route.
@@ -341,13 +341,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                 </div>
 
                 {/* Clear Data */}
-                <div className="space-y-4 pt-3 border-t border-[#40C8EF]/20">
-                  <div className="flex items-center gap-2">
-                    <Trash2 size={16} className="text-[#FF6B35]" />
-                    <h3 className="uppercase font-display font-bold tracking-[-0.36px] text-[#FF6B35] text-sm">
-                      Clear Data
-                    </h3>
-                  </div>
+                <div className="space-y-4">
                   <button
                     onClick={() => handleClearData('notes')}
                     className="w-full py-3 px-4 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 transition-all flex items-center justify-center gap-2 touch-manipulation text-sm"
