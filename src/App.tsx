@@ -262,7 +262,7 @@ export default function App() {
             aria-label="The Route"
           >
             <MapIcon size={16} className={showRoute ? 'text-white' : 'text-[#40C8EF]'} />
-            <span className="uppercase font-display font-medium tracking-[-0.36px] text-sm md:text-base">
+            <span className="uppercase font-display font-medium tracking-[-0.36px] text-[13px] md:text-sm">
               Route
             </span>
           </button>
@@ -276,7 +276,7 @@ export default function App() {
             aria-label="Journal"
           >
             <BookOpen size={16} className={showJournal ? 'text-white' : 'text-[#40C8EF]'} />
-            <span className="uppercase font-display font-medium tracking-[-0.36px] text-sm md:text-base">
+            <span className="uppercase font-display font-medium tracking-[-0.36px] text-[13px] md:text-sm">
               Journal
             </span>
           </button>

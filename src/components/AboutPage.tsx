@@ -1,4 +1,5 @@
-import { ChevronLeft, Ruler, Download, Upload, Trash2, RotateCcw, FileText, AlertTriangle } from 'lucide-react';
+import { ChevronLeft, Ruler, Download, Upload, Trash2, RotateCcw, FileText, AlertTriangle, Instagram, Youtube, Globe, ExternalLink } from 'lucide-react';
+import { socialLinks } from '../data/social';
 import { useState } from 'react';
 import type { MeasurementSystem } from '../utils/measurements';
 import navBgPattern from 'figma:asset/53e87b274f9e9eae37a672b63e5feb2e3c44276d.png';
@@ -177,6 +178,51 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                   offline access during your ride.
                 </p>
               </div>
+            </div>
+          </div>
+
+          {/* Social Section */}
+          <div className="w-full">
+            <div className="flex gap-[10px] items-center justify-center pb-[24px]">
+              <p className="font-display font-bold text-[#40c8ef] text-[18px] tracking-[-0.36px] uppercase whitespace-nowrap">
+                Social
+              </p>
+            </div>
+            <div className="bg-white relative w-full">
+              <div aria-hidden="true" className="absolute border border-[#40c8ef] inset-0 pointer-events-none" />
+              <ul className="divide-y divide-[#40C8EF]/30">
+                {socialLinks.map((link) => {
+                  const Icon = link.platform === 'instagram' ? Instagram : link.platform === 'youtube' ? Youtube : Globe;
+                  const content = (
+                    <>
+                      <Icon size={18} className="text-[#40C8EF] shrink-0" />
+                      <span className="font-display font-medium text-[12px] uppercase tracking-tight text-[#231f20] w-[84px] shrink-0">
+                        {link.label}
+                      </span>
+                      <span className={`flex-1 min-w-0 truncate text-[13px] ${link.url ? 'text-[#231f20]' : 'text-[#231f20]/40 italic'}`}>
+                        {link.url ? (link.handle || link.url) : 'Link coming soon'}
+                      </span>
+                      {link.url && <ExternalLink size={14} className="text-[#40C8EF] shrink-0" />}
+                    </>
+                  );
+                  return (
+                    <li key={link.platform}>
+                      {link.url ? (
+                        <a
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-3 px-6 py-4 hover:bg-[#F5FCFF] transition-colors touch-manipulation"
+                        >
+                          {content}
+                        </a>
+                      ) : (
+                        <div className="flex items-center gap-3 px-6 py-4">{content}</div>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
           </div>
 
