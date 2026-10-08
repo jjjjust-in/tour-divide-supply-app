@@ -24,6 +24,7 @@ export const ROUTE_POIS: RoutePoi[] = [
   { id: 'huckleberry-pass', name: 'Huckleberry Pass', mile: 557, elevationFt: 5960 },
   { id: 'lava-mountain', name: 'Lava Mountain', mile: 659, elevationFt: 7470 },
   { id: 'fleecer-ridge', name: 'Fleecer Ridge', mile: 752, elevationFt: 7840 },
+  { id: 'old-bannack-road', name: 'Old Bannack Road Pass', mile: 861, elevationFt: 7880 },
   { id: 'union-pass', name: 'Union Pass', mile: 1152, elevationFt: 9210, published: true },
   { id: 'lynx-pass', name: 'Lynx Pass', mile: 1594, elevationFt: 8937, published: true },
   { id: 'boreas-pass', name: 'Boreas Pass', mile: 1699, elevationFt: 11482, published: true },
