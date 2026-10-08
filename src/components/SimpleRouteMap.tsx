@@ -177,7 +177,7 @@ function ItineraryRow({
       >
         <div className="content-stretch flex gap-[10px] h-full items-center justify-center relative shrink-0">
           <div aria-hidden="true" className="absolute border border-[#40c8ef] border-solid inset-0 pointer-events-none" />
-          <div className="flex flex-col font-['Coordinates:Medium',sans-serif] h-[15px] justify-center leading-[0] not-italic relative shrink-0 text-black text-[12px] text-center uppercase w-[60px]">
+          <div className="flex flex-col font-display font-medium h-[15px] justify-center leading-[0] not-italic relative shrink-0 text-black text-[12px] text-center uppercase w-[60px]">
             <p className="leading-[normal]">{mileage}</p>
           </div>
         </div>
@@ -189,8 +189,8 @@ function ItineraryRow({
                 isClickable ? 'cursor-pointer transition-colors' : ''
               }`}
             >
-              <p className={`flex-1 font-['Coordinates:Medium',sans-serif] leading-[normal] min-h-px min-w-px not-italic relative shrink-0 text-black text-[12px] uppercase ${
-                isClickable ? "hover:font-['Coordinates:Bold',sans-serif]" : ''
+              <p className={`flex-1 font-display font-medium leading-[normal] min-h-px min-w-px not-italic relative shrink-0 text-black text-[12px] uppercase ${
+                isClickable ? "hover:font-bold" : ''
               }`}>
                 {location}
               </p>
@@ -219,29 +219,29 @@ function ItineraryRow({
             {/* Stats Grid */}
             <div className="grid grid-cols-3 gap-2">
               <div>
-                <div className="text-black uppercase font-['Coordinates:Bold',sans-serif] tracking-[-0.36px] text-[12px] mb-0.5">
+                <div className="text-black uppercase font-display font-bold tracking-[-0.36px] text-[12px] mb-0.5">
                   ELEV
                 </div>
-                <div className="text-black text-[14px] font-['Coordinates:Medium',sans-serif] leading-[120%]">
+                <div className="text-black text-[14px] font-display font-medium leading-[120%]">
                   {formatElevation(town.elevation, measurementSystem)}
                 </div>
               </div>
               {town.population && (
                 <div>
-                  <div className="text-black uppercase font-['Coordinates:Bold',sans-serif] tracking-[-0.36px] text-[12px] mb-0.5">
+                  <div className="text-black uppercase font-display font-bold tracking-[-0.36px] text-[12px] mb-0.5">
                     POP
                   </div>
-                  <div className="text-black text-[14px] font-['Coordinates:Medium',sans-serif] leading-[120%]">
+                  <div className="text-black text-[14px] font-display font-medium leading-[120%]">
                     {town.population.toLocaleString()}
                   </div>
                 </div>
               )}
               {mileageToNext !== null && (
                 <div>
-                  <div className="text-black uppercase font-['Coordinates:Bold',sans-serif] tracking-[-0.36px] text-[12px] mb-0.5">
+                  <div className="text-black uppercase font-display font-bold tracking-[-0.36px] text-[12px] mb-0.5">
                     TO NEXT
                   </div>
-                  <div className="text-black text-[14px] font-['Coordinates:Medium',sans-serif] leading-[120%]">
+                  <div className="text-black text-[14px] font-display font-medium leading-[120%]">
                     {formatDistance(mileageToNext, measurementSystem)}
                   </div>
                 </div>
@@ -271,7 +271,7 @@ function ItineraryRow({
                     setShowNoteForm(false);
                     setShowResupplyForm(false);
                   }}
-                  className={`flex-1 px-2 py-1 text-[14px] font-['Coordinates:Bold',sans-serif] uppercase tracking-[-0.2px] rounded transition-colors flex items-center justify-center gap-1 ${
+                  className={`flex-1 px-2 py-1 text-[14px] font-display font-bold uppercase tracking-[-0.2px] rounded transition-colors flex items-center justify-center gap-1 ${
                     activeTab === 'notes'
                       ? 'bg-[#40c8ef] text-white'
                       : 'bg-gray-200 text-black hover:bg-gray-300'
@@ -285,7 +285,7 @@ function ItineraryRow({
                     setShowNoteForm(false);
                     setShowResupplyForm(false);
                   }}
-                  className={`flex-1 px-2 py-1 text-[14px] font-['Coordinates:Bold',sans-serif] uppercase tracking-[-0.2px] rounded transition-colors flex items-center justify-center gap-1 ${
+                  className={`flex-1 px-2 py-1 text-[14px] font-display font-bold uppercase tracking-[-0.2px] rounded transition-colors flex items-center justify-center gap-1 ${
                     activeTab === 'resupplies'
                       ? 'bg-[#40c8ef] text-white'
                       : 'bg-gray-200 text-black hover:bg-gray-300'
@@ -314,14 +314,14 @@ function ItineraryRow({
                             <div className="flex gap-1">
                               <button
                                 onClick={handleCancelEditNote}
-                                className="flex-1 bg-gray-300 text-black py-1 px-1.5 rounded hover:bg-gray-400 transition-colors text-[13px] font-['Coordinates:Bold',sans-serif] uppercase"
+                                className="flex-1 bg-gray-300 text-black py-1 px-1.5 rounded hover:bg-gray-400 transition-colors text-[13px] font-display font-bold uppercase"
                               >
                                 Cancel
                               </button>
                               <button
                                 onClick={handleSaveNote}
                                 disabled={!editNoteContent.trim()}
-                                className="flex-1 bg-[#40c8ef] text-white py-1 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[13px] font-['Coordinates:Bold',sans-serif] uppercase"
+                                className="flex-1 bg-[#40c8ef] text-white py-1 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[13px] font-display font-bold uppercase"
                               >
                                 Save
                               </button>
@@ -355,7 +355,7 @@ function ItineraryRow({
                   {!showNoteForm ? (
                     <button
                       onClick={() => setShowNoteForm(true)}
-                      className="w-full bg-[#40c8ef] text-white py-1.5 px-2 rounded hover:bg-[#00B6EB] transition-colors flex items-center justify-center gap-1 text-[13px] font-['Coordinates:Bold',sans-serif] uppercase tracking-[-0.2px]"
+                      className="w-full bg-[#40c8ef] text-white py-1.5 px-2 rounded hover:bg-[#00B6EB] transition-colors flex items-center justify-center gap-1 text-[13px] font-display font-bold uppercase tracking-[-0.2px]"
                     >
                       <Plus size={10} />
                       Add Note
@@ -377,14 +377,14 @@ function ItineraryRow({
                             setShowNoteForm(false);
                             setNewNote('');
                           }}
-                          className="flex-1 bg-gray-300 text-black py-1 px-1.5 rounded hover:bg-gray-400 transition-colors text-[13px] font-['Coordinates:Bold',sans-serif] uppercase"
+                          className="flex-1 bg-gray-300 text-black py-1 px-1.5 rounded hover:bg-gray-400 transition-colors text-[13px] font-display font-bold uppercase"
                         >
                           Cancel
                         </button>
                         <button
                           type="submit"
                           disabled={!newNote.trim()}
-                          className="flex-1 bg-[#40c8ef] text-white py-1 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[13px] font-['Coordinates:Bold',sans-serif] uppercase"
+                          className="flex-1 bg-[#40c8ef] text-white py-1 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[13px] font-display font-bold uppercase"
                         >
                           Add
                         </button>
@@ -435,14 +435,14 @@ function ItineraryRow({
                             <div className="flex gap-1">
                               <button
                                 onClick={handleCancelEditResupply}
-                                className="flex-1 bg-gray-300 text-black py-1 px-1.5 rounded hover:bg-gray-400 transition-colors text-[13px] font-['Coordinates:Bold',sans-serif] uppercase"
+                                className="flex-1 bg-gray-300 text-black py-1 px-1.5 rounded hover:bg-gray-400 transition-colors text-[13px] font-display font-bold uppercase"
                               >
                                 Cancel
                               </button>
                               <button
                                 onClick={handleSaveResupply}
                                 disabled={!editResupply.name.trim()}
-                                className="flex-1 bg-[#40c8ef] text-white py-1 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[13px] font-['Coordinates:Bold',sans-serif] uppercase"
+                                className="flex-1 bg-[#40c8ef] text-white py-1 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[13px] font-display font-bold uppercase"
                               >
                                 Save
                               </button>
@@ -451,22 +451,22 @@ function ItineraryRow({
                         ) : (
                           <div className="flex justify-between items-start gap-1">
                             <div className="flex-1">
-                              <h4 className="text-black font-['Coordinates:Bold',sans-serif] uppercase text-[13px] leading-[120%] font-bold">
+                              <h4 className="text-black font-display font-bold uppercase text-[13px] leading-[120%] font-bold">
                                 {resupply.name}
                               </h4>
                               {resupply.hours && (
                                 <p className="text-[10px] text-black leading-[120%] mt-0.5">
-                                  <span className="font-['Coordinates:Bold',sans-serif] text-black">Hours:</span> {resupply.hours}
+                                  <span className="font-display font-bold text-black">Hours:</span> {resupply.hours}
                                 </p>
                               )}
                               {resupply.phone && (
                                 <p className="text-[10px] text-black leading-[120%] mt-0.5">
-                                  <span className="font-['Coordinates:Bold',sans-serif] text-black">Phone:</span> {resupply.phone}
+                                  <span className="font-display font-bold text-black">Phone:</span> {resupply.phone}
                                 </p>
                               )}
                               {resupply.address && (
                                 <p className="text-[10px] text-black leading-[120%] mt-0.5">
-                                  <span className="font-['Coordinates:Bold',sans-serif] text-black">Address:</span>{' '}
+                                  <span className="font-display font-bold text-black">Address:</span>{' '}
                                   <a
                                     href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(resupply.address)}`}
                                     target="_blank"
@@ -503,7 +503,7 @@ function ItineraryRow({
                   {!showResupplyForm ? (
                     <button
                       onClick={() => setShowResupplyForm(true)}
-                      className="w-full bg-[#40c8ef] text-white py-1.5 px-2 rounded hover:bg-[#00B6EB] transition-colors flex items-center justify-center gap-1 text-[13px] font-['Coordinates:Bold',sans-serif] uppercase tracking-[-0.2px]"
+                      className="w-full bg-[#40c8ef] text-white py-1.5 px-2 rounded hover:bg-[#00B6EB] transition-colors flex items-center justify-center gap-1 text-[13px] font-display font-bold uppercase tracking-[-0.2px]"
                     >
                       <Plus size={10} />
                       Add Resupply
@@ -547,14 +547,14 @@ function ItineraryRow({
                             setShowResupplyForm(false);
                             setNewResupply({ name: '', hours: '', phone: '', address: '' });
                           }}
-                          className="flex-1 bg-gray-300 text-black py-1 px-1.5 rounded hover:bg-gray-400 transition-colors text-[13px] font-['Coordinates:Bold',sans-serif] uppercase"
+                          className="flex-1 bg-gray-300 text-black py-1 px-1.5 rounded hover:bg-gray-400 transition-colors text-[13px] font-display font-bold uppercase"
                         >
                           Cancel
                         </button>
                         <button
                           type="submit"
                           disabled={!newResupply.name.trim()}
-                          className="flex-1 bg-[#40c8ef] text-white py-1 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[13px] font-['Coordinates:Bold',sans-serif] uppercase"
+                          className="flex-1 bg-[#40c8ef] text-white py-1 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[13px] font-display font-bold uppercase"
                         >
                           Add
                         </button>
@@ -580,7 +580,7 @@ export function SimpleRouteMap({ towns, measurementSystem, notes, resupplies, on
         <div className="box-border content-stretch flex flex-col gap-[10px] items-center justify-center px-[20px] md:px-[85px] py-[40px] pb-[150px] md:py-[96px] md:pb-[206px] relative">
           {/* Title */}
           <div className="box-border content-stretch flex flex-col gap-[10px] items-center justify-center pb-[24px] pt-0 px-0 relative shrink-0 w-full h-[94px]">
-            <p className="font-['Coordinates:Bold',sans-serif] leading-[normal] not-italic relative shrink-0 text-black text-[20px] text-nowrap tracking-[-0.36px] uppercase whitespace-pre font-bold">The Route</p>
+            <p className="font-display font-bold leading-[normal] not-italic relative shrink-0 text-black text-[20px] text-nowrap tracking-[-0.36px] uppercase whitespace-pre font-bold">The Route</p>
           </div>
 
           {/* Itinerary List */}

@@ -7,7 +7,7 @@ function LogoLockup() {
       <div className="h-[143.993px] relative shrink-0 w-[143.999px]" data-name="Logo">
         <Vector />
       </div>
-      <p className="font-['Coordinates:Bold',sans-serif] leading-[normal] not-italic relative shrink-0 text-[#231f20] text-[18px] text-nowrap tracking-[-0.36px] uppercase whitespace-pre">
+      <p className="font-display font-bold leading-[normal] not-italic relative shrink-0 text-[#231f20] text-[18px] text-nowrap tracking-[-0.36px] uppercase whitespace-pre">
         tourdividesupp<span className="tracking-[-2.24px]">l</span>
         <span className="tracking-[-4.32px]">y</span>
         <span className="tracking-[-2.56px]">.</span>com
@@ -40,7 +40,7 @@ export function SplashScreen({ onComplete }: SplashScreenProps) {
 
         {/* Tap to continue hint */}
         <motion.div
-          className="absolute bottom-8 text-[#231f20]/60 text-sm uppercase font-['Coordinates:Medium',sans-serif] tracking-wide"
+          className="absolute bottom-8 text-[#231f20]/60 text-sm uppercase font-display font-medium tracking-wide"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1, duration: 0.8 }}

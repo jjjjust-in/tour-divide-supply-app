@@ -30,6 +30,11 @@
   --radius: 0.625rem;
 }
 
+@theme {
+  /* Inconsolata replaces Coordinates. Bundled locally so it works offline. */
+  --font-display: 'Inconsolata Variable', 'Inconsolata', ui-monospace, 'SF Mono', Menlo, monospace;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

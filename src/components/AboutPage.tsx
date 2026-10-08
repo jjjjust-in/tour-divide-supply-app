@@ -131,7 +131,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
           >
             <ChevronLeft size={20} />
           </button>
-          <h1 className="text-[#40C8EF] uppercase font-['Coordinates:Bold',sans-serif] tracking-[-0.36px] text-lg md:text-xl flex-1 font-bold">
+          <h1 className="text-[#40C8EF] uppercase font-display font-bold tracking-[-0.36px] text-lg md:text-xl flex-1 font-bold">
             Settings & About
           </h1>
         </div>
@@ -154,7 +154,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
           {/* About Section */}
           <div className="w-full">
             <div className="flex gap-[10px] items-center justify-center pb-[24px]">
-              <p className="font-['Coordinates:Bold',sans-serif] text-[#40c8ef] text-[18px] tracking-[-0.36px] uppercase whitespace-nowrap font-bold">
+              <p className="font-display font-bold text-[#40c8ef] text-[18px] tracking-[-0.36px] uppercase whitespace-nowrap font-bold">
                 What is Tour Divide Supply?
               </p>
             </div>
@@ -163,7 +163,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
               <div className="p-6 space-y-4 text-[#1a1a1a] leading-relaxed">
                 <p className="text-[12px]">
                   TourDivideSupply.com was created by{' '}
-                  <span className="font-['Coordinates:Bold',sans-serif] text-[#40C8EF]">JJJJustin</span>,
+                  <span className="font-display font-bold text-[#40C8EF]">JJJJustin</span>,
                   an avid bikepacker and product designer who has ridden over 5000 miles on the Tour Divide route.
                 </p>
                 <p className="text-[12px]">
@@ -183,7 +183,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
           {/* Resources Section */}
           <div className="w-full">
             <div className="flex gap-[10px] items-center justify-center pb-[24px]">
-              <p className="font-['Coordinates:Bold',sans-serif] text-[#40c8ef] text-[18px] tracking-[-0.36px] uppercase whitespace-nowrap font-bold">
+              <p className="font-display font-bold text-[#40c8ef] text-[18px] tracking-[-0.36px] uppercase whitespace-nowrap font-bold">
                 Resources
               </p>
             </div>
@@ -193,7 +193,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                 {/* GPX Files */}
                 {(topofusionFiles.length > 0 || acaFiles.length > 0) && (
                   <div className="space-y-4">
-                    <h2 className="font-['Coordinates:Bold',sans-serif] text-[#231f20] text-sm uppercase tracking-tight flex items-center gap-2 font-bold">
+                    <h2 className="font-display font-bold text-[#231f20] text-sm uppercase tracking-tight flex items-center gap-2 font-bold">
                       <FileText size={18} className="text-[#40C8EF]" />
                       Download GPX Files
                     </h2>
@@ -203,7 +203,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                         <table className="w-full">
                           <thead>
                             <tr className="bg-[#40C8EF]">
-                              <th colSpan={3} className="text-left p-3 font-['Coordinates:Bold',sans-serif] text-sm uppercase tracking-tight text-white">
+                              <th colSpan={3} className="text-left p-3 font-display font-bold text-sm uppercase tracking-tight text-white">
                                 Official Tour Divide Route from Topofusion
                               </th>
                             </tr>
@@ -214,7 +214,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                                 key={resource.id}
                                 className={`${index !== topofusionFiles.length - 1 ? 'border-b border-[#40C8EF]/30' : ''} hover:bg-[#F5FCFF] transition-colors`}
                               >
-                                <td className="p-3 font-['Coordinates:Bold',sans-serif] text-sm uppercase tracking-tight text-[#231f20]">
+                                <td className="p-3 font-display font-bold text-sm uppercase tracking-tight text-[#231f20]">
                                   {resource.fileName}
                                 </td>
                                 <td className="p-3 text-xs text-[#231f20]/60">{resource.fileSize}</td>
@@ -235,7 +235,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                         <table className="w-full">
                           <thead>
                             <tr className="bg-[#40C8EF]">
-                              <th colSpan={3} className="text-left p-3 font-['Coordinates:Bold',sans-serif] text-sm uppercase tracking-tight text-white">
+                              <th colSpan={3} className="text-left p-3 font-display font-bold text-sm uppercase tracking-tight text-white">
                                 Great Divide Mountain Bike Route from ACA
                               </th>
                             </tr>
@@ -246,7 +246,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                                 key={resource.id}
                                 className={`${index !== acaFiles.length - 1 ? 'border-b border-[#40C8EF]/30' : ''} hover:bg-[#F5FCFF] transition-colors`}
                               >
-                                <td className="p-3 font-['Coordinates:Bold',sans-serif] text-sm uppercase tracking-tight text-[#231f20]">
+                                <td className="p-3 font-display font-bold text-sm uppercase tracking-tight text-[#231f20]">
                                   {resource.fileName}
                                 </td>
                                 <td className="p-3 text-xs text-[#231f20]/60">{resource.fileSize}</td>
@@ -267,7 +267,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                 {/* Route Notes & Alerts */}
                 {noteResources.length > 0 && (
                   <div>
-                    <h2 className="font-['Coordinates:Bold',sans-serif] text-[#231f20] text-sm uppercase tracking-tight mb-3 flex items-center gap-2 font-bold">
+                    <h2 className="font-display font-bold text-[#231f20] text-sm uppercase tracking-tight mb-3 flex items-center gap-2 font-bold">
                       <AlertTriangle size={18} className="text-[#febc12]" />
                       Route Updates
                     </h2>
@@ -285,11 +285,11 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                             <div className="flex items-start gap-3">
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-start justify-between gap-2">
-                                  <h3 className="font-['Coordinates:Bold',sans-serif] text-[#231f20] text-base font-bold">
+                                  <h3 className="font-display font-bold text-[#231f20] text-base font-bold">
                                     {resource.title}
                                   </h3>
                                   {resource.isPushed && (
-                                    <span className="bg-[#EF4444] text-white text-xs px-2 py-1 rounded uppercase font-['Coordinates:Bold',sans-serif] tracking-tight shrink-0">
+                                    <span className="bg-[#EF4444] text-white text-xs px-2 py-1 rounded uppercase font-display font-bold tracking-tight shrink-0">
                                       Alert
                                     </span>
                                   )}
@@ -315,7 +315,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
           {/* Settings Section */}
           <div className="w-full">
             <div className="flex gap-[10px] items-center justify-center pb-[24px]">
-              <p className="font-['Coordinates:Bold',sans-serif] text-[#40c8ef] text-[18px] tracking-[-0.36px] uppercase whitespace-nowrap font-bold">
+              <p className="font-display font-bold text-[#40c8ef] text-[18px] tracking-[-0.36px] uppercase whitespace-nowrap font-bold">
                 Settings
               </p>
             </div>
@@ -327,7 +327,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <Ruler size={16} className="text-[#40C8EF]" />
-                    <h3 className="uppercase font-['Coordinates:Bold',sans-serif] tracking-[-0.36px] text-[#40C8EF] text-sm font-bold">
+                    <h3 className="uppercase font-display font-bold tracking-[-0.36px] text-[#40C8EF] text-sm font-bold">
                       Measurement System
                     </h3>
                   </div>
@@ -340,7 +340,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                           : 'bg-gray-100 text-[#999] hover:bg-[#F5FCFF]'
                       }`}
                     >
-                      <div className="text-sm uppercase font-['Coordinates:Bold',sans-serif] tracking-[-0.36px]">Imperial</div>
+                      <div className="text-sm uppercase font-display font-bold tracking-[-0.36px]">Imperial</div>
                       <div className="text-xs opacity-80">Miles & Feet</div>
                     </button>
                     <div className="w-px bg-[#40C8EF]" />
@@ -352,7 +352,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                           : 'bg-gray-100 text-[#999] hover:bg-[#F5FCFF]'
                       }`}
                     >
-                      <div className="text-sm uppercase font-['Coordinates:Bold',sans-serif] tracking-[-0.36px]">Metric</div>
+                      <div className="text-sm uppercase font-display font-bold tracking-[-0.36px]">Metric</div>
                       <div className="text-xs opacity-80">Km & Meters</div>
                     </button>
                   </div>
@@ -362,7 +362,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                 <div className="space-y-3 pt-3 border-t border-[#40C8EF]/20">
                   <div className="flex items-center gap-2">
                     <Download size={16} className="text-[#40C8EF]" />
-                    <h3 className="uppercase font-['Coordinates:Bold',sans-serif] tracking-[-0.36px] text-[#40C8EF] text-sm font-bold">
+                    <h3 className="uppercase font-display font-bold tracking-[-0.36px] text-[#40C8EF] text-sm font-bold">
                       Data Management
                     </h3>
                   </div>
@@ -371,14 +371,14 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                     className="w-full py-3 px-4 rounded-lg border-2 border-[#40C8EF] text-[#40C8EF] hover:bg-[#F5FCFF] transition-all flex items-center justify-center gap-2 touch-manipulation"
                   >
                     <Download size={16} />
-                    <span className="text-sm uppercase font-['Coordinates:Bold',sans-serif] tracking-[-0.36px]">Export All Data</span>
+                    <span className="text-sm uppercase font-display font-bold tracking-[-0.36px]">Export All Data</span>
                   </button>
                   <button
                     onClick={handleImportData}
                     className="w-full py-3 px-4 rounded-lg border-2 border-[#40C8EF] text-[#40C8EF] hover:bg-[#F5FCFF] transition-all flex items-center justify-center gap-2 touch-manipulation"
                   >
                     <Upload size={16} />
-                    <span className="text-sm uppercase font-['Coordinates:Bold',sans-serif] tracking-[-0.36px]">Import Data</span>
+                    <span className="text-sm uppercase font-display font-bold tracking-[-0.36px]">Import Data</span>
                   </button>
                   <p className="text-xs text-gray-500 text-center">
                     Backup your notes and resupplies to restore them later or on another device
@@ -389,7 +389,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                 <div className="space-y-3 pt-3 border-t border-[#40C8EF]/20">
                   <div className="flex items-center gap-2">
                     <Trash2 size={16} className="text-[#FF6B35]" />
-                    <h3 className="uppercase font-['Coordinates:Bold',sans-serif] tracking-[-0.36px] text-[#FF6B35] text-sm font-bold">
+                    <h3 className="uppercase font-display font-bold tracking-[-0.36px] text-[#FF6B35] text-sm font-bold">
                       Clear Data
                     </h3>
                   </div>
@@ -412,7 +412,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                     className="w-full py-2.5 px-4 rounded-lg border-2 border-[#FF6B35] text-[#FF6B35] hover:bg-[#FF6B35] hover:text-white transition-all flex items-center justify-center gap-2 touch-manipulation"
                   >
                     <RotateCcw size={14} />
-                    <span className="text-sm uppercase font-['Coordinates:Bold',sans-serif] tracking-[-0.36px]">Reset All Data</span>
+                    <span className="text-sm uppercase font-display font-bold tracking-[-0.36px]">Reset All Data</span>
                   </button>
                   <p className="text-xs text-gray-500 text-center">
                     ⚠️ This action cannot be undone. ⚠️<br />Export your data first!
@@ -429,7 +429,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
       {showClearConfirm && (
         <div className="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full border-4 border-[#FF6B35] shadow-2xl">
-            <h3 className="text-xl mb-4 uppercase font-['Coordinates:Bold',sans-serif] tracking-[-0.36px] text-[#FF6B35] font-bold">
+            <h3 className="text-xl mb-4 uppercase font-display font-bold tracking-[-0.36px] text-[#FF6B35] font-bold">
               Confirm Delete
             </h3>
             <p className="text-gray-700 mb-6">
@@ -444,7 +444,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
               </button>
               <button
                 onClick={confirmClearData}
-                className="flex-1 py-3 px-4 rounded-lg bg-[#FF6B35] text-white hover:bg-[#E55A25] transition-all touch-manipulation uppercase font-['Coordinates:Bold',sans-serif] tracking-[-0.36px]"
+                className="flex-1 py-3 px-4 rounded-lg bg-[#FF6B35] text-white hover:bg-[#E55A25] transition-all touch-manipulation uppercase font-display font-bold tracking-[-0.36px]"
               >
                 Delete
               </button>
