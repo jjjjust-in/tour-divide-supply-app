@@ -15,7 +15,7 @@ import type { Note, Resupply, JournalEntry } from './types';
 import type { MeasurementSystem } from './utils/measurements';
 import { inRideOrder, loadDirection, saveDirection, type RideDirection } from './utils/direction';
 import { loadCollection, saveCollection, requestPersistentStorage, STORAGE_KEYS } from './utils/storage';
-import { Plus, Clock, BookOpen, ListOrdered, MapIcon } from 'lucide-react';
+import { Plus, Clock } from 'lucide-react';
 import { MapPage } from './components/MapPage';
 import { Wordmark } from './components/Wordmark';
 import { AnimatePresence } from 'motion/react';
@@ -284,7 +284,6 @@ export default function App() {
             }`}
             aria-label="Itinerary"
           >
-            <ListOrdered size={16} className={showRoute ? 'text-white' : 'text-[#40C8EF]'} />
             <span className="uppercase font-display font-medium tracking-[-0.36px] text-[13px] md:text-sm">
               Itinerary
             </span>
@@ -298,7 +297,6 @@ export default function App() {
             }`}
             aria-label="Route"
           >
-            <MapIcon size={16} className={showMap ? 'text-white' : 'text-[#40C8EF]'} />
             <span className="uppercase font-display font-medium tracking-[-0.36px] text-[13px] md:text-sm">
               Route
             </span>
@@ -312,7 +310,6 @@ export default function App() {
             }`}
             aria-label="Journal"
           >
-            <BookOpen size={16} className={showJournal ? 'text-white' : 'text-[#40C8EF]'} />
             <span className="uppercase font-display font-medium tracking-[-0.36px] text-[13px] md:text-sm">
               Journal
             </span>
