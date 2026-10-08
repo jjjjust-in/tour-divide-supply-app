@@ -12,7 +12,7 @@ import { MAP_STATES, STATES_OUTLINE, type MapState } from '../data/mapStates';
 import { ROUTE_POIS, TOTAL_CLIMBING_FT, type RoutePoi } from '../data/passes';
 import { ELEVATION_POLYGON } from '../data/elevationGeometry';
 import type { Town } from '../types';
-import { formatElevation, type MeasurementSystem } from '../utils/measurements';
+import type { MeasurementSystem } from '../utils/measurements';
 import { locateOnRoute, mileToRoutePoint, type RoutePosition } from '../utils/routeLocation';
 
 // Strip the outer <svg> so each layer can be placed inside one composed map
@@ -123,6 +123,8 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
   const MAP_PX_HEIGHT = MAP_LAYOUT.viewBox.height * mapScale;
   // Offset that puts the grid's center at the center of the screen
   const MAP_PX_LEFT_OF_CENTER = (GRID_CENTER_X - MAP_LAYOUT.viewBox.x) * mapScale;
+  // The grid itself (not the artwork around it), for sizing the waypoint card
+  const GRID_PX_WIDTH = GRID_UNITS_WIDE * mapScale;
   const [location, setLocation] = useState<LocationState>({ status: 'idle' });
   const [demoMile, setDemoMile] = useState(1215);
   const [selection, setSelection] = useState<MapSelection>(null);
@@ -489,46 +491,43 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
         )}
       </div>
 
-      {/* Waypoint card: towns on the map, passes and climbs on the elevation profile */}
+      {/* Waypoint card: towns on the map, passes and climbs on the elevation profile.
+          Compact, the same width as the grid, and pinned just above the bottom nav. */}
       {(isElevation ? pass : waypoint) && (
-        // Pinned just above the bottom nav so it's always there for stepping through waypoints
-        <div className="sticky bottom-[127px] md:bottom-[144px] z-20 bg-white border border-[#40c8ef] max-w-[360px] mx-auto shadow-[0_6px_24px_rgba(35,31,32,0.12)]">
+        <div
+          className="sticky bottom-[127px] md:bottom-[144px] z-20 bg-white border border-[#40c8ef] shadow-[0_6px_24px_rgba(35,31,32,0.12)]"
+          style={{ width: GRID_PX_WIDTH, marginLeft: `calc(50% - ${GRID_PX_WIDTH / 2}px)` }}
+        >
           <div className="flex items-stretch">
             <button
               onClick={() => stepTo(cardIndex - 1)}
               disabled={cardIndex === 0}
               aria-label={isElevation ? 'Previous pass' : 'Previous waypoint'}
-              className="w-12 shrink-0 flex items-center justify-center text-black hover:bg-[#F5FCFF] disabled:opacity-25 transition-colors touch-manipulation"
+              className="w-11 shrink-0 flex items-center justify-center text-black hover:bg-[#F5FCFF] disabled:opacity-25 transition-colors touch-manipulation"
             >
-              <ChevronLeft size={22} />
+              <ChevronLeft size={20} />
             </button>
-            <div className="flex-1 min-w-0 px-2 py-4 text-center" aria-live="polite">
+            <div className="flex-1 min-w-0 py-2.5 text-center" aria-live="polite">
               {isElevation ? (
                 <>
-                  <p className="text-[12px] text-black/60 uppercase tracking-[0.04em] tabular-nums">
+                  <p className="font-display font-bold text-[15px] uppercase tracking-tight text-black truncate">{pass.name}</p>
+                  <p className="text-[11px] text-black/60 tabular-nums truncate mt-0.5">
                     {formatMilepost(pass.mile, measurementSystem)} · {passElevation(pass.elevationFt)}
-                  </p>
-                  <p className="font-display font-bold text-[18px] uppercase tracking-tight text-black truncate mt-1">{pass.name}</p>
-                  <p className="text-[13px] text-black/70 tabular-nums mt-1">
-                    {followingPass
-                      ? `${formatDistance(followingPass.mile - pass.mile, measurementSystem)} to ${followingPass.name}`
-                      : 'Last big climb'}
+                    {followingPass ? ` · ${formatDistance(followingPass.mile - pass.mile, measurementSystem)} to ${followingPass.name}` : ' · last big climb'}
                   </p>
                 </>
               ) : (
                 <>
-                  <p className="text-[12px] text-black/60 uppercase tracking-[0.04em] tabular-nums">
-                    {formatMilepost(waypoint.mile, measurementSystem)} · {formatElevation(waypoint.town.elevation, measurementSystem)}
-                  </p>
                   <button
                     onClick={() => onOpenTown(waypoint.town.id)}
                     aria-label={`Open ${waypoint.town.name} in the itinerary`}
-                    className="max-w-full font-display font-bold text-[18px] uppercase tracking-tight text-black truncate mt-1 underline decoration-[#40c8ef] decoration-2 underline-offset-[5px] hover:text-[#00B6EB] transition-colors"
+                    className="max-w-full font-display font-bold text-[15px] uppercase tracking-tight text-black truncate underline decoration-[#40c8ef] decoration-2 underline-offset-[4px] hover:text-[#00B6EB] transition-colors"
                   >
                     {waypoint.town.name}, {waypoint.town.state}
                   </button>
-                  <p className="text-[13px] text-black/70 tabular-nums mt-1">
-                    {following ? `${formatDistance(following.mile - waypoint.mile, measurementSystem)} to ${following.town.name}` : 'Finish line'}
+                  <p className="text-[11px] text-black/60 tabular-nums truncate mt-0.5">
+                    {formatMilepost(waypoint.mile, measurementSystem)} · {passElevation(waypoint.town.elevation)}
+                    {following ? ` · ${formatDistance(following.mile - waypoint.mile, measurementSystem)} to ${following.town.name}` : ' · finish line'}
                   </p>
                 </>
               )}
@@ -537,9 +536,9 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
               onClick={() => stepTo(cardIndex + 1)}
               disabled={cardIndex === cardCount - 1}
               aria-label={isElevation ? 'Next pass' : 'Next waypoint'}
-              className="w-12 shrink-0 flex items-center justify-center text-black hover:bg-[#F5FCFF] disabled:opacity-25 transition-colors touch-manipulation"
+              className="w-11 shrink-0 flex items-center justify-center text-black hover:bg-[#F5FCFF] disabled:opacity-25 transition-colors touch-manipulation"
             >
-              <ChevronRight size={22} />
+              <ChevronRight size={20} />
             </button>
           </div>
         </div>
