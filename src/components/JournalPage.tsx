@@ -57,12 +57,12 @@ export function JournalPage({ direction, journalEntries, towns, onDeleteJournalE
       }
     >
       {sorted.length === 0 ? (
-        <div className="w-[298px] border border-[#40C8EF] px-6 py-10 text-center">
+        <div className="w-[298px] border-2 border-[#40C8EF] px-6 py-10 text-center">
           <p className="font-display font-medium text-[13px] uppercase text-black">No entries yet</p>
           <p className="text-[13px] text-black/60 mt-2">Tap + to write your first journal entry.</p>
         </div>
       ) : (
-        <ul className="w-[298px] border border-[#40C8EF] divide-y divide-[#40C8EF]">
+        <ul className="w-[298px] border-2 border-[#40C8EF] divide-y-2 divide-[#40C8EF]">
           {sorted.map((entry) => {
             const town = townLabel(entry.townId);
             const isEditing = editingId === entry.id;
@@ -112,7 +112,7 @@ export function JournalPage({ direction, journalEntries, towns, onDeleteJournalE
                     <textarea
                       value={editingContent}
                       onChange={(e) => setEditingContent(e.target.value)}
-                      className="w-full text-[14px] leading-relaxed border border-[#40c8ef] rounded px-2 py-1.5 resize-none focus:outline-none focus:ring-1 focus:ring-[#40c8ef]/50"
+                      className="w-full text-[14px] leading-relaxed border-2 border-[#40C8EF] rounded-lg px-3 py-2 resize-none focus:outline-none focus-visible:ring-2 focus-visible:ring-[#40C8EF]/40"
                       rows={6}
                       autoFocus
                     />
