@@ -360,44 +360,41 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, direct
                   </div>
                   <button
                     onClick={handleExportData}
-                    className="w-full py-3.5 px-4 rounded-lg border-2 border-[#40C8EF] text-[#40C8EF] hover:bg-[#F5FCFF] transition-all flex items-center justify-center gap-2 touch-manipulation"
+                    className="w-full py-3.5 px-4 rounded-lg border-2 transition-all flex items-center justify-center gap-2 touch-manipulation border-[#40C8EF] text-[#40C8EF] hover:bg-[#F5FCFF]"
                   >
                     <Download size={16} />
                     <span className="text-sm uppercase font-display font-medium tracking-[-0.36px]">Export All Data</span>
                   </button>
                   <button
                     onClick={handleImportData}
-                    className="w-full py-3.5 px-4 rounded-lg border-2 border-[#40C8EF] text-[#40C8EF] hover:bg-[#F5FCFF] transition-all flex items-center justify-center gap-2 touch-manipulation"
+                    className="w-full py-3.5 px-4 rounded-lg border-2 transition-all flex items-center justify-center gap-2 touch-manipulation border-[#40C8EF] text-[#40C8EF] hover:bg-[#F5FCFF]"
                   >
                     <Upload size={16} />
                     <span className="text-sm uppercase font-display font-medium tracking-[-0.36px]">Import Data</span>
                   </button>
-                </div>
-
-                {/* Clear Data */}
-                <div className="py-6 space-y-3">
+                  {/* Clear and reset: same size as the buttons above */}
                   <button
                     onClick={() => handleClearData('notes')}
-                    className="w-full py-3 px-4 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 transition-all flex items-center justify-center gap-2 touch-manipulation text-sm"
+                    className="w-full py-3.5 px-4 rounded-lg border-2 transition-all flex items-center justify-center gap-2 touch-manipulation border-gray-300 text-gray-600 hover:bg-gray-50"
                   >
-                    <Trash2 size={14} />
-                    Clear All Journal Entries
+                    <Trash2 size={16} />
+                    <span className="text-sm uppercase font-display font-medium tracking-[-0.36px]">Clear All Journal Entries</span>
                   </button>
                   <button
                     onClick={() => handleClearData('resupplies')}
-                    className="w-full py-3 px-4 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 transition-all flex items-center justify-center gap-2 touch-manipulation text-sm"
+                    className="w-full py-3.5 px-4 rounded-lg border-2 transition-all flex items-center justify-center gap-2 touch-manipulation border-gray-300 text-gray-600 hover:bg-gray-50"
                   >
-                    <Trash2 size={14} />
-                    Clear All Resupplies
+                    <Trash2 size={16} />
+                    <span className="text-sm uppercase font-display font-medium tracking-[-0.36px]">Clear All Resupplies</span>
                   </button>
                   <button
                     onClick={() => handleClearData('all')}
-                    className="w-full py-3 px-4 rounded-lg border-2 border-[#FF6B35] text-[#FF6B35] hover:bg-[#FF6B35] hover:text-white transition-all flex items-center justify-center gap-2 touch-manipulation"
+                    className="w-full py-3.5 px-4 rounded-lg border-2 transition-all flex items-center justify-center gap-2 touch-manipulation border-[#FF6B35] text-[#FF6B35] hover:bg-[#FF6B35] hover:text-white"
                   >
-                    <RotateCcw size={14} />
+                    <RotateCcw size={16} />
                     <span className="text-sm uppercase font-display font-medium tracking-[-0.36px]">Reset All Data</span>
                   </button>
-                  <p className="text-xs text-gray-500 text-center">
+                  <p className="text-xs text-gray-500 text-center pt-1">
                     ⚠️ This action cannot be undone. ⚠️<br />Export your data first!
                   </p>
                 </div>
