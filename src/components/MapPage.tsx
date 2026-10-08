@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { Town } from '../types';
 import type { MeasurementSystem } from '../utils/measurements';
-import { MapIcon, Mountain } from 'lucide-react';
 import { RouteMap } from './RouteMap';
 
 interface MapPageProps {
@@ -46,9 +45,9 @@ export function MapPage({ towns, measurementSystem, onOpenTown }: MapPageProps) 
             }`}
           />
           {([
-            { key: 'map', label: 'Map', Icon: MapIcon },
-            { key: 'elevation', label: 'Elevation', Icon: Mountain },
-          ] as const).map(({ key, label, Icon }) => {
+            { key: 'map', label: 'Map' },
+            { key: 'elevation', label: 'Elevation' },
+          ] as const).map(({ key, label }) => {
             const active = view === key;
             return (
               <button
@@ -60,7 +59,6 @@ export function MapPage({ towns, measurementSystem, onOpenTown }: MapPageProps) 
                   active ? 'text-white' : 'text-[#40C8EF] hover:text-[#00B6EB]'
                 }`}
               >
-                <Icon size={16} />
                 <span className="uppercase font-display font-medium tracking-[-0.36px] text-[13px] md:text-sm">{label}</span>
               </button>
             );

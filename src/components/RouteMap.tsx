@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, LocateFixed, Loader2 } from 'lucide-react';
 import gridSvg from '../assets/map/grid.svg?raw';
+import navBgPattern from 'figma:asset/53e87b274f9e9eae37a672b63e5feb2e3c44276d.png';
 import outlineSvg from '../assets/map/states-outline.svg?raw';
 import stateLinesSvg from '../assets/map/state-lines.svg?raw';
 import routeSvg from '../assets/map/route.svg?raw';
@@ -8,7 +9,8 @@ import elevationSvg from '../assets/map/elevation-profile.svg?raw';
 import { ELEVATION_LAYOUT, ELEVATION_LINE, ELEVATION_SCALE_X } from '../data/elevationGeometry';
 import { MAP_LAYOUT, TOWN_ANCHORS } from '../data/mapGeometry';
 import { MAP_STATES, STATES_OUTLINE, type MapState } from '../data/mapStates';
-import { ROUTE_POIS, type RoutePoi } from '../data/passes';
+import { ROUTE_POIS, TOTAL_CLIMBING_FT, type RoutePoi } from '../data/passes';
+import { ELEVATION_POLYGON } from '../data/elevationGeometry';
 import type { Town } from '../types';
 import { formatElevation, type MeasurementSystem } from '../utils/measurements';
 import { locateOnRoute, mileToRoutePoint, type RoutePosition } from '../utils/routeLocation';
@@ -20,7 +22,8 @@ const LAYERS = {
   outline: innerSvg(outlineSvg),
   stateLines: innerSvg(stateLinesSvg),
   route: innerSvg(routeSvg),
-  elevation: innerSvg(elevationSvg),
+  // Profile shape filled with the app's dot pattern instead of flat white
+  elevation: innerSvg(elevationSvg).replace('fill="white"', 'fill="url(#elevation-dots)"'),
 };
 
 // The grid is 16 x 27 squares, each one 100 x 100 miles
@@ -52,6 +55,7 @@ type MapSelection =
   | { kind: 'cell'; col: number; row: number }
   | { kind: 'state'; state: MapState }
   | { kind: 'poi'; poi: RoutePoi }
+  | { kind: 'climb'; at: [number, number] }
   | null;
 
 interface RouteMapProps {
@@ -180,8 +184,11 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
     return null;
   };
 
-  // Elevation view: the grid is a scale only, nothing to tap
-  const hitTestElevation = (_p: [number, number]): MapSelection => null;
+  // Elevation view: the grid is a scale only; the profile shape shows total climbing
+  const hitTestElevation = (p: [number, number]): MapSelection => {
+    const artX = ELEVATION_LAYOUT.artLeft + (p[0] - ELEVATION_LAYOUT.artLeft) / ELEVATION_SCALE_X;
+    return pointInPolygon([artX, p[1]], ELEVATION_POLYGON) ? { kind: 'climb', at: p } : null;
+  };
   const hitFor = (p: [number, number]) => (view === 'elevation' ? hitTestElevation(p) : hitTest(p));
 
   // A fresh view starts with nothing selected
@@ -193,8 +200,9 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
   const handleMapClick = (e: React.MouseEvent<SVGSVGElement>) => {
     const p = toMapPoint(e.clientX, e.clientY);
     const hit = p ? hitFor(p) : null;
-    // Tapping the same square or state again clears it
+    // Tapping the same square, state or profile again clears it
     const same =
+      (hit?.kind === 'climb' && selection?.kind === 'climb') ||
       (hit?.kind === 'state' && selection?.kind === 'state' && selection.state.name === hit.state.name) ||
       (hit?.kind === 'cell' && selection?.kind === 'cell' && selection.col === hit.col && selection.row === hit.row);
     setSelection(same ? null : hit);
@@ -226,9 +234,12 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
       const side = Math.round(toUnits(100, measurementSystem));
       return { ...pct(cellRect.x + GRID.cellW / 2, cellRect.y), text: `${side} × ${side} ${unit(measurementSystem)}` };
     }
-    if (selection?.kind === 'poi') {
-      const [px, py] = mileToElevationPoint(selection.poi.mile);
-      return { ...pct(px, py - 4), text: `${selection.poi.name} · ${measurementSystem === 'metric' ? `${Math.round(selection.poi.elevationFt * 0.3048).toLocaleString('en-US')} m` : `${selection.poi.elevationFt.toLocaleString('en-US')}'`}` };
+    if (selection?.kind === 'climb') {
+      const climb =
+        measurementSystem === 'metric'
+          ? `${(Math.round((TOTAL_CLIMBING_FT * 0.3048) / 1000) * 1000).toLocaleString('en-US')} m`
+          : `${TOTAL_CLIMBING_FT.toLocaleString('en-US')}'`;
+      return { ...pct(selection.at[0], selection.at[1]), text: `Total climbing · about ${climb}` };
     }
     if (selection?.kind === 'state') {
       const [lx, ly] = selection.state.labelAt;
@@ -261,6 +272,12 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
             onPointerMove={handlePointerMove}
             onPointerLeave={() => setHoverCell(null)}
           >
+            <defs>
+              <pattern id="elevation-dots" patternUnits="userSpaceOnUse" width={222} height={222}>
+                <rect width={222} height={222} fill="#ffffff" />
+                <image href={navBgPattern} width={222} height={222} preserveAspectRatio="none" />
+              </pattern>
+            </defs>
             <g fill="none" dangerouslySetInnerHTML={{ __html: LAYERS.grid }} />
             {cellRect && (
               <rect x={cellRect.x} y={cellRect.y} width={GRID.cellW} height={GRID.cellH} fill="#40C8EF" opacity={0.45} pointerEvents="none" />
@@ -280,23 +297,36 @@ export function RouteMap({ view = 'map', towns, measurementSystem, onOpenTown }:
               {measurementSystem === 'metric' ? '3,658 m' : "12,000'"}
             </text>
 
-            {/* Passes and points of interest: tap for name and elevation */}
+            {/* Passes and points of interest: marker on the peak, label to its left */}
             {ROUTE_POIS.map((poi) => {
               const [x, y] = mileToElevationPoint(poi.mile);
-              const isSelected = selection?.kind === 'poi' && selection.poi.id === poi.id;
+              const elevation =
+                measurementSystem === 'metric'
+                  ? `${Math.round(poi.elevationFt * 0.3048).toLocaleString('en-US')} m`
+                  : `${poi.elevationFt.toLocaleString('en-US')}'`;
               return (
-                <g
-                  key={poi.id}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelection(isSelected ? null : { kind: 'poi', poi });
-                  }}
-                >
-                  <circle cx={x + 3} cy={y} r={7} fill="transparent" />
+                <g key={poi.id} pointerEvents="none">
+                  <text
+                    x={Math.min(x - 2, 284)}
+                    y={y}
+                    textAnchor="end"
+                    dominantBaseline="central"
+                    fontSize={5.6}
+                    fontWeight={700}
+                    fill="#231F20"
+                    stroke="#ffffff"
+                    strokeWidth={2.2}
+                    strokeLinejoin="round"
+                    paintOrder="stroke"
+                    className="font-display uppercase"
+                    letterSpacing={0.1}
+                  >
+                    {poi.name} · {elevation}
+                  </text>
                   {/* small triangle pointing out from the peak */}
                   <polygon
                     points={`${x + 1.5},${y - 3} ${x + 6.5},${y} ${x + 1.5},${y + 3}`}
-                    fill={isSelected ? '#231F20' : '#ffffff'}
+                    fill="#ffffff"
                     stroke="#231F20"
                     strokeWidth={1}
                     strokeLinejoin="round"

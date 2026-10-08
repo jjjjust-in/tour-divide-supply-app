@@ -28,3 +28,10 @@ export const ROUTE_POIS: RoutePoi[] = [
   { id: 'indiana-pass', name: 'Indiana Pass', mile: 1964, elevationFt: 11910, published: true },
   { id: 'polvadera', name: 'Polvadera', mile: 2143, elevationFt: 10290 },
 ];
+
+/**
+ * Total climbing for the whole route, shown when the elevation profile is
+ * tapped. Commonly cited as over 200,000 ft; individual riders' GPS records
+ * vary (one 2024 race file logged about 174,600 ft). Edit to taste.
+ */
+export const TOTAL_CLIMBING_FT = 200000;
