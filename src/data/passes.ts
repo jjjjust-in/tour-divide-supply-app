@@ -16,6 +16,8 @@ export interface RoutePoi {
 
 export const ROUTE_POIS: RoutePoi[] = [
   { id: 'koko-claims', name: 'Koko Claims', mile: 105, elevationFt: 6730 },
+  { id: 'hartley-pass', name: 'Hartley Pass', mile: 186, elevationFt: 5620 },
+  { id: 'cabin-pass', name: 'Cabin Pass', mile: 218, elevationFt: 5600 },
   { id: 'galton-pass', name: 'Galton Pass', mile: 254, elevationFt: 6250 },
   { id: 'red-meadow', name: 'Red Meadow', mile: 337, elevationFt: 5630 },
   { id: 'richmond-peak', name: 'Richmond Peak', mile: 494, elevationFt: 6700 },
