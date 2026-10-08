@@ -124,10 +124,10 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center gap-4 border-b-2 border-[#40C8EF]">
           <button
             onClick={onClose}
-            className="p-3 bg-white/90 hover:bg-white text-[#40C8EF] transition-all shadow-lg flex items-center justify-center border-2 border-white rounded-full touch-manipulation min-w-[44px] min-h-[44px] shrink-0"
+            className="-ml-2 text-[#40C8EF] hover:text-[#00B6EB] transition-colors flex items-center justify-center touch-manipulation min-w-[44px] min-h-[44px] shrink-0"
             aria-label="Go back"
           >
-            <ChevronLeft size={20} />
+            <ChevronLeft size={26} />
           </button>
           <h1 className="text-[#40C8EF] uppercase font-display font-bold tracking-[-0.36px] text-lg md:text-xl flex-1">
             Settings & About
