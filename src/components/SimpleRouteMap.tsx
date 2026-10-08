@@ -58,7 +58,7 @@ function ItineraryRow({
   onEditResupply: (resupplyId: string, resupply: Omit<Resupply, 'id' | 'townId' | 'timestamp'>) => void;
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const [activeTab, setActiveTab] = useState<'notes' | 'resupplies'>('notes');
+  const [activeTab, setActiveTab] = useState<'notes' | 'resupplies'>('resupplies');
   const [showNoteForm, setShowNoteForm] = useState(false);
   const [showResupplyForm, setShowResupplyForm] = useState(false);
   const [newNote, setNewNote] = useState('');
@@ -82,7 +82,7 @@ function ItineraryRow({
     if (isClickable && linkedTownId) {
       setIsExpanded(!isExpanded);
       if (!isExpanded) {
-        setActiveTab('notes');
+        setActiveTab('resupplies');
         setShowNoteForm(false);
         setShowResupplyForm(false);
       }
@@ -93,7 +93,7 @@ function ItineraryRow({
     e.stopPropagation();
     setIsExpanded(!isExpanded);
     if (!isExpanded) {
-      setActiveTab('notes');
+      setActiveTab('resupplies');
       setShowNoteForm(false);
       setShowResupplyForm(false);
     }
@@ -267,20 +267,6 @@ function ItineraryRow({
               <div className="flex gap-1">
                 <button
                   onClick={() => {
-                    setActiveTab('notes');
-                    setShowNoteForm(false);
-                    setShowResupplyForm(false);
-                  }}
-                  className={`flex-1 px-2 py-2 text-[12px] font-display font-medium uppercase tracking-[-0.2px] rounded transition-colors flex items-center justify-center gap-1 ${
-                    activeTab === 'notes'
-                      ? 'bg-[#40c8ef] text-white'
-                      : 'bg-gray-200 text-black hover:bg-gray-300'
-                  }`}
-                >
-                  Notes ({townNotes.length})
-                </button>
-                <button
-                  onClick={() => {
                     setActiveTab('resupplies');
                     setShowNoteForm(false);
                     setShowResupplyForm(false);
@@ -293,13 +279,27 @@ function ItineraryRow({
                 >
                   Resupplies ({townResupplies.length})
                 </button>
+                <button
+                  onClick={() => {
+                    setActiveTab('notes');
+                    setShowNoteForm(false);
+                    setShowResupplyForm(false);
+                  }}
+                  className={`flex-1 px-2 py-2 text-[12px] font-display font-medium uppercase tracking-[-0.2px] rounded transition-colors flex items-center justify-center gap-1 ${
+                    activeTab === 'notes'
+                      ? 'bg-[#40c8ef] text-white'
+                      : 'bg-gray-200 text-black hover:bg-gray-300'
+                  }`}
+                >
+                  Journal ({townNotes.length})
+                </button>
               </div>
 
               {/* Notes Tab Content */}
               {activeTab === 'notes' && (
                 <div className="space-y-2">
                   {townNotes.length === 0 ? (
-                    <p className="text-[13px] text-black italic leading-[120%]">No notes yet</p>
+                    <p className="text-[13px] text-black italic leading-[120%]">No journal entries yet</p>
                   ) : (
                     townNotes.map(note => (
                       <div key={note.id} className="bg-white/50 border border-[#40c8ef]/20 rounded p-1.5 group">
@@ -334,14 +334,14 @@ function ItineraryRow({
                               <button
                                 onClick={() => handleEditNote(note)}
                                 className="text-[#999] hover:text-[#40c8ef] transition-colors p-0.5"
-                                aria-label="Edit note"
+                                aria-label="Edit journal entry"
                               >
                                 <Edit2 size={10} />
                               </button>
                               <button
                                 onClick={() => onDeleteNote(note.id)}
                                 className="text-[#999] hover:text-[#FF6B35] transition-colors p-0.5"
-                                aria-label="Delete note"
+                                aria-label="Delete journal entry"
                               >
                                 <Trash2 size={10} />
                               </button>
@@ -358,14 +358,14 @@ function ItineraryRow({
                       className="w-full bg-[#40c8ef] text-white py-2.5 px-2 rounded hover:bg-[#00B6EB] transition-colors flex items-center justify-center gap-1 text-[11px] font-display font-medium uppercase tracking-[-0.2px]"
                     >
                       <Plus size={10} />
-                      Add Note
+                      Add Entry
                     </button>
                   ) : (
                     <form onSubmit={handleSubmitNote} className="space-y-1.5">
                       <textarea
                         value={newNote}
                         onChange={(e) => setNewNote(e.target.value)}
-                        placeholder="Enter your note..."
+                        placeholder="Write a journal entry..."
                         className="w-full border border-[#40c8ef] rounded px-1.5 py-1 focus:outline-none focus:ring-1 focus:ring-[#40c8ef]/50 resize-none text-[13px] leading-[120%]"
                         rows={2}
                         autoFocus

@@ -171,7 +171,7 @@ export function NotesPage({
 
         {filteredNotes.length === 0 && filteredResupplies.length === 0 && (
           <div className="text-center text-gray-400 py-12 text-sm">
-            {searchQuery ? 'No results found' : 'No notes yet. Tap + to add one.'}
+            {searchQuery ? 'No results found' : 'No journal entries yet. Tap + to add one.'}
           </div>
         )}
       </div>

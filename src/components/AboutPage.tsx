@@ -80,13 +80,12 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
 
   const confirmClearData = async () => {
     if (clearTarget === 'notes' || clearTarget === 'all') {
+      // "notes" now means the journal (town notes were merged into it)
       await set(STORAGE_KEYS.notes, []);
+      await set(STORAGE_KEYS.journal, []);
     }
     if (clearTarget === 'resupplies' || clearTarget === 'all') {
       await set(STORAGE_KEYS.resupplies, []);
-    }
-    if (clearTarget === 'all') {
-      await set(STORAGE_KEYS.journal, []);
     }
     setShowClearConfirm(false);
     setClearTarget(null);
@@ -336,7 +335,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                     <span className="text-sm uppercase font-display font-medium tracking-[-0.36px]">Import Data</span>
                   </button>
                   <p className="text-xs text-gray-500 text-center">
-                    Backup your notes and resupplies to restore them later or on another device
+                    Back up your journal and resupplies to restore them later or on another device
                   </p>
                 </div>
 
@@ -347,7 +346,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                     className="w-full py-3 px-4 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-50 transition-all flex items-center justify-center gap-2 touch-manipulation text-sm"
                   >
                     <Trash2 size={14} />
-                    Clear All Notes
+                    Clear All Journal Entries
                   </button>
                   <button
                     onClick={() => handleClearData('resupplies')}
@@ -382,7 +381,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
               Confirm Delete
             </h3>
             <p className="text-gray-700 mb-8">
-              Are you sure you want to clear {clearTarget === 'all' ? 'all your data' : `all ${clearTarget}`}? This action cannot be undone.
+              Are you sure you want to clear {clearTarget === 'all' ? 'all your data' : `all ${clearTarget === 'notes' ? 'journal entries' : clearTarget}`}? This action cannot be undone.
             </p>
             <div className="flex gap-3">
               <button

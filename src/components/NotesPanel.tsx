@@ -32,7 +32,7 @@ export function NotesPanel({
   onDeleteResupply,
   onClose,
 }: NotesPanelProps) {
-  const [activeTab, setActiveTab] = useState<'notes' | 'resupply'>('notes');
+  const [activeTab, setActiveTab] = useState<'notes' | 'resupply'>('resupply');
   const [newNote, setNewNote] = useState('');
   const [editingNoteId, setEditingNoteId] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState('');
@@ -99,7 +99,7 @@ export function NotesPanel({
               activeTab === 'notes' ? 'bg-[#231F20] text-white' : 'bg-white/60 text-[#231F20]'
             }`}
           >
-            Notes ({townNotes.length})
+            Journal ({townNotes.length})
           </button>
           <button
             onClick={() => setActiveTab('resupply')}
@@ -116,7 +116,7 @@ export function NotesPanel({
       <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
         {activeTab === 'notes' ? (
           townNotes.length === 0 ? (
-            <div className="text-center text-gray-400 py-8 text-sm">No notes yet</div>
+            <div className="text-center text-gray-400 py-8 text-sm">No journal entries yet</div>
           ) : (
             townNotes.map(note => (
               <div key={note.id} className="bg-gray-50 rounded-xl p-3 border border-gray-100">
@@ -210,7 +210,7 @@ export function NotesPanel({
             <textarea
               value={newNote}
               onChange={e => setNewNote(e.target.value)}
-              placeholder="Add a note..."
+              placeholder="Write a journal entry..."
               className="flex-1 text-sm border border-gray-200 rounded-xl px-3 py-2 resize-none focus:outline-none focus:ring-2 focus:ring-[#febc12] focus:border-transparent"
               rows={2}
               onKeyDown={e => { if (e.key === 'Enter' && e.metaKey) handleAddNote(); }}

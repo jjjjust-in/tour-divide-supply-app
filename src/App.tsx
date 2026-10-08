@@ -10,7 +10,6 @@ import { AboutPage } from './components/AboutPage';
 import { Stopwatch } from './components/Stopwatch';
 import { MeasurementSelector } from './components/MeasurementSelector';
 import { towns } from './data/towns';
-import { sampleNotes } from './data/sampleNotes';
 import { sampleResupplies } from './data/sampleResupplies';
 import { sampleJournalEntries } from './data/sampleJournalEntries';
 import type { Note, Resupply, JournalEntry } from './types';
@@ -34,7 +33,6 @@ export default function App() {
   const [selectedTownId, setSelectedTownId] = useState<string | null>(null);
   // Saved data loads asynchronously from IndexedDB. Sample data is only
   // used on a true first launch, so clearing your data stays cleared.
-  const [notes, setNotes] = useState<Note[]>([]);
   const [resupplies, setResupplies] = useState<Resupply[]>([]);
   const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([]);
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -42,15 +40,26 @@ export default function App() {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const [n, r, j] = await Promise.all([
-        loadCollection<Note>(STORAGE_KEYS.notes, sampleNotes),
+      const [legacyNotes, r, j] = await Promise.all([
+        loadCollection<Note>(STORAGE_KEYS.notes, []),
         loadCollection<Resupply>(STORAGE_KEYS.resupplies, sampleResupplies),
         loadCollection<JournalEntry>(STORAGE_KEYS.journal, sampleJournalEntries),
       ]);
       if (cancelled) return;
-      setNotes(n);
+      // Town notes are now journal entries. Fold any saved notes into the
+      // journal once, keeping their town and date, then empty the old store.
+      let journal = j;
+      if (legacyNotes.length > 0) {
+        const existing = new Set(j.map(e => e.id));
+        const converted: JournalEntry[] = legacyNotes
+          .filter(note => !existing.has(note.id))
+          .map(note => ({ id: note.id, townId: note.townId, content: note.content, timestamp: note.timestamp }));
+        journal = [...j, ...converted];
+        await saveCollection(STORAGE_KEYS.journal, journal);
+        await saveCollection(STORAGE_KEYS.notes, []);
+      }
       setResupplies(r);
-      setJournalEntries(j);
+      setJournalEntries(journal);
       setDataLoaded(true);
     })();
     requestPersistentStorage();
@@ -84,10 +93,6 @@ export default function App() {
   // Persist changes, but never before the initial load finishes
   // (otherwise the empty starting arrays would overwrite saved data).
   useEffect(() => {
-    if (dataLoaded) saveCollection(STORAGE_KEYS.notes, notes);
-  }, [notes, dataLoaded]);
-
-  useEffect(() => {
     if (dataLoaded) saveCollection(STORAGE_KEYS.resupplies, resupplies);
   }, [resupplies, dataLoaded]);
 
@@ -101,32 +106,28 @@ export default function App() {
 
   const selectedTown = towns.find(t => t.id === selectedTownId) || null;
 
+  // Town panels and lists still speak in "notes"; they now show the
+  // journal entries tied to each town.
+  const notes: Note[] = journalEntries
+    .filter(entry => entry.townId)
+    .map(entry => ({ id: entry.id, townId: entry.townId as string, content: entry.content, timestamp: entry.timestamp }));
+
   const notesCount = notes.reduce((acc, note) => {
     acc[note.townId] = (acc[note.townId] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 
   const handleAddNote = (townId: string, content: string) => {
-    const newNote: Note = {
-      id: `note-${Date.now()}-${Math.random()}`,
-      townId,
-      content,
-      timestamp: Date.now(),
-    };
-    setNotes(prev => [...prev, newNote]);
+    handleAddJournalEntry(content, undefined, townId);
   };
 
-  const handleDeleteNote = (noteId: string) => {
-    if (window.confirm('Are you sure you want to delete this note? This action cannot be undone.')) {
-      setNotes(prev => prev.filter(n => n.id !== noteId));
-    }
+  const handleDeleteNote = (entryId: string) => {
+    handleDeleteJournalEntry(entryId);
   };
 
-  const handleEditNote = (noteId: string, content: string) => {
-    setNotes(prev => prev.map(note =>
-      note.id === noteId
-        ? { ...note, content, timestamp: Date.now() }
-        : note
+  const handleEditNote = (entryId: string, content: string) => {
+    setJournalEntries(prev => prev.map(entry =>
+      entry.id === entryId ? { ...entry, content, timestamp: Date.now() } : entry
     ));
   };
 
@@ -283,7 +284,7 @@ export default function App() {
           <button
             onClick={() => setShowQuickAdd(!showQuickAdd)}
             className="bg-[#40C8EF] text-white p-3 md:p-3.5 rounded-lg hover:bg-[#00B6EB] transition-all shadow-lg flex items-center justify-center"
-            aria-label="Add Note"
+            aria-label="Add"
           >
             <Plus size={20} strokeWidth={2.5} />
           </button>
@@ -362,7 +363,7 @@ export default function App() {
 
       {showJournal && (
         <JournalPage
-          notes={notes}
+          notes={[]}
           journalEntries={journalEntries}
           towns={towns}
           measurementSystem={measurementSystem}

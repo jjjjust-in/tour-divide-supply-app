@@ -52,7 +52,7 @@ export default function StoryExport({ towns, journalEntries, notes, onClose }: S
       // Add notes for this town
       const townNotes = notes.filter(n => n.townId === townId);
       if (townNotes.length > 0) {
-        lines.push('**Route Notes:**');
+        lines.push('**Journal:**');
         townNotes.forEach(note => {
           lines.push(`- ${note.content}`);
         });

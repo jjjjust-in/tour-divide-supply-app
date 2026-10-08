@@ -164,7 +164,7 @@ export function TownsList({
                   {/* Notes */}
                   <div>
                     <div className="flex items-center justify-between mb-1.5">
-                      <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wide">My Notes</h4>
+                      <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wide">Journal</h4>
                       <button onClick={() => setAddingNoteFor(town.id)} className="text-[10px] text-[#febc12] font-semibold flex items-center gap-0.5">
                         <Plus size={10} /> Add
                       </button>
@@ -174,7 +174,7 @@ export function TownsList({
                         <textarea
                           value={newNote}
                           onChange={e => setNewNote(e.target.value)}
-                          placeholder="Add a note..."
+                          placeholder="Write a journal entry..."
                           className="w-full text-xs border border-[#febc12] rounded-lg px-2 py-1.5 resize-none focus:outline-none"
                           rows={2}
                           autoFocus
@@ -188,7 +188,7 @@ export function TownsList({
                       </div>
                     )}
                     {townNotes.length === 0 && !addingNoteFor ? (
-                      <p className="text-xs text-gray-400 italic">No notes yet</p>
+                      <p className="text-xs text-gray-400 italic">No journal entries yet</p>
                     ) : (
                       <div className="space-y-2">
                         {townNotes.slice(0, 2).map(note => (
