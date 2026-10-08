@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { Note, JournalEntry, Town } from '../types';
 import type { MeasurementSystem } from '../utils/measurements';
 import { Trash2, Edit2 } from 'lucide-react';
@@ -24,6 +24,21 @@ export function JournalPage({ direction, journalEntries, towns, onDeleteJournalE
   const [filterTownId, setFilterTownId] = useState<string>('all');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingContent, setEditingContent] = useState('');
+  // Newest first by default; remembered on this device
+  const [order, setOrder] = useState<'newest' | 'oldest'>(() => {
+    try {
+      return localStorage.getItem('tour-divide-journal-order') === 'oldest' ? 'oldest' : 'newest';
+    } catch {
+      return 'newest';
+    }
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem('tour-divide-journal-order', order);
+    } catch {
+      // not critical
+    }
+  }, [order]);
 
   const townsInRouteOrder = inRideOrder([...towns].sort((a, b) => a.mileage - b.mileage), direction);
   const townLabel = (townId?: string) => {
@@ -32,7 +47,7 @@ export function JournalPage({ direction, journalEntries, towns, onDeleteJournalE
   };
 
   const filtered = filterTownId === 'all' ? journalEntries : journalEntries.filter((e) => e.townId === filterTownId);
-  const sorted = [...filtered].sort((a, b) => b.timestamp - a.timestamp);
+  const sorted = [...filtered].sort((a, b) => (order === 'newest' ? b.timestamp - a.timestamp : a.timestamp - b.timestamp));
   const count = (n: number) => `${n} ${n === 1 ? 'entry' : 'entries'}`;
 
   const saveEdit = (entry: JournalEntry) => {
@@ -46,14 +61,40 @@ export function JournalPage({ direction, journalEntries, towns, onDeleteJournalE
       title="Journal"
       meta={filterTownId === 'all' ? count(journalEntries.length) : `${count(filtered.length)} in ${townLabel(filterTownId)}`}
       control={
-        <PageSelect id="journal-filter" label="Filter by town" value={filterTownId} onChange={setFilterTownId}>
-          <option value="all">All towns</option>
-          {townsInRouteOrder.map((town) => (
-            <option key={town.id} value={town.id}>
-              {town.name}, {town.state}
-            </option>
-          ))}
-        </PageSelect>
+        <div className="space-y-3">
+          <PageSelect id="journal-filter" label="Filter by town" value={filterTownId} onChange={setFilterTownId}>
+            <option value="all">All towns</option>
+            {townsInRouteOrder.map((town) => (
+              <option key={town.id} value={town.id}>
+                {town.name}, {town.state}
+              </option>
+            ))}
+          </PageSelect>
+
+          {/* Newest / Oldest: same sliding switch as the Route page */}
+          <div role="radiogroup" aria-label="Sort entries" className="relative grid grid-cols-2 border-2 border-[#40C8EF] rounded-lg bg-white overflow-hidden">
+            <span
+              aria-hidden="true"
+              className={`absolute inset-y-0 left-0 w-1/2 bg-[#40C8EF] motion-safe:transition-transform motion-safe:duration-200 ease-out ${
+                order === 'oldest' ? 'translate-x-full' : 'translate-x-0'
+              }`}
+            />
+            {([
+              { key: 'newest', label: 'Newest first' },
+              { key: 'oldest', label: 'Oldest first' },
+            ] as const).map(({ key, label }) => (
+              <button
+                key={key}
+                role="radio"
+                aria-checked={order === key}
+                onClick={() => setOrder(key)}
+                className={`relative z-10 px-4 py-2.5 transition-colors ${order === key ? 'text-white' : 'text-[#40C8EF] hover:text-[#00B6EB]'}`}
+              >
+                <span className="uppercase font-display font-medium tracking-[-0.36px] text-[13px] md:text-sm">{label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
       }
     >
       {sorted.length === 0 ? (

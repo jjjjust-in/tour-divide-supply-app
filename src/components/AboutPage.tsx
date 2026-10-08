@@ -154,18 +154,18 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, direct
 
           {/* About Section */}
           <div className="w-full">
-            <div className="space-y-6 text-[#1a1a1a]">
-              <p className="font-display font-bold text-[26px] leading-[1.3] tracking-[-0.02em]">
+            <div className="space-y-5 text-[#1a1a1a] pr-6">
+              <p className="font-display font-bold text-[23px] leading-[1.3] tracking-[-0.02em]">
                 <span className="uppercase tracking-[0.02em]">Tour Divide Supply</span> is built by{' '}
                 <span className="text-[#40C8EF]">JJJJustin</span>,
                 a bikepacker and product designer with over 5000 miles on the Tour Divide route.
               </p>
-              <p className="text-[18px] leading-relaxed">
+              <p className="text-[17px] leading-relaxed">
                 After planning and riding the 2745 miles from Canada to Mexico, Justin built this app to help
                 future riders organize their notes and track resupply points. It isn&apos;t a replacement for
                 RideWithGPS or your Garmin. It&apos;s a starting place to fill with your own notes and memories.
               </p>
-              <p className="text-[18px] leading-relaxed">
+              <p className="text-[17px] leading-relaxed">
                 The app features interactive maps, elevation profiles, and a collaborative notes system where riders can
                 document their experiences at each town along the route. All data is stored locally in your browser for
                 offline access during your ride.
