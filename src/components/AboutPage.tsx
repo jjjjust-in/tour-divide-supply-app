@@ -1,4 +1,4 @@
-import { ChevronLeft, Ruler, Download, Upload, Trash2, RotateCcw, FileText, AlertTriangle, Instagram, Youtube, Globe, ExternalLink } from 'lucide-react';
+import { ChevronLeft, Ruler, Download, Upload, Trash2, RotateCcw, FileText, Instagram, Globe, ExternalLink } from 'lucide-react';
 import { socialLinks } from '../data/social';
 import { useState } from 'react';
 import type { MeasurementSystem } from '../utils/measurements';
@@ -159,25 +159,22 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                 What is Tour Divide Supply?
               </p>
             </div>
-            <div className="bg-white relative w-full">
-              <div aria-hidden="true" className="absolute border border-[#40c8ef] inset-0 pointer-events-none" />
-              <div className="p-6 space-y-5 text-[#1a1a1a] leading-relaxed">
-                <p className="text-[12px]">
-                  TourDivideSupply.com was created by{' '}
-                  <span className="font-display font-medium text-[#40C8EF]">JJJJustin</span>,
-                  an avid bikepacker and product designer who has ridden over 5000 miles on the Tour Divide route.
-                </p>
-                <p className="text-[12px]">
-                  After experiencing the challenges of planning and navigating the 2,745-mile route from Canada to Mexico,
-                  Justin built this app to help future riders organize their notes, track resupply points. It's not intended
-                  to replace RideWithGPS or your Garmin, rather it's built to be a starting place to fill with your notes and memories.
-                </p>
-                <p className="text-[12px]">
-                  The app features interactive maps, elevation profiles, and a collaborative notes system where riders can
-                  document their experiences at each town along the route. All data is stored locally in your browser for
-                  offline access during your ride.
-                </p>
-              </div>
+            <div className="space-y-5 text-[#1a1a1a]">
+              <p className="font-display font-semibold text-[22px] leading-[1.25] tracking-[-0.02em] text-balance">
+                Built by{' '}
+                <span className="text-[#40C8EF]">JJJJustin</span>,
+                a bikepacker and product designer with over 5,000 miles on the Tour Divide route.
+              </p>
+              <p className="text-[16px] leading-relaxed">
+                After planning and riding the 2,745 miles from Canada to Mexico, Justin built this app to help
+                future riders organize their notes and track resupply points. It isn&apos;t a replacement for
+                RideWithGPS or your Garmin. It&apos;s a starting place to fill with your own notes and memories.
+              </p>
+              <p className="text-[16px] leading-relaxed">
+                The app features interactive maps, elevation profiles, and a collaborative notes system where riders can
+                document their experiences at each town along the route. All data is stored locally in your browser for
+                offline access during your ride.
+              </p>
             </div>
           </div>
 
@@ -192,7 +189,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
               <div aria-hidden="true" className="absolute border border-[#40c8ef] inset-0 pointer-events-none" />
               <ul className="divide-y divide-[#40C8EF]/30">
                 {socialLinks.map((link) => {
-                  const Icon = link.platform === 'instagram' ? Instagram : link.platform === 'youtube' ? Youtube : Globe;
+                  const Icon = link.platform === 'instagram' ? Instagram : Globe;
                   const content = (
                     <>
                       <Icon size={18} className="text-[#40C8EF] shrink-0" />
@@ -313,10 +310,6 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, onClos
                 {/* Route Notes & Alerts */}
                 {noteResources.length > 0 && (
                   <div>
-                    <h2 className="font-display font-bold text-[#231f20] text-sm uppercase tracking-tight mb-4 flex items-center gap-2">
-                      <AlertTriangle size={18} className="text-[#febc12]" />
-                      Route Updates
-                    </h2>
                     <div className="space-y-3.5">
                       {noteResources.map((resource) => (
                         <div
