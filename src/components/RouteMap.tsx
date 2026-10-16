@@ -6,6 +6,11 @@ import outlineSvg from '../assets/map/states-outline.svg?raw';
 import stateLinesSvg from '../assets/map/state-lines.svg?raw';
 import routeSvg from '../assets/map/route.svg?raw';
 import elevationSvg from '../assets/map/elevation-profile.svg?raw';
+import coloradoLabelSvg from '../assets/map/labels/colorado.svg?raw';
+import idahoLabelSvg from '../assets/map/labels/idaho.svg?raw';
+import montanaLabelSvg from '../assets/map/labels/montana.svg?raw';
+import newMexicoLabelSvg from '../assets/map/labels/new-mexico.svg?raw';
+import wyomingLabelSvg from '../assets/map/labels/wyoming.svg?raw';
 import { ELEVATION_LAYOUT, ELEVATION_LINE, ELEVATION_SCALE_X } from '../data/elevationGeometry';
 import { MAP_LAYOUT, TOWN_ANCHORS } from '../data/mapGeometry';
 import { MAP_STATES, STATES_OUTLINE, type MapState } from '../data/mapStates';
@@ -27,6 +32,21 @@ const LAYERS = {
   // Profile shape filled with the app's dot pattern instead of flat white
   elevation: innerSvg(elevationSvg).replace('fill="white"', 'fill="url(#elevation-dots)"'),
 };
+
+// State name artwork, keyed by state abbreviation. Each is drawn at
+// STATE_LABEL_HEIGHT map units tall, centred on the state's labelAt point.
+const svgWidth = (svg: string) => Number(svg.match(/<svg[^>]*\bwidth="([\d.]+)"/)?.[1]);
+const svgHeight = (svg: string) => Number(svg.match(/<svg[^>]*\bheight="([\d.]+)"/)?.[1]);
+const STATE_LABEL_HEIGHT = 6;
+const STATE_LABELS: Record<string, { svg: string; width: number; height: number }> = Object.fromEntries(
+  ([
+    ['MT', montanaLabelSvg],
+    ['ID', idahoLabelSvg],
+    ['WY', wyomingLabelSvg],
+    ['CO', coloradoLabelSvg],
+    ['NM', newMexicoLabelSvg],
+  ] as const).map(([abbr, svg]) => [abbr, { svg: innerSvg(svg), width: svgWidth(svg), height: svgHeight(svg) }])
+);
 
 // The grid is 16 x 27 squares, each one 100 x 100 miles
 const GRID = { cols: 16, rows: 27, x0: 0.5, y0: 0.5, cellW: 18.625, cellH: 17.7778 };
@@ -446,6 +466,23 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
           )}
 
           <g fill="none" transform={`translate(${MAP_LAYOUT.stateLines.x} ${MAP_LAYOUT.stateLines.y})`} dangerouslySetInnerHTML={{ __html: LAYERS.stateLines }} />
+
+          {/* State names */}
+          <g transform={`translate(${MAP_LAYOUT.stateLines.x} ${MAP_LAYOUT.stateLines.y})`} pointerEvents="none" aria-hidden="true">
+            {MAP_STATES.map((state) => {
+              const label = STATE_LABELS[state.abbr];
+              if (!label) return null;
+              const k = STATE_LABEL_HEIGHT / label.height;
+              const [lx, ly] = state.labelAt;
+              return (
+                <g
+                  key={state.abbr}
+                  transform={`translate(${lx - (label.width * k) / 2} ${ly - STATE_LABEL_HEIGHT / 2}) scale(${k})`}
+                  dangerouslySetInnerHTML={{ __html: label.svg }}
+                />
+              );
+            })}
+          </g>
 
           <g transform={`translate(${route.x} ${route.y}) scale(${route.scaleX} ${route.scaleY})`}>
             <g fill="none" pointerEvents="none" dangerouslySetInnerHTML={{ __html: LAYERS.route }} />
