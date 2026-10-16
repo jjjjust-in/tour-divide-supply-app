@@ -137,11 +137,10 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, direct
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center gap-4 border-b-2 border-[#40C8EF]">
           <button
             onClick={onClose}
-            className="w-11 h-11 shrink-0 flex items-center justify-center rounded-lg border-2 border-[#40C8EF] bg-white text-[#40C8EF] shadow-lg hover:bg-[#F5FCFF] active:bg-[#40C8EF] active:text-white transition-colors touch-manipulation"
+            className="-ml-2 text-[#40C8EF] hover:text-[#00B6EB] transition-colors flex items-center justify-center touch-manipulation min-w-[44px] min-h-[44px] shrink-0"
             aria-label="Go back"
           >
-            {/* Bordered like the main nav buttons, so it reads as tappable */}
-            <ChevronLeft size={22} strokeWidth={2.5} />
+            <ChevronLeft size={26} />
           </button>
           {/* Same size as the Itinerary, Route and Journal titles: bold, 20px */}
           <h1 className="text-[#40C8EF] uppercase font-display font-bold tracking-[-0.36px] text-[20px] flex-1">
