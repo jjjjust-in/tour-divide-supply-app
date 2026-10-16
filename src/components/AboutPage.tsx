@@ -127,7 +127,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, direct
     <div className="fixed inset-0 z-50 bg-[#E6F7FD] flex flex-col">
       {/* Sticky header */}
       <div
-        className="flex-shrink-0 sticky top-0 z-20 shadow-sm"
+        className="flex-shrink-0 sticky top-0 z-20 shadow-sm pt-safe"
         style={{
           backgroundImage: `url(${navBgPattern})`,
           backgroundSize: '300px 300px',

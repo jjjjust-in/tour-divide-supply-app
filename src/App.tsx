@@ -406,7 +406,7 @@ export default function App() {
       {!showSplash && !showStopwatch && (
         <button
           onClick={() => setShowStopwatch(true)}
-          className="absolute top-4 right-4 z-40 bg-[#febc12] text-[#231f20] w-14 h-14 rounded-full hover:bg-[#feca3d] transition-all shadow-lg flex items-center justify-center touch-manipulation"
+          className="absolute top-[calc(1rem+var(--sat))] right-4 z-40 bg-[#febc12] text-[#231f20] w-14 h-14 rounded-full hover:bg-[#feca3d] transition-all shadow-lg flex items-center justify-center touch-manipulation"
           aria-label="Ride Timer"
         >
           <Clock size={24} />
@@ -417,6 +417,8 @@ export default function App() {
       {showStopwatch && (
         <Stopwatch onClose={() => setShowStopwatch(false)} />
       )}
+      {/* Frosted band under the phone's status bar */}
+      {!showSplash && <div aria-hidden="true" className="status-blur" />}
     </div>
   );
 }

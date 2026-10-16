@@ -458,7 +458,7 @@ export function Stopwatch({ onClose }: StopwatchProps) {
         )}
 
         {showConfirmation && (
-          <div className="fixed top-4 left-4 right-4 z-[70] flex justify-center" role="status">
+          <div className="fixed top-[calc(1rem+var(--sat))] left-4 right-4 z-[70] flex justify-center" role="status">
             <div className="w-full max-w-md bg-[#231F20] text-white rounded-lg px-4 py-3 shadow-lg flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
                 <Flag size={16} />

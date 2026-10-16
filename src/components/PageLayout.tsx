@@ -17,7 +17,7 @@ interface PageLayoutProps {
 export function PageLayout({ title, meta, control, children }: PageLayoutProps) {
   return (
     <div className="relative w-full h-full bg-white overflow-y-auto overflow-x-hidden">
-      <div className="flex flex-col items-center px-[20px] md:px-[85px] pt-[40px] pb-[150px] md:pt-[96px] md:pb-[206px]">
+      <div className="flex flex-col items-center px-[20px] md:px-[85px] pt-[calc(40px+var(--sat))] pb-[150px] md:pt-[96px] md:pb-[206px]">
         <header className="flex flex-col items-center gap-1 text-center w-full">
           <h1 className="font-display font-bold text-black text-[20px] tracking-[-0.36px] uppercase">{title}</h1>
           {meta && <p className="text-[13px] text-black/60 tabular-nums">{meta}</p>}

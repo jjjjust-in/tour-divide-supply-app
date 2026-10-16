@@ -27,7 +27,7 @@ export function ResourcesPage({ resources, onClose }: ResourcesPageProps) {
     <div className="fixed inset-0 z-40 bg-white flex flex-col">
       {/* Header */}
       <div
-        className="px-4 pt-4 pb-3 flex-shrink-0"
+        className="px-4 pt-[calc(1rem+var(--sat))] pb-3 flex-shrink-0"
         style={navBgPattern ? { backgroundImage: `url(${navBgPattern})`, backgroundSize: '300px 300px' } : { backgroundColor: '#febc12' }}
       >
         <div className="flex items-center justify-between mb-1.5">

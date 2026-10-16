@@ -132,7 +132,7 @@ export default function StoryExport({ towns, journalEntries, notes, onClose }: S
   return (
     <div className="fixed inset-0 z-50 flex flex-col bg-white">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-[#febc12]">
+      <div className="flex items-center justify-between px-4 pb-3 pt-[calc(0.75rem+var(--sat))] border-b border-gray-100 bg-[#febc12]">
         <div>
           <h2 className="font-bold text-base text-[#231F20]">Export Story</h2>
           <p className="text-xs text-[#231F20]/70 mt-1">
