@@ -7,7 +7,6 @@ import { QuickAddNote } from './components/QuickAddNote';
 import { SplashScreen } from './components/SplashScreen';
 import { AboutPage } from './components/AboutPage';
 import { Stopwatch } from './components/Stopwatch';
-import { MeasurementSelector } from './components/MeasurementSelector';
 import { towns } from './data/towns';
 import { sampleResupplies } from './data/sampleResupplies';
 import { sampleJournalEntries } from './data/sampleJournalEntries';
@@ -27,13 +26,12 @@ export default function App() {
   // Returning riders pick up where they left off; the splash only shows on a first launch
   const [savedSession] = useState(loadSession);
   const [showSplash, setShowSplash] = useState(savedSession === null);
-  const [showMeasurementSelector, setShowMeasurementSelector] = useState(false);
   const [measurementSystem, setMeasurementSystem] = useState<MeasurementSystem>(() => {
     const saved = localStorage.getItem('tour-divide-measurement-system');
     if (saved) {
       return saved as MeasurementSystem;
     }
-    return 'imperial'; // Default, will show selector on first load
+    return 'imperial'; // Default; change it in Settings
   });
   const [selectedTownId] = useState<string | null>(null);
   // Saved data loads asynchronously from IndexedDB. Sample data is only
@@ -109,18 +107,6 @@ export default function App() {
   useEffect(() => {
     saveSession({ page: activePage, townId: activePage === 'route' ? expandedTownId : null });
   }, [activePage, expandedTownId]);
-
-  // Check if this is first time opening the app
-  useEffect(() => {
-    const hasSeenMeasurementSelector = localStorage.getItem('tour-divide-measurement-system');
-    if (!hasSeenMeasurementSelector) {
-      // Wait for splash screen to finish, then show measurement selector
-      const timer = setTimeout(() => {
-        setShowMeasurementSelector(true);
-      }, 2500); // Match splash screen duration
-      return () => clearTimeout(timer);
-    }
-  }, []);
 
   // Persist changes, but never before the initial load finishes
   // (otherwise the empty starting arrays would overwrite saved data).
@@ -220,20 +206,11 @@ export default function App() {
     setActivePage('route');
   };
 
-  const handleMeasurementSelect = (system: MeasurementSystem) => {
-    setMeasurementSystem(system);
-    setShowMeasurementSelector(false);
-  };
-
   return (
     <div className="relative w-full h-screen overflow-hidden bg-white">
       <AnimatePresence>
         {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
       </AnimatePresence>
-
-      {showMeasurementSelector && (
-        <MeasurementSelector onSelect={handleMeasurementSelect} />
-      )}
 
       {/* Main pages: a short slide and fade when switching */}
       <AnimatePresence initial={false} custom={pageDir}>
