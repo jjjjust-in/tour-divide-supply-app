@@ -50,7 +50,7 @@ export function PageSelect({
         id={id}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full appearance-none bg-white border-2 border-[#40C8EF] rounded-lg pl-4 pr-10 py-2.5 font-display font-medium uppercase tracking-[-0.2px] text-[13px] text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-[#40C8EF]/40"
+        className="w-full appearance-none bg-white border-2 border-[#40C8EF] rounded-lg h-11 pl-4 pr-10 font-display font-medium uppercase tracking-[-0.2px] text-[13px] text-black focus:outline-none focus-visible:ring-2 focus-visible:ring-[#40C8EF]/40"
       >
         {children}
       </select>

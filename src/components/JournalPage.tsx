@@ -67,7 +67,7 @@ export function JournalPage({ direction, journalEntries, towns, resupplies, onDe
       title="Journal"
       meta={filterTownId === 'all' ? count(journalEntries.length) : `${count(filtered.length)} in ${townLabel(filterTownId)}`}
       control={
-        <div className="space-y-3">
+        <div className="space-y-2">
           <PageSelect id="journal-filter" label="Filter by town" value={filterTownId} onChange={setFilterTownId}>
             <option value="all">All towns</option>
             {townsInRouteOrder.map((town) => (
@@ -78,7 +78,7 @@ export function JournalPage({ direction, journalEntries, towns, resupplies, onDe
           </PageSelect>
 
           {/* Newest / Oldest: same sliding switch as the Route page */}
-          <div role="radiogroup" aria-label="Sort entries" className="relative grid grid-cols-2 border-2 border-[#40C8EF] rounded-lg bg-white overflow-hidden">
+          <div role="radiogroup" aria-label="Sort entries" className="relative grid grid-cols-2 h-11 border-2 border-[#40C8EF] rounded-lg bg-white overflow-hidden">
             <span
               aria-hidden="true"
               className={`absolute inset-y-0 left-0 w-1/2 bg-[#40C8EF] motion-safe:transition-transform motion-safe:duration-200 ease-out ${
@@ -94,23 +94,24 @@ export function JournalPage({ direction, journalEntries, towns, resupplies, onDe
                 role="radio"
                 aria-checked={order === key}
                 onClick={() => setOrder(key)}
-                className={`relative z-10 px-4 py-2.5 transition-colors ${order === key ? 'text-white' : 'text-[#40C8EF] hover:text-[#00B6EB]'}`}
+                className={`relative z-10 px-4 transition-colors ${order === key ? 'text-white' : 'text-[#40C8EF] hover:text-[#00B6EB]'}`}
               >
                 <span className="uppercase font-display font-medium tracking-[-0.36px] text-[13px] md:text-sm">{label}</span>
               </button>
             ))}
           </div>
+
+          {recapYear !== undefined && (
+            <button
+              onClick={() => setShowRecap(true)}
+              className="w-full h-11 border-2 border-[#40C8EF] bg-white text-[#40C8EF] px-4 rounded-lg hover:bg-[#F5FCFF] transition-colors"
+            >
+              <span className="uppercase font-display font-medium tracking-[-0.36px] text-[13px] md:text-sm">{recapYear} Recap</span>
+            </button>
+          )}
         </div>
       }
     >
-      {recapYear !== undefined && (
-        <button
-          onClick={() => setShowRecap(true)}
-          className="w-[298px] mb-4 border-2 border-[#40C8EF] bg-white text-[#40C8EF] py-2.5 rounded-lg hover:bg-[#F5FCFF] transition-colors"
-        >
-          <span className="uppercase font-display font-medium tracking-[-0.36px] text-[13px] md:text-sm">{recapYear} Recap</span>
-        </button>
-      )}
       {showRecap && (
         <RecapSheet
           direction={direction}
