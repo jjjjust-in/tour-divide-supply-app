@@ -142,7 +142,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, direct
           >
             <ChevronLeft size={26} />
           </button>
-          <h1 className="text-[#40C8EF] uppercase font-display font-bold tracking-[-0.36px] text-lg md:text-xl flex-1">
+          <h1 className="text-[#40C8EF] uppercase font-display font-bold tracking-[-0.36px] text-[20px] flex-1">
             Settings & About
           </h1>
         </div>
