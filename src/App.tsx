@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { SimpleRouteMap } from './components/SimpleRouteMap';
 import { TownsList } from './components/TownsList';
 import { NotesPage } from './components/NotesPage';
@@ -19,7 +19,7 @@ import { loadSession, saveSession, type ActivePage } from './utils/session';
 import { Plus, Clock } from 'lucide-react';
 import { MapPage } from './components/MapPage';
 import { Wordmark } from './components/Wordmark';
-import { AnimatePresence } from 'motion/react';
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
 import navBgPattern from 'figma:asset/53e87b274f9e9eae37a672b63e5feb2e3c44276d.png';
 import svgPaths from './imports/svg-do3t78tvh5';
 
@@ -73,6 +73,23 @@ export default function App() {
   // Exactly one main page is open at a time
   const [activePage, setActivePage] = useState<ActivePage>(savedSession?.page ?? 'route');
   const [showQuickAdd, setShowQuickAdd] = useState(false);
+  // Page switches slide toward the tapped tab: right for tabs to the right, left for tabs to the left
+  const reduceMotion = useReducedMotion();
+  const pageOrder: ActivePage[] = ['route', 'towns', 'notes', 'map', 'journal'];
+  const prevPageRef = useRef<ActivePage>(activePage);
+  const pageDirRef = useRef(1);
+  if (prevPageRef.current !== activePage) {
+    // Set once per switch so re-renders mid-animation keep the same direction
+    pageDirRef.current = pageOrder.indexOf(activePage) > pageOrder.indexOf(prevPageRef.current) ? 1 : -1;
+    prevPageRef.current = activePage;
+  }
+  const pageDir = pageDirRef.current;
+  const shift = reduceMotion ? 0 : 28;
+  const pageVariants = {
+    enter: (dir: number) => ({ opacity: 0, x: dir * shift }),
+    center: { opacity: 1, x: 0 },
+    exit: (dir: number) => ({ opacity: 0, x: dir * -shift }),
+  };
   const [showAbout, setShowAbout] = useState(false);
   const [showStopwatch, setShowStopwatch] = useState(false);
 
@@ -122,7 +139,6 @@ export default function App() {
   // Southbound (Banff first) or northbound (Antelope Wells first)
   const [direction, setDirection] = useState<RideDirection>(loadDirection);
   useEffect(() => saveDirection(direction), [direction]);
-
 
   // Town panels and lists still speak in "notes"; they now show the
   // journal entries tied to each town.
@@ -204,7 +220,6 @@ export default function App() {
     setActivePage('route');
   };
 
-
   const handleMeasurementSelect = (system: MeasurementSystem) => {
     setMeasurementSystem(system);
     setShowMeasurementSelector(false);
@@ -220,59 +235,104 @@ export default function App() {
         <MeasurementSelector onSelect={handleMeasurementSelect} />
       )}
 
-      {activePage === 'route' && (
-        <SimpleRouteMap
-          towns={towns}
-          selectedTownId={selectedTownId}
-          onTownSelect={handleTownSelect}
-          notesCount={notesCount}
-          measurementSystem={measurementSystem}
-          direction={direction}
-          focusTownId={routeFocusTownId}
-          onFocusHandled={clearRouteFocus}
-          onExpandedTownChange={setExpandedTownId}
-          onClose={undefined}
-          onOpenTimer={() => setShowStopwatch(true)}
-          notes={notes}
-          resupplies={resupplies}
-          onAddNote={handleAddNote}
-          onDeleteNote={handleDeleteNote}
-          onEditNote={handleEditNote}
-          onAddResupply={handleAddResupply}
-          onDeleteResupply={handleDeleteResupply}
-          onEditResupply={handleEditResupply}
-        />
-      )}
+      {/* Main pages: a short slide and fade when switching */}
+      <AnimatePresence initial={false} custom={pageDir}>
+        <motion.div
+          key={activePage}
+          custom={pageDir}
+          variants={pageVariants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={{ duration: reduceMotion ? 0.12 : 0.24, ease: [0.22, 1, 0.36, 1] }}
+          className="absolute inset-0"
+        >
+            {activePage === 'route' && (
+              <SimpleRouteMap
+                towns={towns}
+                selectedTownId={selectedTownId}
+                onTownSelect={handleTownSelect}
+                notesCount={notesCount}
+                measurementSystem={measurementSystem}
+                direction={direction}
+                focusTownId={routeFocusTownId}
+                onFocusHandled={clearRouteFocus}
+                onExpandedTownChange={setExpandedTownId}
+                onClose={undefined}
+                onOpenTimer={() => setShowStopwatch(true)}
+                notes={notes}
+                resupplies={resupplies}
+                onAddNote={handleAddNote}
+                onDeleteNote={handleDeleteNote}
+                onEditNote={handleEditNote}
+                onAddResupply={handleAddResupply}
+                onDeleteResupply={handleDeleteResupply}
+                onEditResupply={handleEditResupply}
+              />
+            )}
 
-      {showMap && (
-        <MapPage
-          direction={direction}
-          towns={towns}
-          measurementSystem={measurementSystem}
-          onOpenTown={(townId) => {
-            setRouteFocusTownId(townId);
-            setActivePage('route');
-          }}
-        />
-      )}
+            {showMap && (
+              <MapPage
+                direction={direction}
+                towns={towns}
+                measurementSystem={measurementSystem}
+                onOpenTown={(townId) => {
+                  setRouteFocusTownId(townId);
+                  setActivePage('route');
+                }}
+              />
+            )}
 
-      {showList && (
-        <TownsList
-          towns={towns}
-          notes={notes}
-          resupplies={resupplies}
-          notesCount={notesCount}
-          measurementSystem={measurementSystem}
-          onAddNote={handleAddNote}
-          onDeleteNote={handleDeleteNote}
-          onEditNote={handleEditNote}
-          onAddResupply={handleAddResupply}
-          onDeleteResupply={handleDeleteResupply}
-          onEditResupply={handleEditResupply}
-          onClose={() => setActivePage('route')}
-          onOpenTimer={() => setShowStopwatch(true)}
-        />
-      )}
+            {showList && (
+              <TownsList
+                towns={towns}
+                notes={notes}
+                resupplies={resupplies}
+                notesCount={notesCount}
+                measurementSystem={measurementSystem}
+                onAddNote={handleAddNote}
+                onDeleteNote={handleDeleteNote}
+                onEditNote={handleEditNote}
+                onAddResupply={handleAddResupply}
+                onDeleteResupply={handleDeleteResupply}
+                onEditResupply={handleEditResupply}
+                onClose={() => setActivePage('route')}
+                onOpenTimer={() => setShowStopwatch(true)}
+              />
+            )}
+
+            {showJournal && (
+              <JournalPage
+                direction={direction}
+                notes={[]}
+                journalEntries={journalEntries}
+                towns={towns}
+                resupplies={resupplies}
+                measurementSystem={measurementSystem}
+                onDeleteNote={handleDeleteNote}
+                onDeleteJournalEntry={handleDeleteJournalEntry}
+                onEditNote={handleEditNote}
+                onEditJournalEntry={handleEditJournalEntry}
+                onTownSelect={handleTownSelect}
+              />
+            )}
+
+            {showAllNotes && (
+              <NotesPage
+                notes={notes}
+                resupplies={resupplies}
+                towns={towns}
+                measurementSystem={measurementSystem}
+                onDeleteNote={handleDeleteNote}
+                onDeleteResupply={handleDeleteResupply}
+                onEditNote={handleEditNote}
+                onEditResupply={handleEditResupply}
+                onTownSelect={handleTownSelect}
+                onOpenTimer={() => setShowStopwatch(true)}
+              />
+            )}
+        </motion.div>
+      </AnimatePresence>
 
       {/* Bottom Navigation - Hidden on splash, always visible elsewhere */}
       {!showSplash && (
@@ -348,22 +408,6 @@ export default function App() {
         </div>
       )}
 
-
-      {showAllNotes && (
-        <NotesPage
-          notes={notes}
-          resupplies={resupplies}
-          towns={towns}
-          measurementSystem={measurementSystem}
-          onDeleteNote={handleDeleteNote}
-          onDeleteResupply={handleDeleteResupply}
-          onEditNote={handleEditNote}
-          onEditResupply={handleEditResupply}
-          onTownSelect={handleTownSelect}
-          onOpenTimer={() => setShowStopwatch(true)}
-        />
-      )}
-
       {showQuickAdd && (
         <AnimatePresence>
           <QuickAddNote
@@ -383,22 +427,6 @@ export default function App() {
           direction={direction}
           onChangeDirection={setDirection}
           onClose={() => setShowAbout(false)}
-        />
-      )}
-
-      {showJournal && (
-        <JournalPage
-          direction={direction}
-          notes={[]}
-          journalEntries={journalEntries}
-          towns={towns}
-          resupplies={resupplies}
-          measurementSystem={measurementSystem}
-          onDeleteNote={handleDeleteNote}
-          onDeleteJournalEntry={handleDeleteJournalEntry}
-          onEditNote={handleEditNote}
-          onEditJournalEntry={handleEditJournalEntry}
-          onTownSelect={handleTownSelect}
         />
       )}
 
