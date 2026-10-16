@@ -13,7 +13,7 @@ import newMexicoLabelSvg from '../assets/map/labels/new-mexico.svg?raw';
 import wyomingLabelSvg from '../assets/map/labels/wyoming.svg?raw';
 import { ELEVATION_LAYOUT, ELEVATION_LINE, ELEVATION_SCALE_X } from '../data/elevationGeometry';
 import { MAP_LAYOUT, TOWN_ANCHORS } from '../data/mapGeometry';
-import { MAP_STATES, STATES_OUTLINE, type MapState } from '../data/mapStates';
+import { MAP_STATES, STATES_OUTLINE } from '../data/mapStates';
 import { ROUTE_POIS, TOTAL_CLIMBING_FT, type RoutePoi } from '../data/passes';
 import { inRideOrder, rideMile, ROUTE_TOTAL_MILES, type RideDirection } from '../utils/direction';
 import { ELEVATION_POLYGON } from '../data/elevationGeometry';
@@ -88,7 +88,6 @@ type LocationState =
 
 type MapSelection =
   | { kind: 'cell'; col: number; row: number }
-  | { kind: 'state'; state: MapState }
   | { kind: 'poi'; poi: RoutePoi }
   | { kind: 'climb'; at: [number, number] }
   | null;
@@ -138,7 +137,6 @@ function mileToElevationPoint(mile: number): [number, number] {
   return [fit(line[line.length - 1][0]), y];
 }
 
-const toPoints = (poly: [number, number][]) => poly.map(([x, y]) => `${x},${y}`).join(' ');
 
 export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementSystem, onOpenTown }: RouteMapProps) {
   const svgRef = useRef<SVGSVGElement>(null);
@@ -229,13 +227,10 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
     return [pt.x, pt.y];
   };
 
-  // What's under a map point: a state, or a grid square outside the states
+  // What's under a map point: a grid square outside the states (states aren't tappable)
   const hitTest = (p: [number, number]): MapSelection => {
     const sl: [number, number] = [p[0] - MAP_LAYOUT.stateLines.x, p[1] - MAP_LAYOUT.stateLines.y];
-    if (pointInPolygon(sl, STATES_OUTLINE)) {
-      const state = MAP_STATES.find((s) => pointInPolygon(sl, s.polygon));
-      return state ? { kind: 'state', state } : null;
-    }
+    if (pointInPolygon(sl, STATES_OUTLINE)) return null;
     const col = Math.floor((p[0] - GRID.x0) / GRID.cellW);
     const row = Math.floor((p[1] - GRID.y0) / GRID.cellH);
     if (col >= 0 && col < GRID.cols && row >= 0 && row < GRID.rows) return { kind: 'cell', col, row };
@@ -262,10 +257,9 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
   const handleMapClick = (e: React.MouseEvent<SVGSVGElement>) => {
     const p = toMapPoint(e.clientX, e.clientY);
     const hit = p ? hitFor(p) : null;
-    // Tapping the same square, state or profile again clears it
+    // Tapping the same square or profile again clears it
     const same =
       (hit?.kind === 'climb' && selection?.kind === 'climb') ||
-      (hit?.kind === 'state' && selection?.kind === 'state' && selection.state.name === hit.state.name) ||
       (hit?.kind === 'cell' && selection?.kind === 'cell' && selection.col === hit.col && selection.row === hit.row);
     setSelection(same ? null : hit);
   };
@@ -283,7 +277,7 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
     y: GRID.y0 + shownCell.row * GRID.cellH,
   };
 
-  // Label pinned above the selected square or state, in % of the map box
+  // Label pinned above the selected square, in % of the map box
   const { route } = MAP_LAYOUT;
   // Both views share one frame so the grid stays put; artwork may break past it
   const viewBox = MAP_LAYOUT.viewBox;
@@ -321,14 +315,6 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
           ? `${formatNumber((Math.round((TOTAL_CLIMBING_FT * 0.3048) / 1000) * 1000))} m`
           : `${formatNumber(TOTAL_CLIMBING_FT)}'`;
       return { ...pct(selection.at[0], selection.at[1]), text: `Total climbing · about ${climb}` };
-    }
-    if (selection?.kind === 'state') {
-      const [lx, ly] = selection.state.labelAt;
-      return {
-        ...pct(lx + MAP_LAYOUT.stateLines.x, ly + MAP_LAYOUT.stateLines.y),
-        text: selection.state.name,
-        detail: `${formatDistance(selection.state.routeMiles, measurementSystem)} of route`,
-      };
     }
     return null;
   })();
@@ -434,21 +420,11 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
           fill="none"
           className="w-full h-auto block cursor-pointer overflow-visible"
           role="img"
-          aria-label="Map of the Tour Divide route from Banff to Antelope Wells. Tap a state or a grid square for details."
+          aria-label="Map of the Tour Divide route from Banff to Antelope Wells. Tap a grid square for details."
           onClick={handleMapClick}
           onPointerMove={handlePointerMove}
           onPointerLeave={() => setHoverCell(null)}
         >
-          <defs>
-            <pattern id="map-dots" patternUnits="userSpaceOnUse" width={222} height={222}>
-              <rect width={222} height={222} fill="#ffffff" />
-              <image href={navBgPattern} width={222} height={222} preserveAspectRatio="none" />
-            </pattern>
-            <clipPath id="states-clip">
-              <polygon points={toPoints(STATES_OUTLINE)} />
-            </clipPath>
-          </defs>
-
           <g fill="none" transform={`translate(${MAP_LAYOUT.grid.x} ${MAP_LAYOUT.grid.y})`} dangerouslySetInnerHTML={{ __html: LAYERS.grid }} />
 
           {/* Highlighted 100-mile square */}
@@ -457,13 +433,6 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
           )}
 
           <g fill="none" transform={`translate(${MAP_LAYOUT.statesOutline.x} ${MAP_LAYOUT.statesOutline.y})`} dangerouslySetInnerHTML={{ __html: LAYERS.outline }} />
-
-          {/* Highlighted state */}
-          {selection?.kind === 'state' && (
-            <g transform={`translate(${MAP_LAYOUT.stateLines.x} ${MAP_LAYOUT.stateLines.y})`} pointerEvents="none">
-              <polygon points={toPoints(selection.state.polygon)} fill="url(#map-dots)" clipPath="url(#states-clip)" />
-            </g>
-          )}
 
           <g fill="none" transform={`translate(${MAP_LAYOUT.stateLines.x} ${MAP_LAYOUT.stateLines.y})`} dangerouslySetInnerHTML={{ __html: LAYERS.stateLines }} />
 
@@ -529,7 +498,7 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
         )}
 
 
-        {/* Label for the selected square or state */}
+        {/* Label for the selected square */}
         {label && (
           <div
             className={`absolute pointer-events-none -translate-y-[calc(100%+6px)] whitespace-nowrap ${
