@@ -1,4 +1,4 @@
-import { ChevronLeft, Download, Upload, Trash2, RotateCcw, Instagram, Globe, ExternalLink } from 'lucide-react';
+import { ChevronLeft, Download, Upload, Trash2, RotateCcw, Instagram, Globe, Mail, ExternalLink } from 'lucide-react';
 import { socialLinks } from '../data/social';
 import type { RideDirection } from '../utils/direction';
 import { useState } from 'react';
@@ -173,18 +173,18 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, direct
             </div>
           </div>
 
-          {/* Social Section */}
+          {/* Connect Section */}
           <div className="w-full">
             <div className="flex gap-[10px] items-center justify-center pb-[12px]">
               <p className="font-display font-bold text-[#40c8ef] text-[18px] tracking-[-0.36px] uppercase whitespace-nowrap">
-                Social
+                Connect
               </p>
             </div>
             <div className="bg-white relative w-full">
               <div aria-hidden="true" className="absolute border border-[#40c8ef] inset-0 pointer-events-none" />
               <ul className="divide-y divide-[#40C8EF]/30">
                 {socialLinks.map((link) => {
-                  const Icon = link.platform === 'instagram' ? Instagram : Globe;
+                  const Icon = link.platform === 'instagram' ? Instagram : link.platform === 'email' ? Mail : Globe;
                   const content = (
                     <>
                       <Icon size={18} className="text-[#40C8EF] shrink-0" />
@@ -194,7 +194,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, direct
                       <span className={`flex-1 min-w-0 truncate text-[13px] ${link.url ? 'text-[#231f20]' : 'text-[#231f20]/40 italic'}`}>
                         {link.url ? (link.handle || link.url) : 'Link coming soon'}
                       </span>
-                      {link.url && <ExternalLink size={14} className="text-[#40C8EF] shrink-0" />}
+                      {link.url && link.platform !== 'email' && <ExternalLink size={14} className="text-[#40C8EF] shrink-0" />}
                     </>
                   );
                   return (
@@ -202,8 +202,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, direct
                       {link.url ? (
                         <a
                           href={link.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                          {...(link.platform === 'email' ? {} : { target: '_blank', rel: 'noopener noreferrer' })}
                           className="flex items-center gap-3 px-6 py-4 hover:bg-[#F5FCFF] transition-colors touch-manipulation"
                         >
                           {content}
