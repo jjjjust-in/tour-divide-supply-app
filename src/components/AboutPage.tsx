@@ -142,9 +142,12 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, direct
           >
             <ChevronLeft size={26} />
           </button>
-          <h1 className="text-[#40C8EF] uppercase font-display font-bold tracking-[-0.36px] text-[20px] flex-1">
+          {/* Same title style as Itinerary, Route and Journal: black, bold, 20px, centered */}
+          <h1 className="text-black uppercase font-display font-bold tracking-[-0.36px] text-[20px] flex-1 text-center">
             Settings & About
           </h1>
+          {/* Balances the back button so the title sits in the true center */}
+          <div aria-hidden="true" className="w-[44px] -mr-2 shrink-0" />
         </div>
       </div>
 
