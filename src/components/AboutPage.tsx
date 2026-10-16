@@ -142,8 +142,8 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, direct
           >
             <ChevronLeft size={26} />
           </button>
-          {/* Same title style as Itinerary, Route and Journal: black, bold, 20px */}
-          <h1 className="text-black uppercase font-display font-bold tracking-[-0.36px] text-[20px] flex-1">
+          {/* Same size as the Itinerary, Route and Journal titles: bold, 20px */}
+          <h1 className="text-[#40C8EF] uppercase font-display font-bold tracking-[-0.36px] text-[20px] flex-1">
             Settings & About
           </h1>
         </div>
@@ -166,7 +166,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, direct
           {/* About Section */}
           <div className="w-full">
             <div className="space-y-5 text-[#1a1a1a] pr-6">
-              <p className="font-display font-bold text-[23px] leading-[1.3] tracking-[-0.02em]">
+              <p className="font-display font-bold text-[20px] leading-[1.3] tracking-[-0.02em]">
                 <span className="uppercase tracking-[0.02em]">Tour Divide Supply</span> is built by{' '}
                 <span className="text-[#40C8EF]">JJJJustin</span>,
                 a bikepacker and product designer with over 5000 miles on the Tour Divide route.
