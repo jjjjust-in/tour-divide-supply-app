@@ -1,4 +1,4 @@
-import { ChevronLeft, Ruler, Compass, Download, Upload, Trash2, RotateCcw, Instagram, Globe, ExternalLink } from 'lucide-react';
+import { ChevronLeft, Download, Upload, Trash2, RotateCcw, Instagram, Globe, ExternalLink } from 'lucide-react';
 import { socialLinks } from '../data/social';
 import type { RideDirection } from '../utils/direction';
 import { useState } from 'react';
@@ -278,16 +278,10 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, direct
             </div>
             <div className="bg-white relative w-full">
               <div aria-hidden="true" className="absolute border border-[#40c8ef] inset-0 pointer-events-none" />
-              <div className="px-6 py-6 space-y-8">
+              <div className="px-6 py-6 space-y-3">
 
                 {/* Ride Direction */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Compass size={16} className="text-[#40C8EF]" />
-                    <h3 className="uppercase font-display font-bold tracking-[-0.36px] text-[#40C8EF] text-sm">
-                      Ride Direction
-                    </h3>
-                  </div>
+                <div>
                   <div className="flex bg-white border-2 border-[#40C8EF] rounded-lg overflow-hidden" role="radiogroup" aria-label="Ride direction">
                     <button
                       role="radio"
@@ -316,14 +310,8 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, direct
                 </div>
 
                 {/* Measurement System */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Ruler size={16} className="text-[#40C8EF]" />
-                    <h3 className="uppercase font-display font-bold tracking-[-0.36px] text-[#40C8EF] text-sm">
-                      Measurement System
-                    </h3>
-                  </div>
-                  <div className="flex bg-white border-2 border-[#40C8EF] rounded-lg overflow-hidden">
+                <div>
+                  <div className="flex bg-white border-2 border-[#40C8EF] rounded-lg overflow-hidden" role="group" aria-label="Measurement system">
                     <button
                       onClick={() => onChangeMeasurementSystem('imperial')}
                       className={`flex-1 py-3.5 px-4 transition-all touch-manipulation ${
@@ -352,12 +340,6 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, direct
 
                 {/* Data Management */}
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Download size={16} className="text-[#40C8EF]" />
-                    <h3 className="uppercase font-display font-bold tracking-[-0.36px] text-[#40C8EF] text-sm">
-                      Data Management
-                    </h3>
-                  </div>
                   <button
                     onClick={handleExportData}
                     className="w-full py-3.5 px-4 rounded-lg border-2 transition-all flex items-center justify-center gap-2 touch-manipulation border-[#40C8EF] text-[#40C8EF] hover:bg-[#F5FCFF]"
