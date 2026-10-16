@@ -446,7 +446,13 @@ export default function App() {
         <Stopwatch onClose={() => setShowStopwatch(false)} />
       )}
       {/* Frosted band under the phone's status bar */}
-      {!showSplash && <div aria-hidden="true" className="status-blur" />}
+      {!showSplash && (
+        <div aria-hidden="true" className="status-blur">
+          <span />
+          <span />
+          <span />
+        </div>
+      )}
     </div>
   );
 }

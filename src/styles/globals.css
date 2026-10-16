@@ -91,16 +91,51 @@ html {
 }
 
 .status-blur {
+  /* Fades out over 32px below the status bar instead of ending on a hard edge */
+  --fade: 32px;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  height: var(--sat);
-  z-index: 100;
+  height: calc(var(--sat) + var(--fade));
+  /* Under the timer button and full-screen pages, over the main pages */
+  z-index: 35;
   pointer-events: none;
-  background: rgba(255, 255, 255, 0.55);
+}
+
+/* Three stacked layers: the blur gets lighter as it fades down */
+.status-blur > span {
+  position: absolute;
+  inset: 0;
+}
+
+.status-blur > span:nth-child(1) {
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - var(--fade)), transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - var(--fade)), transparent 100%);
+}
+
+.status-blur > span:nth-child(2) {
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - var(--fade)), transparent calc(100% - var(--fade) / 3));
+  mask-image: linear-gradient(to bottom, #000 calc(100% - var(--fade)), transparent calc(100% - var(--fade) / 3));
+}
+
+.status-blur > span:nth-child(3) {
   -webkit-backdrop-filter: blur(14px) saturate(1.4);
   backdrop-filter: blur(14px) saturate(1.4);
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - var(--fade) * 1.4), transparent calc(100% - var(--fade) * 0.8));
+  mask-image: linear-gradient(to bottom, #000 calc(100% - var(--fade) * 1.4), transparent calc(100% - var(--fade) * 0.8));
+}
+
+/* White wash that also fades, so the time stays readable */
+.status-blur::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.6) calc(100% - var(--fade)), rgba(255, 255, 255, 0) 100%);
 }
 
 .pt-safe {
