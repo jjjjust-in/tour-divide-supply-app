@@ -4,7 +4,7 @@ import type { MeasurementSystem } from '../utils/measurements';
 import { formatNumber } from '../utils/measurements';
 import { RouteMap } from './RouteMap';
 import { PageLayout } from './PageLayout';
-import type { RideDirection } from '../utils/direction';
+import { ROUTE_TOTAL_MILES, type RideDirection } from '../utils/direction';
 import { TOTAL_CLIMBING_FT } from '../data/passes';
 
 interface MapPageProps {
@@ -75,8 +75,8 @@ export function MapPage({ direction, towns, measurementSystem, locationEnabled, 
       title="Route"
       meta={
         measurementSystem === 'metric'
-          ? `${formatNumber(4345)} km · ${formatNumber((Math.round((TOTAL_CLIMBING_FT * 0.3048) / 1000) * 1000))} m elevation`
-          : `${formatNumber(2700)} miles · ${formatNumber(TOTAL_CLIMBING_FT)} feet elevation`
+          ? `${formatNumber(Math.round(ROUTE_TOTAL_MILES * 1.60934))} km · ${formatNumber((Math.round((TOTAL_CLIMBING_FT * 0.3048) / 1000) * 1000))} m elevation`
+          : `${formatNumber(ROUTE_TOTAL_MILES)} miles · ${formatNumber(TOTAL_CLIMBING_FT)} feet elevation`
       }
       control={viewSwitch}
     >

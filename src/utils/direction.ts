@@ -1,11 +1,11 @@
 // Ride direction. The route data is stored southbound (Banff = mile 0,
-// Antelope Wells = mile 2700). Northbound riders see everything from their
+// Antelope Wells = mile 2745). Northbound riders see everything from their
 // own start: the itinerary runs Antelope Wells to Banff and mileposts count
 // up from the border.
 
 export type RideDirection = 'sobo' | 'nobo';
 
-export const ROUTE_TOTAL_MILES = 2700;
+export const ROUTE_TOTAL_MILES = 2745;
 
 const STORAGE_KEY = 'tour-divide-direction';
 

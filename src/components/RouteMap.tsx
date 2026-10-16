@@ -262,15 +262,16 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
       top: ((y - viewBox.y) / viewBox.height) * 100,
     });
     if (cellRect && shownCell && view === 'elevation') {
-      // Columns are slices of 1500' to 12,000'; rows are 100 route miles
+      // Columns are slices of 1500' to 12,000'; rows are equal slices of the route (about 102 miles)
       const feetPerCol = (ELEVATION_LAYOUT.maxFeet - ELEVATION_LAYOUT.minFeet) / GRID.cols;
       const lowFt = ELEVATION_LAYOUT.minFeet + shownCell.col * feetPerCol;
       const band =
         measurementSystem === 'metric'
           ? `${formatNumber((Math.round((lowFt * 0.3048) / 10) * 10))}–${formatNumber((Math.round(((lowFt + feetPerCol) * 0.3048) / 10) * 10))} m`
           : `${formatNumber((Math.round(lowFt / 50) * 50))}–${formatNumber((Math.round((lowFt + feetPerCol) / 50) * 50))}'`;
-      const sStart = shownCell.row * 100;
-      const sEnd = Math.min(ROUTE_TOTAL_MILES, (shownCell.row + 1) * 100);
+      const milesPerRow = ROUTE_TOTAL_MILES / GRID.rows;
+      const sStart = Math.round(shownCell.row * milesPerRow);
+      const sEnd = Math.min(ROUTE_TOTAL_MILES, Math.round((shownCell.row + 1) * milesPerRow));
       const [rStart, rEnd] = direction === 'nobo' ? [rideMile(sEnd, direction), rideMile(sStart, direction)] : [sStart, sEnd];
       const from = formatNumber(Math.round(toUnits(rStart, measurementSystem)));
       const to = formatNumber(Math.round(toUnits(rEnd, measurementSystem)));
@@ -340,7 +341,7 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
             fill="none"
             className="w-full h-auto block cursor-pointer overflow-visible"
             role="img"
-            aria-label="Elevation profile from Banff (top) to Antelope Wells (bottom). Each grid row is 100 route miles."
+            aria-label="Elevation profile from Banff (top) to Antelope Wells (bottom). Each grid row is about 100 route miles."
             onClick={handleMapClick}
             onPointerMove={handlePointerMove}
             onPointerLeave={() => setHoverCell(null)}
@@ -579,7 +580,7 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
             id="demo-mile"
             type="range"
             min={0}
-            max={2700}
+            max={ROUTE_TOTAL_MILES}
             step={1}
             value={demoMile}
             onChange={(e) => {
