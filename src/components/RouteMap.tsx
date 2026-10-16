@@ -143,6 +143,8 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
   const mapScale = useMapScale();
   const MAP_PX_WIDTH = MAP_LAYOUT.viewBox.width * mapScale;
   const MAP_PX_HEIGHT = MAP_LAYOUT.viewBox.height * mapScale;
+  // Headroom above the map so Banff's dot and selection ring aren't clipped at the top edge
+  const MAP_TOP_ROOM = 8;
   // Offset that puts the grid's center at the center of the screen
   const MAP_PX_LEFT_OF_CENTER = (GRID_CENTER_X - MAP_LAYOUT.viewBox.x) * mapScale;
   // The grid itself (not the artwork around it), for sizing the waypoint card
@@ -351,8 +353,8 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
     <div className="w-full space-y-4">
       {/* Map */}
       {/* Full-width strip; the grid is centered and the rest falls off the sides */}
-      <div className="relative w-screen max-w-[100vw] left-1/2 -translate-x-1/2 overflow-clip" style={{ height: MAP_PX_HEIGHT }}>
-      <div className="absolute top-0 select-none" style={{ width: MAP_PX_WIDTH, left: `calc(50% - ${MAP_PX_LEFT_OF_CENTER}px)` }}>
+      <div className="relative w-screen max-w-[100vw] left-1/2 -translate-x-1/2 overflow-clip" style={{ height: MAP_PX_HEIGHT + MAP_TOP_ROOM }}>
+      <div className="absolute select-none" style={{ top: MAP_TOP_ROOM, width: MAP_PX_WIDTH, left: `calc(50% - ${MAP_PX_LEFT_OF_CENTER}px)` }}>
         {view === 'elevation' ? (
           <svg
             ref={svgRef}
