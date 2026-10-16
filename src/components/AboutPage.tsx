@@ -226,14 +226,14 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, direct
             </div>
           </div>
 
-          {/* Resources Section */}
+          {/* Resources Section: current route files */}
           <div className="w-full">
             <div className="flex gap-[10px] items-center justify-center pb-[12px]">
               <p className="font-display font-bold text-[#40c8ef] text-[18px] tracking-[-0.36px] uppercase whitespace-nowrap">
                 Resources
               </p>
             </div>
-            <div className="space-y-4">
+            <div>
               {/* Current GPX downloads, one per route */}
               <div className="bg-white relative w-full">
                 <div aria-hidden="true" className="absolute border border-[#40c8ef] inset-0 pointer-events-none" />
@@ -260,8 +260,23 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, direct
                   ))}
                 </ul>
               </div>
+            </div>
+          </div>
 
-              {/* Active reroutes, always red */}
+          {/* Alerts Section: active reroutes, always red */}
+          <div className="w-full">
+            <div className="flex gap-[10px] items-center justify-center pb-[12px]">
+              <p className="font-display font-bold text-[#40c8ef] text-[18px] tracking-[-0.36px] uppercase whitespace-nowrap">
+                Alerts
+              </p>
+            </div>
+            <div className="space-y-4">
+              {rerouteResources.length === 0 && (
+                <div className="bg-white relative w-full">
+                  <div aria-hidden="true" className="absolute border border-[#40c8ef] inset-0 pointer-events-none" />
+                  <p className="px-6 py-4 text-[13px] text-[#231f20]/60">No active alerts.</p>
+                </div>
+              )}
               {rerouteResources.map((resource) => (
                 <div key={resource.id} className="border-2 border-[#EF4444] bg-[#FEF2F2] rounded-lg p-4">
                   <div className="flex items-start justify-between gap-3">
