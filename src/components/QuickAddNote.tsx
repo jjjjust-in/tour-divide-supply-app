@@ -152,7 +152,6 @@ export function QuickAddNote({ towns, onClose, onAddResupply, onAddJournalEntry 
                   onChange={(e) => setResupply((r) => ({ ...r, name: e.target.value }))}
                   placeholder="Ridley's Family Market"
                   className={fieldClass}
-                  autoFocus
                 />
               </div>
               <div>
@@ -211,7 +210,6 @@ export function QuickAddNote({ towns, onClose, onAddResupply, onAddJournalEntry 
                   placeholder="What happened today?"
                   className={`${fieldClass} resize-none leading-relaxed`}
                   rows={5}
-                  autoFocus
                 />
               </div>
               <div>
