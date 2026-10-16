@@ -78,7 +78,10 @@ export function buildRecap(
   const photos = entries.map((e) => e.imageUrl).filter((u): u is string => !!u);
 
   // Highlight: the longest entry, which is usually the one with the most to say
-  const longest = [...entries].sort((a, b) => wordCount(b.content) - wordCount(a.content))[0];
+  // Photo-only entries have no words to quote
+  const longest = [...entries]
+    .filter((e) => wordCount(e.content) > 0)
+    .sort((a, b) => wordCount(b.content) - wordCount(a.content))[0];
 
   return {
     year,

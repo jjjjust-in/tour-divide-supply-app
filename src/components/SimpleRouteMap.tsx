@@ -148,7 +148,9 @@ function ItineraryRow({
   };
 
   const handleSaveNote = () => {
-    if (editingNoteId && editNoteContent.trim()) {
+    // Text can be cleared as long as the entry still has its photo
+    const hasPhoto = !!notes.find((n) => n.id === editingNoteId)?.imageUrl;
+    if (editingNoteId && (editNoteContent.trim() || hasPhoto)) {
       onEditNote(editingNoteId, editNoteContent.trim());
       setEditingNoteId(null);
       setEditNoteContent('');
@@ -337,7 +339,7 @@ function ItineraryRow({
                               </button>
                               <button
                                 onClick={handleSaveNote}
-                                disabled={!editNoteContent.trim()}
+                                disabled={!editNoteContent.trim() && !note.imageUrl}
                                 className="flex-1 bg-[#40c8ef] text-white py-2 px-1.5 rounded hover:bg-[#00B6EB] transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-[11px] font-display font-medium uppercase"
                               >
                                 Save
@@ -346,7 +348,13 @@ function ItineraryRow({
                           </div>
                         ) : (
                           <div className="flex justify-between items-start gap-1">
-                            <p className="flex-1 text-[13px] text-black leading-[120%]">{note.content}</p>
+                            {note.content ? (
+                              <p className="flex-1 text-[13px] text-black leading-[120%]">{note.content}</p>
+                            ) : (
+                              // Photo-only entry: show the photo in place of text
+                              <img src={note.imageUrl} alt="" className="w-16 h-16 object-cover rounded" />
+                            )}
+                            {!note.content && <div className="flex-1" />}
                             <div className="flex gap-0.5 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
                               <button
                                 onClick={() => handleEditNote(note)}

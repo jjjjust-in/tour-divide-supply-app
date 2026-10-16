@@ -13,6 +13,7 @@ export interface Note {
   id: string;
   townId: string;
   content: string;
+  imageUrl?: string;
   timestamp: number;
   isShared?: boolean;
   author?: string;

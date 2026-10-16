@@ -130,7 +130,7 @@ export default function App() {
   // journal entries tied to each town.
   const notes: Note[] = journalEntries
     .filter(entry => entry.townId)
-    .map(entry => ({ id: entry.id, townId: entry.townId as string, content: entry.content, timestamp: entry.timestamp }));
+    .map(entry => ({ id: entry.id, townId: entry.townId as string, content: entry.content, imageUrl: entry.imageUrl, timestamp: entry.timestamp }));
 
   const notesCount = notes.reduce((acc, note) => {
     acc[note.townId] = (acc[note.townId] || 0) + 1;

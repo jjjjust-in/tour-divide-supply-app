@@ -57,7 +57,8 @@ export function JournalPage({ direction, journalEntries, towns, resupplies, onDe
   const count = (n: number) => `${n} ${n === 1 ? 'entry' : 'entries'}`;
 
   const saveEdit = (entry: JournalEntry) => {
-    if (!editingContent.trim()) return;
+    // Text can be cleared as long as the entry still has its photo
+    if (!editingContent.trim() && !entry.imageUrl) return;
     onEditJournalEntry(entry.id, editingContent.trim(), entry.imageUrl);
     setEditingId(null);
   };
@@ -190,16 +191,16 @@ export function JournalPage({ direction, journalEntries, towns, resupplies, onDe
                       </button>
                       <button
                         onClick={() => saveEdit(entry)}
-                        disabled={!editingContent.trim()}
+                        disabled={!editingContent.trim() && !entry.imageUrl}
                         className="flex-1 bg-[#40c8ef] text-white py-2.5 rounded text-[12px] font-display font-medium uppercase hover:bg-[#00B6EB] transition-colors disabled:opacity-50"
                       >
                         Save
                       </button>
                     </div>
                   </div>
-                ) : (
+                ) : entry.content ? (
                   <p className="mt-3 text-[14px] leading-relaxed text-black whitespace-pre-wrap">{entry.content}</p>
-                )}
+                ) : null}
               </li>
             );
           })}

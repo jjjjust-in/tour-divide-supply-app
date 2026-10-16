@@ -60,8 +60,8 @@ export function QuickAddNote({ towns, onClose, onAddResupply, onAddJournalEntry 
         address: resupply.address.trim(),
       });
       onClose();
-    } else if (activeTab === 'journal' && journalTownId && journalContent.trim()) {
-      // Every journal entry is tied to a town
+    } else if (activeTab === 'journal' && journalTownId && (journalContent.trim() || imageUrl)) {
+      // Every journal entry is tied to a town and has words, a photo, or both
       onAddJournalEntry(journalContent.trim(), imageUrl, journalTownId);
       onClose();
     }
@@ -69,7 +69,7 @@ export function QuickAddNote({ towns, onClose, onAddResupply, onAddJournalEntry 
 
   const canSubmit =
     (activeTab === 'resupply' && !!resupply.name.trim() && !!selectedTownId) ||
-    (activeTab === 'journal' && !!journalContent.trim() && !!journalTownId);
+    (activeTab === 'journal' && (!!journalContent.trim() || !!imageUrl) && !!journalTownId);
 
   // Field styles shared with the Route page controls: blue 2px border, rounded-lg
   const fieldClass =
