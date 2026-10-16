@@ -278,10 +278,10 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, direct
             </div>
             <div className="bg-white relative w-full">
               <div aria-hidden="true" className="absolute border border-[#40c8ef] inset-0 pointer-events-none" />
-              <div className="px-6 divide-y divide-[#40C8EF]/20">
+              <div className="px-6 py-6 space-y-8">
 
                 {/* Ride Direction */}
-                <div className="py-6 space-y-4">
+                <div className="space-y-4">
                   <div className="flex items-center gap-2">
                     <Compass size={16} className="text-[#40C8EF]" />
                     <h3 className="uppercase font-display font-bold tracking-[-0.36px] text-[#40C8EF] text-sm">
@@ -316,7 +316,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, direct
                 </div>
 
                 {/* Measurement System */}
-                <div className="py-6 space-y-4">
+                <div className="space-y-4">
                   <div className="flex items-center gap-2">
                     <Ruler size={16} className="text-[#40C8EF]" />
                     <h3 className="uppercase font-display font-bold tracking-[-0.36px] text-[#40C8EF] text-sm">
@@ -351,7 +351,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, direct
                 </div>
 
                 {/* Data Management */}
-                <div className="py-6 space-y-3">
+                <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <Download size={16} className="text-[#40C8EF]" />
                     <h3 className="uppercase font-display font-bold tracking-[-0.36px] text-[#40C8EF] text-sm">
