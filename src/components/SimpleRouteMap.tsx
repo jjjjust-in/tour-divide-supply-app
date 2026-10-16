@@ -15,6 +15,8 @@ interface SimpleRouteMapProps {
   /** Town to open and scroll to, e.g. after "View town" on the Map page */
   focusTownId?: string | null;
   onFocusHandled?: () => void;
+  /** Reports the open town (or null) so it can be restored next launch */
+  onExpandedTownChange?: (townId: string | null) => void;
   selectedTownId: string | null;
   onTownSelect: (townId: string) => void;
   notesCount: Record<string, number>;
@@ -586,7 +588,7 @@ function ItineraryRow({
   );
 }
 
-export function SimpleRouteMap({ towns, direction, measurementSystem, focusTownId, onFocusHandled, notes, resupplies, onAddNote, onDeleteNote, onEditNote, onAddResupply, onDeleteResupply, onEditResupply }: SimpleRouteMapProps) {
+export function SimpleRouteMap({ towns, direction, measurementSystem, focusTownId, onFocusHandled, onExpandedTownChange, notes, resupplies, onAddNote, onDeleteNote, onEditNote, onAddResupply, onDeleteResupply, onEditResupply }: SimpleRouteMapProps) {
   // Stops in riding order, with mileposts counted from the rider's start
   const mappedStops = useMemo(() => inRideOrder(itinerary, direction), [direction]);
   // Only one town can be open at a time
@@ -601,6 +603,11 @@ export function SimpleRouteMap({ towns, direction, measurementSystem, focusTownI
     });
     onFocusHandled?.();
   }, [focusTownId, mappedStops, onFocusHandled]);
+
+  useEffect(() => {
+    const stop = mappedStops.find((st) => st.id === expandedStopId);
+    onExpandedTownChange?.(stop?.linkedTownId ?? null);
+  }, [expandedStopId, mappedStops, onExpandedTownChange]);
 
   return (
     <PageLayout

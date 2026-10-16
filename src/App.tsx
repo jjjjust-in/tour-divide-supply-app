@@ -15,6 +15,7 @@ import type { Note, Resupply, JournalEntry } from './types';
 import type { MeasurementSystem } from './utils/measurements';
 import { inRideOrder, loadDirection, saveDirection, type RideDirection } from './utils/direction';
 import { loadCollection, saveCollection, requestPersistentStorage, STORAGE_KEYS } from './utils/storage';
+import { loadSession, saveSession, type ActivePage } from './utils/session';
 import { Plus, Clock } from 'lucide-react';
 import { MapPage } from './components/MapPage';
 import { Wordmark } from './components/Wordmark';
@@ -23,7 +24,9 @@ import navBgPattern from 'figma:asset/53e87b274f9e9eae37a672b63e5feb2e3c44276d.p
 import svgPaths from './imports/svg-do3t78tvh5';
 
 export default function App() {
-  const [showSplash, setShowSplash] = useState(true);
+  // Returning riders pick up where they left off; the splash only shows on a first launch
+  const [savedSession] = useState(loadSession);
+  const [showSplash, setShowSplash] = useState(savedSession === null);
   const [showMeasurementSelector, setShowMeasurementSelector] = useState(false);
   const [measurementSystem, setMeasurementSystem] = useState<MeasurementSystem>(() => {
     const saved = localStorage.getItem('tour-divide-measurement-system');
@@ -67,10 +70,8 @@ export default function App() {
     requestPersistentStorage();
     return () => { cancelled = true; };
   }, []);
-  // Single active page — enforces one-page-at-a-time
   // Exactly one main page is open at a time
-  type ActivePage = 'route' | 'map' | 'journal' | 'towns' | 'notes';
-  const [activePage, setActivePage] = useState<ActivePage>('route');
+  const [activePage, setActivePage] = useState<ActivePage>(savedSession?.page ?? 'route');
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
   const [showStopwatch, setShowStopwatch] = useState(false);
@@ -81,8 +82,16 @@ export default function App() {
   const showAllNotes = activePage === 'notes';
   const showJournal = activePage === 'journal';
   const showMap = activePage === 'map';
-  const [routeFocusTownId, setRouteFocusTownId] = useState<string | null>(null);
+  const [routeFocusTownId, setRouteFocusTownId] = useState<string | null>(
+    savedSession?.page === 'route' ? savedSession.townId : null
+  );
   const clearRouteFocus = useCallback(() => setRouteFocusTownId(null), []);
+  // Town open on the Itinerary, remembered for next launch
+  const [expandedTownId, setExpandedTownId] = useState<string | null>(null);
+
+  useEffect(() => {
+    saveSession({ page: activePage, townId: activePage === 'route' ? expandedTownId : null });
+  }, [activePage, expandedTownId]);
 
   // Check if this is first time opening the app
   useEffect(() => {
@@ -221,6 +230,7 @@ export default function App() {
           direction={direction}
           focusTownId={routeFocusTownId}
           onFocusHandled={clearRouteFocus}
+          onExpandedTownChange={setExpandedTownId}
           onClose={undefined}
           onOpenTimer={() => setShowStopwatch(true)}
           notes={notes}
