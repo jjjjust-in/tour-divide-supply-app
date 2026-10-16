@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, LocateFixed, Loader2 } from 'lucide-react';
 import gridSvg from '../assets/map/grid.svg?raw';
 import navBgPattern from 'figma:asset/53e87b274f9e9eae37a672b63e5feb2e3c44276d.png';
@@ -14,13 +14,14 @@ import wyomingLabelSvg from '../assets/map/labels/wyoming.svg?raw';
 import { ELEVATION_LAYOUT, ELEVATION_LINE, ELEVATION_SCALE_X } from '../data/elevationGeometry';
 import { MAP_LAYOUT, TOWN_ANCHORS } from '../data/mapGeometry';
 import { MAP_STATES, STATES_OUTLINE } from '../data/mapStates';
-import { ROUTE_POIS, TOTAL_CLIMBING_FT, type RoutePoi } from '../data/passes';
+import { ROUTE_POIS, type RoutePoi } from '../data/passes';
 import { inRideOrder, rideMile, ROUTE_TOTAL_MILES, type RideDirection } from '../utils/direction';
 import { ELEVATION_POLYGON } from '../data/elevationGeometry';
 import type { Town } from '../types';
 import type { MeasurementSystem } from '../utils/measurements';
 import { formatNumber } from '../utils/measurements';
-import { locateOnRoute, mileToRoutePoint, type RoutePosition } from '../utils/routeLocation';
+import { mileToRoutePoint, type RoutePosition } from '../utils/routeLocation';
+import { DEMO_LOCATION, useRiderLocation } from '../utils/useRiderLocation';
 
 // Strip the outer <svg> so each layer can be placed inside one composed map
 const innerSvg = (svg: string) => svg.replace(/^[\s\S]*?<svg[^>]*>/, '').replace(/<\/svg>\s*$/, '');
@@ -60,6 +61,11 @@ const ITINERARY_LIST_PX = 27 * 24 + 2;
 const GRID_UNITS_TALL = 481;
 const GRID_UNITS_WIDE = 298;
 const GRID_CENTER_X = 149.8;
+// The grid's outside edges and outer line, in map units (grid.svg strokes the
+// border 1.5 units thick, from x 0 to x 299), so the waypoint card can line up with it exactly
+const GRID_OUTER_LEFT = 0;
+const GRID_OUTER_RIGHT = 299;
+const GRID_OUTER_STROKE = 1.5;
 const SCREEN_GUTTER_PX = 32;
 const MAX_MAP_SCALE = ITINERARY_LIST_PX / GRID_UNITS_TALL;
 
@@ -77,19 +83,9 @@ function useMapScale() {
   return scale;
 }
 
-// The prototype build can't use GPS, so it gets a slider to preview positions
-const DEMO_LOCATION = import.meta.env.VITE_DEMO_LOCATION === 'true';
-
-type LocationState =
-  | { status: 'idle' }
-  | { status: 'locating' }
-  | { status: 'found'; position: RoutePosition }
-  | { status: 'error'; message: string };
-
 type MapSelection =
   | { kind: 'cell'; col: number; row: number }
   | { kind: 'poi'; poi: RoutePoi }
-  | { kind: 'climb'; at: [number, number] }
   | null;
 
 interface RouteMapProps {
@@ -99,6 +95,8 @@ interface RouteMapProps {
   direction?: RideDirection;
   towns: Town[];
   measurementSystem: MeasurementSystem;
+  /** Off in Settings: never ask for GPS and hide the locate button */
+  locationEnabled?: boolean;
   onOpenTown: (townId: string) => void;
 }
 
@@ -137,8 +135,7 @@ function mileToElevationPoint(mile: number): [number, number] {
   return [fit(line[line.length - 1][0]), y];
 }
 
-
-export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementSystem, onOpenTown }: RouteMapProps) {
+export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementSystem, locationEnabled = true, onOpenTown }: RouteMapProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const mapScale = useMapScale();
   const MAP_PX_WIDTH = MAP_LAYOUT.viewBox.width * mapScale;
@@ -148,8 +145,9 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
   // Offset that puts the grid's center at the center of the screen
   const MAP_PX_LEFT_OF_CENTER = (GRID_CENTER_X - MAP_LAYOUT.viewBox.x) * mapScale;
   // The grid itself (not the artwork around it), for sizing the waypoint card
-  const GRID_PX_WIDTH = GRID_UNITS_WIDE * mapScale;
-  const [location, setLocation] = useState<LocationState>({ status: 'idle' });
+  const GRID_PX_WIDTH = (GRID_OUTER_RIGHT - GRID_OUTER_LEFT) * mapScale;
+  const GRID_PX_LEFT_OF_CENTER = (GRID_CENTER_X - GRID_OUTER_LEFT) * mapScale;
+  const GRID_STROKE_PX = GRID_OUTER_STROKE * mapScale;
   const [demoMile, setDemoMile] = useState(1215);
   const [selection, setSelection] = useState<MapSelection>(null);
   const [hoverCell, setHoverCell] = useState<{ col: number; row: number } | null>(null);
@@ -171,31 +169,8 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
     [direction],
   );
 
-  const locate = useCallback(() => {
-    if (!('geolocation' in navigator)) {
-      setLocation({ status: 'error', message: 'This device can’t share its location.' });
-      return;
-    }
-    setLocation({ status: 'locating' });
-    navigator.geolocation.getCurrentPosition(
-      (pos) => setLocation({ status: 'found', position: locateOnRoute(pos.coords.latitude, pos.coords.longitude) }),
-      (err) =>
-        setLocation({
-          status: 'error',
-          message:
-            err.code === err.PERMISSION_DENIED
-              ? 'Location is off for this app. Turn it on in Settings to see yourself on the map.'
-              : 'Couldn’t get a GPS fix. Try again with a clear view of the sky.',
-        }),
-      // GPS works without cell signal; accept a fix up to a minute old to save battery
-      { enableHighAccuracy: true, timeout: 20000, maximumAge: 60000 },
-    );
-  }, []);
-
-  // Find the rider once when the map opens. Refresh is manual to save battery.
-  useEffect(() => {
-    if (!DEMO_LOCATION) locate();
-  }, [locate]);
+  // Found once when the map opens; the locate button refreshes it
+  const { location, locate } = useRiderLocation(locationEnabled);
 
   const position: RoutePosition | null = DEMO_LOCATION
     ? (() => {
@@ -239,10 +214,10 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
     return null;
   };
 
-  // Elevation view: squares carry an elevation band and mile range; the profile shape shows total climbing
+  // Elevation view: squares carry an elevation band and mile range; the profile shape itself isn't tappable
   const hitTestElevation = (p: [number, number]): MapSelection => {
     const artX = ELEVATION_LAYOUT.artLeft + (p[0] - ELEVATION_LAYOUT.artLeft) / ELEVATION_SCALE_X;
-    if (pointInPolygon([artX, p[1]], ELEVATION_POLYGON)) return { kind: 'climb', at: p };
+    if (pointInPolygon([artX, p[1]], ELEVATION_POLYGON)) return null;
     const col = Math.floor((p[0] - GRID.x0) / GRID.cellW);
     const row = Math.floor((p[1] - GRID.y0) / GRID.cellH);
     if (col >= 0 && col < GRID.cols && row >= 0 && row < GRID.rows) return { kind: 'cell', col, row };
@@ -259,10 +234,8 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
   const handleMapClick = (e: React.MouseEvent<SVGSVGElement>) => {
     const p = toMapPoint(e.clientX, e.clientY);
     const hit = p ? hitFor(p) : null;
-    // Tapping the same square or profile again clears it
-    const same =
-      (hit?.kind === 'climb' && selection?.kind === 'climb') ||
-      (hit?.kind === 'cell' && selection?.kind === 'cell' && selection.col === hit.col && selection.row === hit.row);
+    // Tapping the same square again clears it
+    const same = hit?.kind === 'cell' && selection?.kind === 'cell' && selection.col === hit.col && selection.row === hit.row;
     setSelection(same ? null : hit);
   };
 
@@ -311,13 +284,6 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
       const side = Math.round(toUnits(100, measurementSystem));
       return { ...pct(cellRect.x + GRID.cellW / 2, cellRect.y), text: `${side} × ${side} ${unit(measurementSystem)}` };
     }
-    if (selection?.kind === 'climb') {
-      const climb =
-        measurementSystem === 'metric'
-          ? `${formatNumber((Math.round((TOTAL_CLIMBING_FT * 0.3048) / 1000) * 1000))} m`
-          : `${formatNumber(TOTAL_CLIMBING_FT)}'`;
-      return { ...pct(selection.at[0], selection.at[1]), text: `Total climbing · about ${climb}` };
-    }
     return null;
   })();
 
@@ -338,14 +304,26 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
     const gap = ride - positionRide;
     if (Math.abs(gap) < 0.5) return "You're here";
     // Whole miles (or km), not the rounded-to-5 used for route stats
-    const n = Math.max(1, Math.round(toUnits(Math.abs(gap), measurementSystem)));
-    const word = measurementSystem === 'metric' ? (n === 1 ? 'kilometer' : 'kilometers') : n === 1 ? 'mile' : 'miles';
-    const d = `${formatNumber(n)} ${word}`;
+    const d = unitWords(Math.abs(gap));
     return gap > 0 ? `${d} ahead` : `${d} behind you`;
   };
-  // Mile marker (MM), or kilometer marker (KM) in metric
-  const markerLabel = (ride: number) =>
-    `${measurementSystem === 'metric' ? 'KM' : 'MM'} ${formatNumber(Math.round(toUnits(ride, measurementSystem)))}`;
+  const unitWords = (miles: number) => {
+    const n = Math.max(1, Math.round(toUnits(miles, measurementSystem)));
+    const word = measurementSystem === 'metric' ? (n === 1 ? 'kilometer' : 'kilometers') : n === 1 ? 'mile' : 'miles';
+    return `${formatNumber(n)} ${word}`;
+  };
+  // Where the rider stands, when it needs saying: shown along the bottom of the card
+  const locationStatus = DEMO_LOCATION
+    ? null
+    : !locationEnabled
+      ? 'Location is off. Turn it on in Settings.'
+      : position && !position.onRoute
+        ? `Off route: ${formatDistance(position.milesFromRoute, measurementSystem)} from the route, nearest ${formatMilepost(rideMile(position.mile, direction), measurementSystem).toLowerCase()}`
+        : location.status === 'locating'
+          ? 'Finding you…'
+          : location.status === 'error'
+            ? location.message
+            : null;
   const passElevation = (ft: number) =>
     measurementSystem === 'metric' ? `${formatNumber(Math.round(ft * 0.3048))} m` : `${formatNumber(ft)}'`;
 
@@ -517,7 +495,7 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
           </div>
         )}
       </div>
-        {!DEMO_LOCATION && (
+        {!DEMO_LOCATION && locationEnabled && (
           <button
             onClick={locate}
             disabled={location.status === 'locating'}
@@ -533,8 +511,8 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
           Compact, the same width as the grid, and pinned just above the bottom nav. */}
       {(isElevation ? pass : waypoint) && (
         <div
-          className="sticky bottom-[127px] md:bottom-[144px] z-20 bg-white border-2 border-[#40C8EF] shadow-[0_6px_24px_rgba(35,31,32,0.12)]"
-          style={{ width: GRID_PX_WIDTH, marginLeft: `calc(50% - ${GRID_PX_WIDTH / 2}px)` }}
+          className="sticky bottom-[127px] md:bottom-[144px] z-20 bg-white border-solid border-[#40C8EF] shadow-[0_6px_24px_rgba(35,31,32,0.12)]"
+          style={{ width: GRID_PX_WIDTH, marginLeft: `calc(50% - ${GRID_PX_LEFT_OF_CENTER}px)`, borderWidth: GRID_STROKE_PX }}
         >
           <div className="flex items-stretch">
             <button
@@ -548,13 +526,12 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
             <div className="flex-1 min-w-0 py-2.5 text-center" aria-live="polite">
               {isElevation ? (
                 <>
-                  <p className="font-display font-bold text-[15px] uppercase tracking-tight text-black truncate">{pass.name}</p>
-                  {tracking && (
-                    <p className="font-display font-semibold text-[13px] uppercase text-black tabular-nums truncate mt-0.5">{distanceFromRider(pass.ride)}</p>
-                  )}
-                  <p className="text-[11px] uppercase text-black/60 tabular-nums truncate mt-0.5">
-                    {markerLabel(pass.ride)} · Elev {passElevation(pass.elevationFt)}
-                    {tracking ? '' : followingPass ? ` · ${formatDistance(followingPass.ride - pass.ride, measurementSystem)} to ${followingPass.name}` : ' · last big climb'}
+                  {/* Name and elevation together; a long name wraps rather than hiding the elevation */}
+                  <p className="font-display font-bold text-[15px] leading-tight uppercase tracking-tight text-black [text-wrap:balance]">
+                    {pass.name} <span className="whitespace-nowrap tabular-nums">· {passElevation(pass.elevationFt)}</span>
+                  </p>
+                  <p className={tracking ? 'font-display font-semibold text-[13px] uppercase text-black tabular-nums truncate mt-0.5' : 'text-[11px] uppercase text-black/60 tabular-nums truncate mt-0.5'}>
+                    {tracking ? distanceFromRider(pass.ride) : followingPass ? `${unitWords(followingPass.ride - pass.ride)} to ${followingPass.name}` : 'Last big climb'}
                   </p>
                 </>
               ) : (
@@ -562,16 +539,12 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
                   <button
                     onClick={() => onOpenTown(waypoint.town.id)}
                     aria-label={`Open ${waypoint.town.name} in the itinerary`}
-                    className="max-w-full font-display font-bold text-[15px] uppercase tracking-tight text-black truncate underline decoration-[#40c8ef] decoration-2 underline-offset-[4px] hover:text-[#00B6EB] transition-colors"
+                    className="max-w-full font-display font-bold text-[15px] uppercase tracking-tight text-black truncate hover:text-[#00B6EB] transition-colors"
                   >
                     {waypoint.town.name}, {waypoint.town.state}
                   </button>
-                  {tracking && (
-                    <p className="font-display font-semibold text-[13px] uppercase text-black tabular-nums truncate mt-0.5">{distanceFromRider(waypoint.ride)}</p>
-                  )}
-                  <p className="text-[11px] uppercase text-black/60 tabular-nums truncate mt-0.5">
-                    {markerLabel(waypoint.ride)} · Elev {passElevation(waypoint.town.elevation)}
-                    {tracking ? '' : following ? ` · ${formatDistance(following.ride - waypoint.ride, measurementSystem)} to ${following.town.name}` : ' · finish line'}
+                  <p className={tracking ? 'font-display font-semibold text-[13px] uppercase text-black tabular-nums truncate mt-0.5' : 'text-[11px] uppercase text-black/60 tabular-nums truncate mt-0.5'}>
+                    {tracking ? distanceFromRider(waypoint.ride) : following ? `${unitWords(following.ride - waypoint.ride)} to ${following.town.name}` : 'Finish line'}
                   </p>
                 </>
               )}
@@ -585,17 +558,17 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
               <ChevronRight size={20} />
             </button>
           </div>
+          {locationStatus && (
+            <p
+              className="border-t border-solid border-[#40C8EF] bg-[#F5FCFF] px-3 py-1.5 text-center text-[11px] leading-snug text-black/70"
+              style={{ borderTopWidth: GRID_STROKE_PX }}
+              aria-live="polite"
+            >
+              {locationStatus}
+            </p>
+          )}
         </div>
       )}
-
-      {/* Only speak up when something needs attention */}
-      {position && !position.onRoute ? (
-        <p className="text-[13px] text-black/70 text-center px-2" aria-live="polite">
-          Off route: {formatDistance(position.milesFromRoute, measurementSystem)} from the nearest point, {formatMilepost(rideMile(position.mile, direction), measurementSystem).toLowerCase()}.
-        </p>
-      ) : location.status === 'error' ? (
-        <p className="text-[13px] text-black/70 text-center px-2" aria-live="polite">{location.message}</p>
-      ) : null}
 
       {DEMO_LOCATION && (
         <div className="space-y-2 px-1">

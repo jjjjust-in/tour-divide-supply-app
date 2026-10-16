@@ -24,7 +24,7 @@ export const ROUTE_POIS: RoutePoi[] = [
   { id: 'huckleberry-pass', name: 'Huckleberry Pass', mile: 557, elevationFt: 5960, source: 'profile' },
   { id: 'lava-mountain', name: 'Lava Mountain', mile: 659, elevationFt: 7470, source: 'profile' },
   { id: 'fleecer-ridge', name: 'Fleecer Ridge', mile: 752, elevationFt: 7840, source: 'profile' },
-  { id: 'old-bannack-road', name: 'Old Bannack Road Pass', mile: 861, elevationFt: 7880, source: 'profile' },
+  { id: 'old-bannack-road', name: 'Old Bannack Road', mile: 861, elevationFt: 7880, source: 'profile' },
   { id: 'red-rock-pass', name: 'Red Rock Pass', mile: 968, elevationFt: 7152, source: 'Wikipedia: 7,152 ft (2,180 m)' },
   { id: 'union-pass', name: 'Union Pass', mile: 1152, elevationFt: 9212, source: 'TopoQuest (USGS)' },
   { id: 'lander-cutoff', name: 'Lander Cutoff', mile: 1274, elevationFt: 8240, source: 'profile (one rider log from Boulder to Atlantic City: 2480 m high point)' },

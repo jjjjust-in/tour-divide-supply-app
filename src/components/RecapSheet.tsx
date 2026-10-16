@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import type { JournalEntry, Resupply, Town } from '../types';
 import type { RideDirection } from '../utils/direction';
@@ -104,13 +105,17 @@ export function RecapSheet({ direction, journalEntries, towns, resupplies, onClo
   };
   const goTo = (i: number) => scroller.current?.scrollTo({ left: i * scroller.current.clientWidth, behavior: 'smooth' });
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4" onClick={onClose}>
+  // Portal to <body> so the page transition's layer can't put the nav on top of it
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]"
+      onClick={onClose}
+    >
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="recap-title"
-        className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl max-h-[92vh] overflow-y-auto"
+        className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl max-h-full flex flex-col overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -121,9 +126,9 @@ export function RecapSheet({ direction, journalEntries, towns, resupplies, onClo
           <X size={22} />
         </button>
 
-        <div className="flex flex-col items-center gap-1 text-center px-12 pt-6">
+        <div className="shrink-0 flex flex-col items-center gap-1 text-center px-12 pt-6">
           <h2 id="recap-title" className="font-display font-bold text-black text-[20px] tracking-[-0.36px] uppercase">
-            {year} Recap
+            {year} Race Recap
           </h2>
           <p className="text-[13px] text-black/60">
             {hasData ? `${slides.length || '…'} story slides from your rides and journal` : 'Nothing logged this year yet'}
@@ -131,7 +136,7 @@ export function RecapSheet({ direction, journalEntries, towns, resupplies, onClo
         </div>
 
         {years.length > 1 && (
-          <div className="px-5 pt-4 flex justify-center gap-2 flex-wrap">
+          <div className="shrink-0 px-5 pt-4 flex justify-center gap-2 flex-wrap">
             {years.map((y) => (
               <button
                 key={y}
@@ -145,7 +150,7 @@ export function RecapSheet({ direction, journalEntries, towns, resupplies, onClo
           </div>
         )}
 
-        <div className="px-5 pt-5">
+        <div className="flex-1 min-h-0 flex flex-col px-5 pt-5">
           {!hasData ? (
             <div className="border-2 border-[#40C8EF] rounded-lg px-6 py-10 text-center">
               <p className="text-[13px] text-black/60">
@@ -153,7 +158,7 @@ export function RecapSheet({ direction, journalEntries, towns, resupplies, onClo
               </p>
             </div>
           ) : (
-            <div className="relative mx-auto w-full max-w-[270px] aspect-[9/16] border-2 border-[#40C8EF] rounded-lg overflow-hidden bg-[#F5FCFF]">
+            <div className="relative mx-auto h-full max-h-[480px] max-w-full aspect-[9/16] min-h-0 border-2 border-[#40C8EF] rounded-lg overflow-hidden bg-[#F5FCFF]">
               {busy && (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <p className={`${btnLabel} text-[#40C8EF]`}>Drawing…</p>
@@ -183,7 +188,7 @@ export function RecapSheet({ direction, journalEntries, towns, resupplies, onClo
           )}
 
           {slides.length > 1 && (
-            <div className="flex justify-center gap-2 pt-3" role="tablist" aria-label="Slides">
+            <div className="shrink-0 flex justify-center gap-2 pt-3" role="tablist" aria-label="Slides">
               {slides.map((s, i) => (
                 <button
                   key={s.id}
@@ -201,7 +206,7 @@ export function RecapSheet({ direction, journalEntries, towns, resupplies, onClo
         </div>
 
         {hasData && (
-          <div className="px-5 pt-4 pb-5 space-y-2">
+          <div className="shrink-0 px-5 pt-4 pb-5 space-y-2">
             {canShareFiles ? (
               <>
                 <button onClick={shareAll} disabled={busy || !slides.length} className={btnFilled}>
@@ -224,6 +229,7 @@ export function RecapSheet({ direction, journalEntries, towns, resupplies, onClo
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

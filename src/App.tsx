@@ -15,7 +15,7 @@ import type { MeasurementSystem } from './utils/measurements';
 import { inRideOrder, loadDirection, saveDirection, type RideDirection } from './utils/direction';
 import { loadCollection, saveCollection, requestPersistentStorage, STORAGE_KEYS } from './utils/storage';
 import { loadSession, saveSession, type ActivePage } from './utils/session';
-import { Plus, Clock } from 'lucide-react';
+import { Plus, Clock, Check } from 'lucide-react';
 import { MapPage } from './components/MapPage';
 import { Wordmark } from './components/Wordmark';
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react';
@@ -92,7 +92,6 @@ export default function App() {
   const [showStopwatch, setShowStopwatch] = useState(false);
 
   // Derived from activePage for backwards compatibility
-  const showRoute = activePage === 'route';
   const showList = activePage === 'towns';
   const showAllNotes = activePage === 'notes';
   const showJournal = activePage === 'journal';
@@ -126,6 +125,22 @@ export default function App() {
   const [direction, setDirection] = useState<RideDirection>(loadDirection);
   useEffect(() => saveDirection(direction), [direction]);
 
+  // Whether the route map may use GPS; on unless the rider turns it off in Settings
+  const [locationEnabled, setLocationEnabled] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('tour-divide-location') !== 'off';
+    } catch {
+      return true;
+    }
+  });
+  useEffect(() => {
+    try {
+      localStorage.setItem('tour-divide-location', locationEnabled ? 'on' : 'off');
+    } catch {
+      // not critical
+    }
+  }, [locationEnabled]);
+
   // Town panels and lists still speak in "notes"; they now show the
   // journal entries tied to each town.
   const notes: Note[] = journalEntries
@@ -151,6 +166,22 @@ export default function App() {
     ));
   };
 
+  // Every panel that's scrolled down goes back to the top
+  const scrollPageToTop = () => {
+    document.querySelectorAll<HTMLElement>('*').forEach((el) => {
+      if (el.scrollTop > 0) el.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+    });
+  };
+
+  // Brief confirmation in the middle of the screen after something is saved
+  const [toast, setToast] = useState<{ id: number; message: string } | null>(null);
+  useEffect(() => {
+    if (!toast) return;
+    const t = window.setTimeout(() => setToast(null), 1400);
+    return () => window.clearTimeout(t);
+  }, [toast]);
+  const showToast = (message: string) => setToast({ id: Date.now(), message });
+
   const handleAddResupply = (townId: string, resupply: Omit<Resupply, 'id' | 'townId' | 'timestamp'>) => {
     const newResupply: Resupply = {
       id: `resupply-${Date.now()}-${Math.random()}`,
@@ -159,6 +190,7 @@ export default function App() {
       timestamp: Date.now(),
     };
     setResupplies(prev => [...prev, newResupply]);
+    showToast('Resupply Saved');
   };
 
   const handleDeleteResupply = (resupplyId: string) => {
@@ -184,6 +216,7 @@ export default function App() {
       townId,
     };
     setJournalEntries(prev => [...prev, newEntry]);
+    showToast('Journal Entry Saved');
   };
 
   const handleDeleteJournalEntry = (entryId: string) => {
@@ -253,6 +286,7 @@ export default function App() {
                 direction={direction}
                 towns={towns}
                 measurementSystem={measurementSystem}
+                locationEnabled={locationEnabled}
                 onOpenTown={(townId) => {
                   setRouteFocusTownId(townId);
                   setActivePage('route');
@@ -322,45 +356,44 @@ export default function App() {
           }}
         >
           <div className="flex gap-2 md:gap-3">
-          <button
-            onClick={() => setActivePage('route')}
-            className={`border-2 px-3 md:px-4 py-2.5 rounded-lg transition-all shadow-lg flex items-center gap-2 ${
-              showRoute
-                ? 'bg-[#40C8EF] text-white border-[#40C8EF]'
-                : 'bg-white text-[#40C8EF] border-[#40C8EF] hover:bg-[#F5FCFF]'
-            }`}
-            aria-label="Itinerary"
-          >
-            <span className="uppercase font-display font-medium tracking-[-0.36px] text-[13px] md:text-sm">
-              Itinerary
-            </span>
-          </button>
-          <button
-            onClick={() => setActivePage('map')}
-            className={`border-2 px-3 md:px-4 py-2.5 rounded-lg transition-all shadow-lg flex items-center gap-2 ${
-              showMap
-                ? 'bg-[#40C8EF] text-white border-[#40C8EF]'
-                : 'bg-white text-[#40C8EF] border-[#40C8EF] hover:bg-[#F5FCFF]'
-            }`}
-            aria-label="Route"
-          >
-            <span className="uppercase font-display font-medium tracking-[-0.36px] text-[13px] md:text-sm">
-              Route
-            </span>
-          </button>
-          <button
-            onClick={() => setActivePage('journal')}
-            className={`border-2 px-3 md:px-4 py-2.5 rounded-lg transition-all shadow-lg flex items-center gap-2 ${
-              showJournal
-                ? 'bg-[#40C8EF] text-white border-[#40C8EF]'
-                : 'bg-white text-[#40C8EF] border-[#40C8EF] hover:bg-[#F5FCFF]'
-            }`}
-            aria-label="Journal"
-          >
-            <span className="uppercase font-display font-medium tracking-[-0.36px] text-[13px] md:text-sm">
-              Journal
-            </span>
-          </button>
+          {/* The blue fill slides to the tapped tab with the same timing as the page,
+              so the button and the page move as one */}
+          {([
+            { page: 'route', label: 'Itinerary' },
+            { page: 'map', label: 'Route' },
+            { page: 'journal', label: 'Journal' },
+          ] as const).map(({ page, label }) => {
+            const active = activePage === page;
+            return (
+              <motion.button
+                key={page}
+                onClick={() => setActivePage(page)}
+                whileTap={reduceMotion ? undefined : { scale: 0.95 }}
+                transition={{ type: 'spring', stiffness: 600, damping: 30 }}
+                className={`relative border-2 border-[#40C8EF] bg-white px-3 md:px-4 py-2.5 rounded-lg shadow-lg flex items-center gap-2 ${
+                  active ? '' : 'hover:bg-[#F5FCFF]'
+                }`}
+                aria-label={label}
+                aria-current={active ? 'page' : undefined}
+              >
+                {active && (
+                  <motion.span
+                    layoutId="nav-active"
+                    aria-hidden="true"
+                    className="absolute -inset-[2px] rounded-lg bg-[#40C8EF]"
+                    transition={{ duration: reduceMotion ? 0 : 0.24, ease: [0.22, 1, 0.36, 1] }}
+                  />
+                )}
+                <span
+                  className={`relative uppercase font-display font-medium tracking-[-0.36px] text-[13px] md:text-sm transition-colors duration-200 ${
+                    active ? 'text-white' : 'text-[#40C8EF]'
+                  }`}
+                >
+                  {label}
+                </span>
+              </motion.button>
+            );
+          })}
           <button
             onClick={() => setShowQuickAdd(!showQuickAdd)}
             className="bg-[#40C8EF] text-white p-3 md:p-3.5 rounded-lg hover:bg-[#00B6EB] transition-all shadow-lg flex items-center justify-center"
@@ -397,12 +430,36 @@ export default function App() {
         </AnimatePresence>
       )}
 
+      {/* Saved confirmation: a short popup in the middle of the screen */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            key={toast.id}
+            initial={reduceMotion ? { opacity: 0 } : { opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
+            className="fixed inset-0 z-[80] flex items-center justify-center pointer-events-none"
+            role="status"
+          >
+            <div className="flex flex-col items-center gap-3 bg-white border-2 border-[#40C8EF] rounded-2xl px-8 py-6 shadow-[0_6px_24px_rgba(35,31,32,0.18)]">
+              <span className="w-12 h-12 rounded-full bg-[#40C8EF] text-white flex items-center justify-center">
+                <Check size={26} strokeWidth={3} />
+              </span>
+              <span className="font-display font-bold uppercase tracking-[-0.36px] text-[16px] text-[#231F20] whitespace-nowrap">{toast.message}</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {showAbout && (
         <AboutPage
           measurementSystem={measurementSystem}
           onChangeMeasurementSystem={setMeasurementSystem}
           direction={direction}
           onChangeDirection={setDirection}
+          locationEnabled={locationEnabled}
+          onChangeLocationEnabled={setLocationEnabled}
           onClose={() => setShowAbout(false)}
         />
       )}
@@ -429,6 +486,18 @@ export default function App() {
           <span />
           <span />
         </div>
+      )}
+
+      {/* Tap the status bar to go back to the top, like other iPhone apps. The
+          pages scroll inside their own panels, so iOS can't do this by itself. */}
+      {!showSplash && (
+        <button
+          type="button"
+          tabIndex={-1}
+          aria-hidden="true"
+          onClick={scrollPageToTop}
+          className="fixed top-0 left-0 right-0 z-[45] h-[var(--sat)] cursor-default"
+        />
       )}
     </div>
   );

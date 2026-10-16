@@ -24,6 +24,8 @@ export interface RecapData {
   entries: JournalEntry[];
   /** Towns written about, in route order (southbound) */
   townsWritten: Town[];
+  /** Every itinerary town, in route order (southbound) */
+  routeTowns: Town[];
   photos: string[];
   words: number;
   resupplies: number;
@@ -88,6 +90,7 @@ export function buildRecap(
     ride,
     entries,
     townsWritten,
+    routeTowns: [...data.towns].sort((a, b) => a.mileage - b.mileage),
     photos,
     words: entries.reduce((sum, e) => sum + wordCount(e.content), 0),
     resupplies: data.resupplies.filter((r) => yearOf(r.timestamp) === year).length,

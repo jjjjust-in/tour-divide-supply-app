@@ -23,10 +23,47 @@ interface AboutPageProps {
   onChangeMeasurementSystem: (system: MeasurementSystem) => void;
   direction: RideDirection;
   onChangeDirection: (direction: RideDirection) => void;
+  locationEnabled: boolean;
+  onChangeLocationEnabled: (enabled: boolean) => void;
   onClose: () => void;
 }
 
-export function AboutPage({ measurementSystem, onChangeMeasurementSystem, direction, onChangeDirection, onClose }: AboutPageProps) {
+export function AboutPage({
+  measurementSystem,
+  onChangeMeasurementSystem,
+  direction,
+  onChangeDirection,
+  locationEnabled,
+  onChangeLocationEnabled,
+  onClose,
+}: AboutPageProps) {
+  const [locationNote, setLocationNote] = useState<string | null>(null);
+
+  // Turning location on asks the phone right away, so the permission prompt
+  // shows up here instead of later on the map. If the phone says no, stay off.
+  const toggleLocation = () => {
+    setLocationNote(null);
+    if (locationEnabled) {
+      onChangeLocationEnabled(false);
+      return;
+    }
+    if (!('geolocation' in navigator)) {
+      setLocationNote('This device can’t share its location.');
+      return;
+    }
+    onChangeLocationEnabled(true);
+    navigator.geolocation.getCurrentPosition(
+      () => {},
+      (err) => {
+        if (err.code === err.PERMISSION_DENIED) {
+          onChangeLocationEnabled(false);
+          setLocationNote('Location is blocked for this app. Allow it in your phone’s Settings, then turn this on again.');
+        }
+      },
+      { enableHighAccuracy: true, timeout: 20000, maximumAge: 60000 },
+    );
+  };
+
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [clearTarget, setClearTarget] = useState<'notes' | 'resupplies' | 'all' | null>(null);
 
@@ -360,6 +397,32 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, direct
                       <div className="text-xs opacity-80">Km & Meters</div>
                     </button>
                   </div>
+                </div>
+
+                {/* Location */}
+                <div>
+                  <button
+                    role="switch"
+                    aria-checked={locationEnabled}
+                    onClick={toggleLocation}
+                    className="w-full flex items-center justify-between gap-4 py-3.5 px-4 bg-white border-2 border-[#40C8EF] rounded-lg text-left hover:bg-[#F5FCFF] transition-colors touch-manipulation"
+                  >
+                    <span className="min-w-0">
+                      <span className="block text-sm uppercase font-display font-medium tracking-[-0.36px] text-[#231f20]">Allow location</span>
+                      <span className="block text-xs text-[#231f20]/60">Show where you are on the route map</span>
+                    </span>
+                    <span
+                      aria-hidden="true"
+                      className={`relative shrink-0 w-12 h-7 rounded-full transition-colors ${locationEnabled ? 'bg-[#40C8EF]' : 'bg-gray-200'}`}
+                    >
+                      <span
+                        className={`absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow motion-safe:transition-transform ${
+                          locationEnabled ? 'translate-x-5' : 'translate-x-0'
+                        }`}
+                      />
+                    </span>
+                  </button>
+                  {locationNote && <p className="text-xs text-[#231f20]/70 mt-2 px-1">{locationNote}</p>}
                 </div>
 
                 {/* Data Management */}

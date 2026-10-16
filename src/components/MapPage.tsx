@@ -11,13 +11,14 @@ interface MapPageProps {
   direction: RideDirection;
   towns: Town[];
   measurementSystem: MeasurementSystem;
+  locationEnabled: boolean;
   onOpenTown: (townId: string) => void;
 }
 
 type RouteView = 'map' | 'elevation';
 
 // The Route page: map or elevation profile, each with the live location dot
-export function MapPage({ direction, towns, measurementSystem, onOpenTown }: MapPageProps) {
+export function MapPage({ direction, towns, measurementSystem, locationEnabled, onOpenTown }: MapPageProps) {
   const [view, setView] = useState<RouteView>(() => {
     try {
       return localStorage.getItem('tour-divide-route-view') === 'elevation' ? 'elevation' : 'map';
@@ -80,7 +81,7 @@ export function MapPage({ direction, towns, measurementSystem, onOpenTown }: Map
       control={viewSwitch}
     >
       <div className="w-full">
-        <RouteMap view={view} direction={direction} towns={towns} measurementSystem={measurementSystem} onOpenTown={onOpenTown} />
+        <RouteMap view={view} direction={direction} towns={towns} measurementSystem={measurementSystem} locationEnabled={locationEnabled} onOpenTown={onOpenTown} />
       </div>
     </PageLayout>
   );
