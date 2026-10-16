@@ -1,5 +1,6 @@
-import { ChevronLeft, Download, Upload, Trash2, RotateCcw, Instagram, Globe, Mail } from 'lucide-react';
+import { ChevronLeft, Download, Upload, Trash2, RotateCcw, Instagram, Mail } from 'lucide-react';
 import { socialLinks } from '../data/social';
+import svgPaths from '../imports/svg-do3t78tvh5';
 import type { RideDirection } from '../utils/direction';
 import { useState } from 'react';
 import type { MeasurementSystem } from '../utils/measurements';
@@ -7,6 +8,15 @@ import navBgPattern from 'figma:asset/53e87b274f9e9eae37a672b63e5feb2e3c44276d.p
 import { sampleResources } from '../data/resources';
 import { get, set } from 'idb-keyval';
 import { STORAGE_KEYS } from '../utils/storage';
+
+// The app's globe logo, sized like the lucide icons in the Connect list
+function TdsLogo({ size = 18, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" aria-hidden="true" className={className}>
+      <path d={svgPaths.pee90000} fill="currentColor" />
+    </svg>
+  );
+}
 
 interface AboutPageProps {
   measurementSystem: MeasurementSystem;
@@ -184,7 +194,7 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, direct
               <div aria-hidden="true" className="absolute border border-[#40c8ef] inset-0 pointer-events-none" />
               <ul className="divide-y divide-[#40C8EF]/30">
                 {socialLinks.map((link) => {
-                  const Icon = link.platform === 'instagram' ? Instagram : link.platform === 'email' ? Mail : Globe;
+                  const Icon = link.platform === 'instagram' ? Instagram : link.platform === 'email' ? Mail : TdsLogo;
                   const content = (
                     <>
                       <Icon size={18} className="text-[#40C8EF] shrink-0" />
