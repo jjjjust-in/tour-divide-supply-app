@@ -4,6 +4,7 @@ import type { MeasurementSystem } from '../utils/measurements';
 import { resizeImageFile } from '../utils/storage';
 import { Image as ImageIcon, X } from 'lucide-react';
 import { PageSelect } from './PageLayout';
+import { motion, useDragControls } from 'motion/react';
 
 interface QuickAddNoteProps {
   towns: Town[];
@@ -26,6 +27,8 @@ export function QuickAddNote({ towns, onClose, onAddResupply, onAddJournalEntry 
   const [imagePreview, setImagePreview] = useState<string | undefined>(undefined);
   const [resupply, setResupply] = useState({ name: '', hours: '', phone: '', address: '' });
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // The handle and header drag the sheet down; past 100px or a quick flick, it closes
+  const dragControls = useDragControls();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -75,18 +78,32 @@ export function QuickAddNote({ towns, onClose, onAddResupply, onAddJournalEntry 
 
   return (
     <div className="fixed inset-0 z-60 flex items-end justify-center bg-black/40" onClick={onClose}>
-      <div
+      <motion.div
         role="dialog"
         aria-modal="true"
         aria-labelledby="add-sheet-title"
         className="relative w-full max-w-lg bg-white rounded-t-2xl shadow-2xl"
         onClick={(e) => e.stopPropagation()}
+        drag="y"
+        dragControls={dragControls}
+        dragListener={false}
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={{ top: 0, bottom: 1 }}
+        onDragEnd={(_, info) => {
+          if (info.offset.y > 100 || info.velocity.y > 500) onClose();
+        }}
       >
+        {/* Drag area: handle plus header */}
+        <div
+          className="touch-none cursor-grab active:cursor-grabbing"
+          onPointerDown={(e) => dragControls.start(e)}
+        >
         <div className="flex justify-center pt-3">
           <div className="w-10 h-1 bg-[#231F20]/20 rounded-full" />
         </div>
         <button
           onClick={onClose}
+          onPointerDown={(e) => e.stopPropagation()}
           aria-label="Close"
           className="absolute right-2 top-3 w-11 h-11 flex items-center justify-center text-black/60 hover:text-black transition-colors touch-manipulation"
         >
@@ -101,6 +118,7 @@ export function QuickAddNote({ towns, onClose, onAddResupply, onAddJournalEntry 
           <p className="text-[13px] text-black/60">
             {activeTab === 'journal' ? 'Write about a town on the route' : 'Add a store, café or service'}
           </p>
+        </div>
         </div>
 
         <div className="px-5 pt-5">
@@ -131,9 +149,10 @@ export function QuickAddNote({ towns, onClose, onAddResupply, onAddJournalEntry 
         </div>
 
         {/* Form */}
-        <div className="px-5 pt-5 pb-2 space-y-4 max-h-[52vh] overflow-y-auto">
-          {activeTab === 'resupply' ? (
-            <>
+        <div className="px-5 pt-5 pb-2 max-h-[52vh] overflow-y-auto">
+          {/* Both forms share one grid cell, so the sheet is always as tall as the taller one */}
+          <div className="grid">
+            <div className={`col-start-1 row-start-1 space-y-4 ${activeTab === 'resupply' ? '' : 'invisible'}`} inert={activeTab !== 'resupply'}>
               <div>
                 <span className={labelClass}>Town</span>
                 <PageSelect id="add-resupply-town" label="Town" value={selectedTownId} onChange={setSelectedTownId}>
@@ -185,9 +204,9 @@ export function QuickAddNote({ towns, onClose, onAddResupply, onAddJournalEntry 
                   className={fieldClass}
                 />
               </div>
-            </>
-          ) : (
-            <>
+            </div>
+
+            <div className={`col-start-1 row-start-1 flex flex-col space-y-4 ${activeTab === 'journal' ? '' : 'invisible'}`} inert={activeTab !== 'journal'}>
               <div>
                 <span className={labelClass}>Town</span>
                 <PageSelect id="add-journal-town" label="Town" value={journalTownId} onChange={setJournalTownId}>
@@ -201,14 +220,14 @@ export function QuickAddNote({ towns, onClose, onAddResupply, onAddJournalEntry 
                   ))}
                 </PageSelect>
               </div>
-              <div>
+              <div className="flex-1 flex flex-col">
                 <label htmlFor="add-journal-text" className={labelClass}>Entry</label>
                 <textarea
                   id="add-journal-text"
                   value={journalContent}
                   onChange={(e) => setJournalContent(e.target.value)}
                   placeholder="What happened today?"
-                  className={`${fieldClass} resize-none leading-relaxed`}
+                  className={`${fieldClass} flex-1 min-h-[128px] resize-none leading-relaxed`}
                   rows={5}
                 />
               </div>
@@ -238,8 +257,8 @@ export function QuickAddNote({ towns, onClose, onAddResupply, onAddJournalEntry 
                 )}
                 <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
               </div>
-            </>
-          )}
+            </div>
+          </div>
         </div>
 
         {/* Buttons, styled like the main nav */}
@@ -260,7 +279,7 @@ export function QuickAddNote({ towns, onClose, onAddResupply, onAddJournalEntry 
             </span>
           </button>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
