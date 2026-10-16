@@ -1,4 +1,4 @@
-import { ChevronLeft, Download, Upload, Trash2, RotateCcw, Instagram, Globe, Mail, ExternalLink } from 'lucide-react';
+import { ChevronLeft, Download, Upload, Trash2, RotateCcw, Instagram, Globe, Mail } from 'lucide-react';
 import { socialLinks } from '../data/social';
 import type { RideDirection } from '../utils/direction';
 import { useState } from 'react';
@@ -194,7 +194,6 @@ export function AboutPage({ measurementSystem, onChangeMeasurementSystem, direct
                       <span className={`flex-1 min-w-0 truncate text-[13px] ${link.url ? 'text-[#231f20]' : 'text-[#231f20]/40 italic'}`}>
                         {link.url ? (link.handle || link.url) : 'Link coming soon'}
                       </span>
-                      {link.url && link.platform !== 'email' && <ExternalLink size={14} className="text-[#40C8EF] shrink-0" />}
                     </>
                   );
                   return (
