@@ -23,9 +23,11 @@ import navBgPattern from 'figma:asset/53e87b274f9e9eae37a672b63e5feb2e3c44276d.p
 import svgPaths from './imports/svg-do3t78tvh5';
 
 export default function App() {
-  // Returning riders pick up where they left off; the splash only shows on a first launch
+  // The splash shows every time the app opens; behind it, riders pick up where they left off
   const [savedSession] = useState(loadSession);
-  const [showSplash, setShowSplash] = useState(savedSession === null);
+  const [showSplash, setShowSplash] = useState(true);
+  // Units are asked for on the splash once, on the first open; after that, in Settings
+  const [askUnits] = useState(() => localStorage.getItem('tour-divide-measurement-system') === null);
   const [measurementSystem, setMeasurementSystem] = useState<MeasurementSystem>(() => {
     const saved = localStorage.getItem('tour-divide-measurement-system');
     if (saved) {
@@ -117,9 +119,12 @@ export default function App() {
     if (dataLoaded) saveCollection(STORAGE_KEYS.journal, journalEntries);
   }, [journalEntries, dataLoaded]);
 
+  // Saved once chosen: on a first open, not until the rider picks on the splash,
+  // so closing the app there means they're asked again next time
   useEffect(() => {
+    if (askUnits && showSplash) return;
     localStorage.setItem('tour-divide-measurement-system', measurementSystem);
-  }, [measurementSystem]);
+  }, [measurementSystem, askUnits, showSplash]);
 
   // Southbound (Banff first) or northbound (Antelope Wells first)
   const [direction, setDirection] = useState<RideDirection>(loadDirection);
@@ -242,7 +247,15 @@ export default function App() {
   return (
     <div className="relative w-full h-screen overflow-hidden bg-white">
       <AnimatePresence>
-        {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
+        {showSplash && (
+          <SplashScreen
+            askUnits={askUnits}
+            onComplete={(system) => {
+              if (system) setMeasurementSystem(system);
+              setShowSplash(false);
+            }}
+          />
+        )}
       </AnimatePresence>
 
       {/* Main pages: a short slide and fade when switching */}

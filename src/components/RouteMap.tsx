@@ -145,6 +145,8 @@ interface RouteMapProps {
   onOpenTown: (townId: string) => void;
 }
 
+// How long a square the finger slid off takes to fade
+const TRAIL_MS = 700;
 const toUnits = (miles: number, system: MeasurementSystem) => (system === 'metric' ? miles * 1.60934 : miles);
 const unit = (system: MeasurementSystem) => (system === 'metric' ? 'km' : 'mi');
 const formatDistance = (miles: number, system: MeasurementSystem) =>
@@ -311,6 +313,7 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
   // A fresh view starts with nothing selected
   useEffect(() => {
     setSelection(null);
+    setTrail([]);
   }, [view]);
 
   // Squares are touched, not hovered: a tap picks one, and touching and holding
@@ -318,24 +321,45 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
   // A quick swipe still scrolls the page (or slides the elevation strip).
   // With a mouse, click picks and click-and-drag slides.
   const scrub = useRef({ active: false, timer: 0, x: 0, y: 0, justEnded: false });
+  // Squares and states the finger has slid off fade out behind it
+  const [trail, setTrail] = useState<{ id: number; sel: NonNullable<MapSelection> }[]>([]);
+  const trailId = useRef(0);
+  const leaveTrail = (sel: MapSelection) => {
+    if (!sel) return;
+    const id = ++trailId.current;
+    setTrail((t) => [...t.slice(-60), { id, sel }]);
+    window.setTimeout(() => setTrail((t) => t.filter((x) => x.id !== id)), TRAIL_MS);
+  };
+  // What's lit right now, ahead of React re-rendering, so a fast slide never doubles up
+  const selectionRef = useRef<MapSelection>(selection);
+  selectionRef.current = selection;
+  const sameSelection = (a: MapSelection, b: MapSelection) =>
+    (a?.kind === 'cell' && b?.kind === 'cell' && a.col === b.col && a.row === b.row) ||
+    (a?.kind === 'state' && b?.kind === 'state' && a.abbr === b.abbr) ||
+    (!a && !b);
   const selectAt = (clientX: number, clientY: number) => {
     const p = toMapPoint(clientX, clientY);
     const hit = p ? hitFor(p) : null;
-    setSelection((prev) => {
-      const next = hit?.kind === 'cell' || hit?.kind === 'state' ? hit : null;
-      // Same square or state: keep the same object so nothing re-renders mid-slide
-      if (next?.kind === 'cell' && prev?.kind === 'cell' && prev.col === next.col && prev.row === next.row) return prev;
-      if (next?.kind === 'state' && prev?.kind === 'state' && prev.abbr === next.abbr) return prev;
-      return next;
-    });
+    const next = hit?.kind === 'cell' || hit?.kind === 'state' ? hit : null;
+    const prev = selectionRef.current;
+    if (sameSelection(prev, next)) return;
+    leaveTrail(prev);
+    selectionRef.current = next;
+    setSelection(next);
   };
   const selectAtRef = useRef(selectAt);
   selectAtRef.current = selectAt;
   const endScrub = () => {
     const sc = scrub.current;
     window.clearTimeout(sc.timer);
-    // The tap that ends a slide shouldn't also toggle the square off
-    if (sc.active) sc.justEnded = true;
+    if (sc.active) {
+      // The tap that ends a slide shouldn't also toggle the square off
+      sc.justEnded = true;
+      // Lifting the finger lets the last square fade with the rest
+      leaveTrail(selectionRef.current);
+      selectionRef.current = null;
+      setSelection(null);
+    }
     sc.active = false;
   };
 
@@ -423,46 +447,26 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
     x: GRID.x0 + shownCell.col * GRID.cellW,
     y: GRID.y0 + shownCell.row * GRID.cellH,
   };
+  const trailFade = { animation: `map-trail ${TRAIL_MS}ms ease-out forwards` };
+  const trailFadeState = { animation: `map-trail-state ${TRAIL_MS}ms ease-out forwards` };
+  const trailCells = trail.map(({ id, sel }) =>
+    sel.kind === 'cell' ? (
+      <rect
+        key={id}
+        x={GRID.x0 + sel.col * GRID.cellW}
+        y={GRID.y0 + sel.row * GRID.cellH}
+        width={GRID.cellW}
+        height={GRID.cellH}
+        fill="#40C8EF"
+        pointerEvents="none"
+        style={trailFade}
+      />
+    ) : null,
+  );
 
-  // Label pinned above the selected square, in % of the map box
   const { route } = MAP_LAYOUT;
   // Both views share one frame so the grid stays put; artwork may break past it
   const viewBox = MAP_LAYOUT.viewBox;
-  const label = (() => {
-    const pct = (x: number, y: number) => ({
-      left: Math.min(98, Math.max(2, ((x - viewBox.x) / viewBox.width) * 100)),
-      top: ((y - viewBox.y) / viewBox.height) * 100,
-    });
-    if (cellRect && shownCell && view === 'elevation') {
-      // Rows are equal bands of 1500' to 12,000' counted up from the bottom; columns are equal slices of the route
-      const feetPerRow = (ELEVATION_LAYOUT.maxFeet - ELEVATION_LAYOUT.minFeet) / ELEV_ROWS;
-      const lowFt = ELEVATION_LAYOUT.minFeet + (ELEV_ROWS - 1 - shownCell.row) * feetPerRow;
-      const band =
-        measurementSystem === 'metric'
-          ? `${formatNumber((Math.round((lowFt * 0.3048) / 10) * 10))}–${formatNumber((Math.round(((lowFt + feetPerRow) * 0.3048) / 10) * 10))} m`
-          : `${formatNumber((Math.round(lowFt / 50) * 50))}–${formatNumber((Math.round((lowFt + feetPerRow) / 50) * 50))}'`;
-      const milesPerCol = ROUTE_TOTAL_MILES / ELEV_COLS;
-      const sStart = Math.round(shownCell.col * milesPerCol);
-      const sEnd = Math.min(ROUTE_TOTAL_MILES, Math.round((shownCell.col + 1) * milesPerCol));
-      const [rStart, rEnd] = direction === 'nobo' ? [rideMile(sEnd, direction), rideMile(sStart, direction)] : [sStart, sEnd];
-      const from = formatNumber(Math.round(toUnits(rStart, measurementSystem)));
-      const to = formatNumber(Math.round(toUnits(rEnd, measurementSystem)));
-      // The strip ends just above the grid, so labels for the top rows hang below the square
-      const below = shownCell.row < 3;
-      return {
-        left: ((cellRect.x + GRID.cellW / 2 - ELEV_VIEWBOX.x) / ELEV_VIEWBOX.width) * 100,
-        top: (((below ? cellRect.y + GRID.cellH : cellRect.y) - ELEV_VIEWBOX.y) / ELEV_VIEWBOX.height) * 100,
-        below,
-        text: band,
-        detail: `${measurementSystem === 'metric' ? 'Km' : 'Miles'} ${from}–${to}`,
-      };
-    }
-    if (cellRect) {
-      const side = Math.round(toUnits(100, measurementSystem));
-      return { ...pct(cellRect.x + GRID.cellW / 2, cellRect.y), text: `${side} × ${side} ${unit(measurementSystem)}` };
-    }
-    return null;
-  })();
 
   const dot = position ? (position.onRoute ? position.snapped : position.actual) : null;
   const isElevation = view === 'elevation';
@@ -535,6 +539,7 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
                   </defs>
                   <path d={ELEV_GRID_PATHS[0]} stroke="#40C8EF" />
                   <path d={ELEV_GRID_PATHS[1]} stroke="#40C8EF" />
+                  {trailCells}
                   {cellRect && (
                     <rect x={cellRect.x} y={cellRect.y} width={GRID.cellW} height={GRID.cellH} fill="#40C8EF" opacity={0.45} pointerEvents="none" />
                   )}
@@ -579,23 +584,6 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
                     );
                   })()}
                 </svg>
-
-              {/* Label for the selected square */}
-              {label && (
-                <div
-                  className={`absolute pointer-events-none ${'below' in label && label.below ? 'translate-y-[6px]' : '-translate-y-[calc(100%+6px)]'} whitespace-nowrap ${
-                    // keep the label on screen: anchor it inward near the edges
-                    label.left > 65 ? '-translate-x-[calc(100%-10px)]' : label.left < 35 ? '-translate-x-[10px]' : '-translate-x-1/2'
-                  } bg-[#231F20] text-white text-center text-[11px] font-display font-medium uppercase tracking-[0.02em] px-2.5 py-1.5 rounded`}
-                  style={{ left: `${label.left}%`, top: `${label.top}%` }}
-                  role="status"
-                >
-                  <span className="block">{label.text}</span>
-                  {'detail' in label && label.detail && (
-                    <span className="block font-normal normal-case tracking-normal text-white/80 mt-0.5">{label.detail}</span>
-                  )}
-                </div>
-              )}
               </div>
               {!elevationFits && <div aria-hidden="true" className="shrink-0" style={{ flexBasis: ELEV_RIGHT_SPACER }} />}
             </div>
@@ -629,6 +617,9 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
         >
           <g fill="none" transform={`translate(${MAP_LAYOUT.grid.x} ${MAP_LAYOUT.grid.y})`} dangerouslySetInnerHTML={{ __html: LAYERS.grid }} />
 
+          {/* Squares just slid across, fading */}
+          {trailCells}
+
           {/* Highlighted 100-mile square */}
           {cellRect && (
             <rect x={cellRect.x} y={cellRect.y} width={GRID.cellW} height={GRID.cellH} fill="#40C8EF" opacity={0.45} pointerEvents="none" />
@@ -645,6 +636,18 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
           </defs>
 
           <g fill="none" transform={`translate(${MAP_LAYOUT.statesOutline.x} ${MAP_LAYOUT.statesOutline.y})`} dangerouslySetInnerHTML={{ __html: LAYERS.outline }} />
+
+          {/* States just slid across, fading */}
+          {trail.map(({ id, sel }) => {
+            if (sel.kind !== 'state' || (selection?.kind === 'state' && selection.abbr === sel.abbr)) return null;
+            const state = MAP_STATES.find((st) => st.abbr === sel.abbr);
+            if (!state) return null;
+            return (
+              <g key={id} transform={`translate(${MAP_LAYOUT.stateLines.x} ${MAP_LAYOUT.stateLines.y})`} pointerEvents="none" style={trailFadeState}>
+                <polygon points={state.polygon.map((pt) => pt.join(',')).join(' ')} fill="url(#map-dots)" clipPath="url(#states-clip)" />
+              </g>
+            );
+          })}
 
           {/* The tapped state fills with the app's dot pattern */}
           {selection?.kind === 'state' && (() => {
@@ -721,23 +724,6 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
             )}
           </g>
         </svg>
-
-        {/* Label for the selected square */}
-        {label && (
-          <div
-            className={`absolute pointer-events-none ${'below' in label && label.below ? 'translate-y-[6px]' : '-translate-y-[calc(100%+6px)]'} whitespace-nowrap ${
-              // keep the label on screen: anchor it inward near the edges
-              label.left > 65 ? '-translate-x-[calc(100%-10px)]' : label.left < 35 ? '-translate-x-[10px]' : '-translate-x-1/2'
-            } bg-[#231F20] text-white text-center text-[11px] font-display font-medium uppercase tracking-[0.02em] px-2.5 py-1.5 rounded`}
-            style={{ left: `${label.left}%`, top: `${label.top}%` }}
-            role="status"
-          >
-            <span className="block">{label.text}</span>
-            {'detail' in label && label.detail && (
-              <span className="block font-normal normal-case tracking-normal text-white/80 mt-0.5">{label.detail}</span>
-            )}
-          </div>
-        )}
       </div>
         {!DEMO_LOCATION && locationEnabled && (
           <button

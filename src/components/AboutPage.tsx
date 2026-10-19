@@ -171,18 +171,20 @@ export function AboutPage({
           backgroundPosition: 'center'
         }}
       >
-        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center gap-4 border-b-2 border-[#40C8EF]">
+        <div className="max-w-5xl mx-auto px-[20px] py-4 flex items-center gap-4 border-b-2 border-[#40C8EF]">
           <button
             onClick={onClose}
-            className="-ml-2 text-[#40C8EF] hover:text-[#00B6EB] transition-colors flex items-center justify-center touch-manipulation min-w-[44px] min-h-[44px] shrink-0"
+            className="size-[44px] shrink-0 flex items-center justify-center bg-white border-2 border-[#40C8EF] rounded-full text-[#40C8EF] hover:bg-[#F5FCFF] transition-colors touch-manipulation"
             aria-label="Go back"
           >
-            <ChevronLeft size={26} />
+            <ChevronLeft size={22} strokeWidth={2.5} />
           </button>
           {/* Same size as the Itinerary, Route and Journal titles: bold, 20px */}
-          <h1 className="text-[#40C8EF] uppercase font-display font-bold tracking-[-0.36px] text-[20px] flex-1">
+          <h1 className="text-[#40C8EF] uppercase font-display font-bold tracking-[-0.36px] text-[20px] flex-1 text-center">
             Settings & About
           </h1>
+          {/* Mirrors the back button so the title sits at the true center */}
+          <span aria-hidden="true" className="size-[44px] shrink-0" />
         </div>
       </div>
 
@@ -202,18 +204,21 @@ export function AboutPage({
 
           {/* About Section */}
           <div className="w-full">
-            <div className="space-y-5 text-[#1a1a1a] pr-6">
-              <p className="font-display font-bold text-[20px] leading-[1.3] tracking-[-0.02em]">
+            {/* Type set smaller than the page's, each block in a column narrowed by the
+                same ratio (17/20 and 14/17), so lines break at the same words and the
+                page's blue shows to the right */}
+            <div className="space-y-[16px] text-[#1a1a1a] pr-6">
+              <p className="w-[85%] font-display font-bold text-[17px] leading-[1.3] tracking-[-0.02em]">
                 <span className="uppercase tracking-[0.02em]">Tour Divide Supply</span> is built by{' '}
                 <span className="text-[#40C8EF]">JJJJustin</span>,
                 a bikepacker and product designer with over 5000 miles on the Tour Divide route.
               </p>
-              <p className="text-[17px] leading-relaxed">
+              <p className="w-[82.5%] text-[14px] leading-relaxed">
                 After planning and riding the 2745 miles from Canada to Mexico, Justin built this app to help
                 future riders organize their notes and track resupply points. It isn&apos;t a replacement for
                 RideWithGPS or your Garmin. It&apos;s a starting place to fill with your own notes and memories.
               </p>
-              <p className="text-[17px] leading-relaxed">
+              <p className="w-[82.5%] text-[14px] leading-relaxed">
                 The app features interactive maps, elevation profiles, and a collaborative notes system where riders can
                 document their experiences at each town along the route. All data is stored locally in your browser for
                 offline access during your ride.

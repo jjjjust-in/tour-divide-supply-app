@@ -58,17 +58,19 @@ export function RidePage({ initialYear, direction, journalEntries, towns, resupp
     <div role="dialog" aria-modal="true" aria-labelledby="ride-title" className="fixed inset-0 z-[60] bg-[#E6F7FD] flex flex-col">
       {/* Header, as on Settings & About */}
       <div className="shrink-0 z-20 shadow-sm pt-[var(--sat)]" style={pattern}>
-        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center gap-4 border-b-2 border-[#40C8EF]">
+        <div className="max-w-5xl mx-auto px-[20px] py-4 flex items-center gap-4 border-b-2 border-[#40C8EF]">
           <button
             onClick={onClose}
             aria-label="Go back"
-            className="-ml-2 text-[#40C8EF] hover:text-[#00B6EB] transition-colors flex items-center justify-center touch-manipulation min-w-[44px] min-h-[44px] shrink-0"
+            className="size-[44px] shrink-0 flex items-center justify-center bg-white border-2 border-[#40C8EF] rounded-full text-[#40C8EF] hover:bg-[#F5FCFF] transition-colors touch-manipulation"
           >
-            <ChevronLeft size={26} />
+            <ChevronLeft size={22} strokeWidth={2.5} />
           </button>
-          <h1 id="ride-title" className="text-[#40C8EF] uppercase font-display font-bold tracking-[-0.36px] text-[20px] flex-1 truncate">
+          <h1 id="ride-title" className="text-[#40C8EF] uppercase font-display font-bold tracking-[-0.36px] text-[20px] flex-1 truncate text-center">
             Your {year} Ride
           </h1>
+          {/* Mirrors the back button so the title sits at the true center */}
+          <span aria-hidden="true" className="size-[44px] shrink-0" />
         </div>
       </div>
 
