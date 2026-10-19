@@ -47,11 +47,31 @@ function Dialog({ title, text, children }: { title: string; text?: string; child
 );
 }
 
+// The clock as it was left, read straight into state when the timer opens
+// (reading it in an effect let the first save overwrite it before it was read)
+function readSavedClock(): { startTime: number | null; elapsedTime: number; isRunning: boolean; mode: 'countdown' | 'stopwatch' } {
+  try {
+    const saved = JSON.parse(localStorage.getItem('stopwatch') ?? 'null');
+    if (!saved) throw new Error('none');
+    const running = !!saved.isRunning && typeof saved.startTime === 'number';
+    return {
+      startTime: running ? saved.startTime : null,
+      // A running clock picks up the time that passed while the timer was closed
+      elapsedTime: running ? Date.now() - saved.startTime : Number(saved.elapsedTime) || 0,
+      isRunning: running,
+      mode: saved.mode === 'stopwatch' ? 'stopwatch' : 'countdown',
+    };
+  } catch {
+    return { startTime: null, elapsedTime: 0, isRunning: false, mode: 'countdown' };
+  }
+}
+
 export function Stopwatch({ onClose }: StopwatchProps) {
-  const [mode, setMode] = useState<'countdown' | 'stopwatch'>('countdown');
-  const [startTime, setStartTime] = useState<number | null>(null);
-  const [elapsedTime, setElapsedTime] = useState(0);
-  const [isRunning, setIsRunning] = useState(false);
+  const [initial] = useState(readSavedClock);
+  const [mode, setMode] = useState<'countdown' | 'stopwatch'>(initial.mode);
+  const [startTime, setStartTime] = useState<number | null>(initial.startTime);
+  const [elapsedTime, setElapsedTime] = useState(initial.elapsedTime);
+  const [isRunning, setIsRunning] = useState(initial.isRunning);
   const [currentTime, setCurrentTime] = useState(Date.now());
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [saveTitle, setSaveTitle] = useState('');
@@ -64,7 +84,19 @@ export function Stopwatch({ onClose }: StopwatchProps) {
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [showScratchDialog, setShowScratchDialog] = useState(false);
   const [scratchTitle, setScratchTitle] = useState('');
-  const [currentLaps, setCurrentLaps] = useState<Lap[]>([]);
+  // States recorded on the ride in progress. Saved with the running clock so
+  // closing the timer window doesn't lose them.
+  const [currentLaps, setCurrentLaps] = useState<Lap[]>(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('stopwatch-laps') ?? '[]');
+      return Array.isArray(saved) ? saved : [];
+    } catch {
+      return [];
+    }
+  });
+  useEffect(() => {
+    localStorage.setItem('stopwatch-laps', JSON.stringify(currentLaps));
+  }, [currentLaps]);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [confirmationMessage, setConfirmationMessage] = useState('');
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -76,21 +108,6 @@ export function Stopwatch({ onClose }: StopwatchProps) {
   if (now.getTime() > targetDate.getTime()) {
     targetDate = getSecondFridayInJune(currentYear + 1);
   }
-
-  useEffect(() => {
-    const saved = localStorage.getItem('stopwatch');
-    if (saved) {
-      const { startTime: savedStart, elapsedTime: savedElapsed, isRunning: savedRunning, mode: savedMode } = JSON.parse(saved);
-      if (savedMode) setMode(savedMode);
-      if (savedRunning && savedStart) {
-        setStartTime(savedStart);
-        setIsRunning(true);
-        setElapsedTime(savedElapsed + (Date.now() - savedStart));
-      } else {
-        setElapsedTime(savedElapsed);
-      }
-    }
-  }, []);
 
   useEffect(() => {
     localStorage.setItem('stopwatch', JSON.stringify({ startTime, elapsedTime, isRunning, mode }));

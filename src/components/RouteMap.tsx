@@ -28,6 +28,8 @@ const innerSvg = (svg: string) => svg.replace(/^[\s\S]*?<svg[^>]*>/, '').replace
 const LAYERS = {
   grid: innerSvg(gridSvg),
   outline: innerSvg(outlineSvg),
+  // The outline's stroke alone, redrawn over a state's dot fill so its border stays crisp
+  outlineStroke: innerSvg(outlineSvg).replace('fill="white"', 'fill="none"'),
   stateLines: innerSvg(stateLinesSvg),
   route: innerSvg(routeSvg),
   // Profile shape filled with the app's dot pattern instead of flat white
@@ -66,6 +68,48 @@ const GRID_CENTER_X = 149.8;
 const GRID_OUTER_LEFT = 0;
 const GRID_OUTER_RIGHT = 299;
 const GRID_OUTER_STROKE = 1.5;
+
+// The elevation profile lies on its side: miles run left to right and higher
+// ground is higher up. It's drawn on the map's own squares (same size, same
+// shape), 27 rows tall like the map so the window is the map's height:
+// 27 columns of about 100 route miles, 27 rows of about 390 ft (1500' to 12,000').
+const ELEV_COLS = 27;
+const ELEV_ROWS = 27;
+const ELEV_GRID_BOTTOM = GRID.y0 + ELEV_ROWS * GRID.cellH;
+// The grid's outside width, in map units
+const ELEV_GRID_LONG = GRID.x0 * 2 + ELEV_COLS * GRID.cellW;
+const ELEV_VIEWBOX = { x: -8, y: MAP_LAYOUT.viewBox.y, width: ELEV_GRID_LONG + 16, height: MAP_LAYOUT.viewBox.height };
+// The profile data is portrait (x: elevation across 16 columns, y: miles down 27
+// rows). These stretch it onto the landscape grid and back.
+const ELEV_KX = (ELEV_COLS * GRID.cellW) / (ELEVATION_LAYOUT.bottom - ELEVATION_LAYOUT.top);
+const ELEV_KY = (ELEV_ROWS * GRID.cellH) / (ELEVATION_LAYOUT.gridRight - ELEVATION_LAYOUT.gridLeft);
+const toElevationGrid = ([px, py]: [number, number]): [number, number] => [
+  GRID.x0 + (py - ELEVATION_LAYOUT.top) * ELEV_KX,
+  ELEV_GRID_BOTTOM - (px - ELEVATION_LAYOUT.gridLeft) * ELEV_KY,
+];
+const fromElevationGrid = ([lx, ly]: [number, number]): [number, number] => [
+  ELEVATION_LAYOUT.gridLeft + (ELEV_GRID_BOTTOM - ly) / ELEV_KY,
+  ELEVATION_LAYOUT.top + (lx - GRID.x0) / ELEV_KX,
+];
+// The same mapping as an SVG transform, for the artwork
+const ELEV_ART = `matrix(0 ${-ELEV_KY} ${ELEV_KX} 0 ${GRID.x0 - ELEVATION_LAYOUT.top * ELEV_KX} ${ELEV_GRID_BOTTOM + ELEVATION_LAYOUT.gridLeft * ELEV_KY})`;
+// Undoes that stretch (and the artwork's own narrowing) so the dot fill keeps its true shape
+const ELEV_DOTS_UNSTRETCH = `matrix(0 ${1 / ELEV_KX} ${-1 / (ELEV_KY * ELEVATION_SCALE_X)} 0 0 0)`;
+// The map's grid drawing, repeated: every square stroked twice, outer and
+// inset by half a unit, exactly as grid.svg draws it
+const ELEV_GRID_PATHS = (() => {
+  let outer = '';
+  let inner = '';
+  for (let c = 0; c < ELEV_COLS; c++) {
+    for (let r = 0; r < ELEV_ROWS; r++) {
+      const x = GRID.x0 + c * GRID.cellW;
+      const y = GRID.y0 + r * GRID.cellH;
+      outer += `M${x} ${y}h${GRID.cellW}v${GRID.cellH}h${-GRID.cellW}Z`;
+      inner += `M${x + 0.5} ${y + 0.5}H${x + GRID.cellW - 0.5}V${y + GRID.cellH - 0.5}H${x + 0.5}Z`;
+    }
+  }
+  return [outer, inner];
+})();
 const SCREEN_GUTTER_PX = 32;
 const MAX_MAP_SCALE = ITINERARY_LIST_PX / GRID_UNITS_TALL;
 
@@ -86,6 +130,7 @@ function useMapScale() {
 type MapSelection =
   | { kind: 'cell'; col: number; row: number }
   | { kind: 'poi'; poi: RoutePoi }
+  | { kind: 'state'; abbr: string }
   | null;
 
 interface RouteMapProps {
@@ -148,9 +193,22 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
   const GRID_PX_WIDTH = (GRID_OUTER_RIGHT - GRID_OUTER_LEFT) * mapScale;
   const GRID_PX_LEFT_OF_CENTER = (GRID_CENTER_X - GRID_OUTER_LEFT) * mapScale;
   const GRID_STROKE_PX = GRID_OUTER_STROKE * mapScale;
+  // The profile is wider than a phone, so it scrolls sideways. Spacers line the
+  // grid's ends up with the waypoint card's edges at either end of the scroll.
+  const ELEV_PX_WIDTH = ELEV_VIEWBOX.width * mapScale;
+  const ELEV_LEFT_SPACER = `max(0px, calc(50% - ${GRID_PX_LEFT_OF_CENTER + (0 - ELEV_VIEWBOX.x) * mapScale}px))`;
+  const ELEV_RIGHT_SPACER = `max(0px, calc(50% - ${(GRID_OUTER_RIGHT - GRID_CENTER_X + ELEV_VIEWBOX.x + ELEV_VIEWBOX.width - ELEV_GRID_LONG) * mapScale}px))`;
+  // On a wide screen the whole profile fits: center it instead of scrolling
+  const [viewportWidth, setViewportWidth] = useState(() => (typeof window === 'undefined' ? 0 : window.innerWidth));
+  useEffect(() => {
+    const onResize = () => setViewportWidth(window.innerWidth);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+  const elevationFits = viewportWidth >= ELEV_PX_WIDTH + SCREEN_GUTTER_PX * 2;
+  const elevationScrollerRef = useRef<HTMLDivElement>(null);
   const [demoMile, setDemoMile] = useState(1215);
   const [selection, setSelection] = useState<MapSelection>(null);
-  const [hoverCell, setHoverCell] = useState<{ col: number; row: number } | null>(null);
   const [waypointIndex, setWaypointIndex] = useState<number | null>(null);
   const [passIndex, setPassIndex] = useState<number | null>(null);
 
@@ -195,6 +253,27 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
   const pass = passes[activePassIndex];
   const followingPass = passes[activePassIndex + 1];
 
+  // Keep the pass in the card centered in the sideways strip: jump there when the
+  // profile opens, then glide as the rider steps from pass to pass
+  const elevationScrolled = useRef(false);
+  useEffect(() => {
+    if (view !== 'elevation') {
+      elevationScrolled.current = false;
+      return;
+    }
+    const scroller = elevationScrollerRef.current;
+    const dot = scroller?.querySelector('[data-active-pass]');
+    if (!scroller || !dot) return;
+    const box = scroller.getBoundingClientRect();
+    const at = dot.getBoundingClientRect();
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    scroller.scrollBy({
+      left: at.left + at.width / 2 - (box.left + box.width / 2),
+      behavior: elevationScrolled.current && !reduce ? 'smooth' : 'auto',
+    });
+    elevationScrolled.current = true;
+  }, [view, activePassIndex, mapScale]);
+
   // Map coordinates of a pointer event
   const toMapPoint = (clientX: number, clientY: number): [number, number] | null => {
     const svg = svgRef.current;
@@ -204,10 +283,13 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
     return [pt.x, pt.y];
   };
 
-  // What's under a map point: a grid square outside the states (states aren't tappable)
+  // What's under a map point: a state, or a grid square outside the states
   const hitTest = (p: [number, number]): MapSelection => {
     const sl: [number, number] = [p[0] - MAP_LAYOUT.stateLines.x, p[1] - MAP_LAYOUT.stateLines.y];
-    if (pointInPolygon(sl, STATES_OUTLINE)) return null;
+    if (pointInPolygon(sl, STATES_OUTLINE)) {
+      const state = MAP_STATES.find((st) => pointInPolygon(sl, st.polygon));
+      return state ? { kind: 'state', abbr: state.abbr } : null;
+    }
     const col = Math.floor((p[0] - GRID.x0) / GRID.cellW);
     const row = Math.floor((p[1] - GRID.y0) / GRID.cellH);
     if (col >= 0 && col < GRID.cols && row >= 0 && row < GRID.rows) return { kind: 'cell', col, row };
@@ -216,11 +298,12 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
 
   // Elevation view: squares carry an elevation band and mile range; the profile shape itself isn't tappable
   const hitTestElevation = (p: [number, number]): MapSelection => {
-    const artX = ELEVATION_LAYOUT.artLeft + (p[0] - ELEVATION_LAYOUT.artLeft) / ELEVATION_SCALE_X;
-    if (pointInPolygon([artX, p[1]], ELEVATION_POLYGON)) return null;
+    const [px, py] = fromElevationGrid(p);
+    const artX = ELEVATION_LAYOUT.artLeft + (px - ELEVATION_LAYOUT.artLeft) / ELEVATION_SCALE_X;
+    if (pointInPolygon([artX, py], ELEVATION_POLYGON)) return null;
     const col = Math.floor((p[0] - GRID.x0) / GRID.cellW);
     const row = Math.floor((p[1] - GRID.y0) / GRID.cellH);
-    if (col >= 0 && col < GRID.cols && row >= 0 && row < GRID.rows) return { kind: 'cell', col, row };
+    if (col >= 0 && col < ELEV_COLS && row >= 0 && row < ELEV_ROWS) return { kind: 'cell', col, row };
     return null;
   };
   const hitFor = (p: [number, number]) => (view === 'elevation' ? hitTestElevation(p) : hitTest(p));
@@ -228,25 +311,114 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
   // A fresh view starts with nothing selected
   useEffect(() => {
     setSelection(null);
-    setHoverCell(null);
   }, [view]);
 
+  // Squares are touched, not hovered: a tap picks one, and touching and holding
+  // then sliding drags the highlight from square to square under the finger.
+  // A quick swipe still scrolls the page (or slides the elevation strip).
+  // With a mouse, click picks and click-and-drag slides.
+  const scrub = useRef({ active: false, timer: 0, x: 0, y: 0, justEnded: false });
+  const selectAt = (clientX: number, clientY: number) => {
+    const p = toMapPoint(clientX, clientY);
+    const hit = p ? hitFor(p) : null;
+    setSelection((prev) => {
+      const next = hit?.kind === 'cell' || hit?.kind === 'state' ? hit : null;
+      // Same square or state: keep the same object so nothing re-renders mid-slide
+      if (next?.kind === 'cell' && prev?.kind === 'cell' && prev.col === next.col && prev.row === next.row) return prev;
+      if (next?.kind === 'state' && prev?.kind === 'state' && prev.abbr === next.abbr) return prev;
+      return next;
+    });
+  };
+  const selectAtRef = useRef(selectAt);
+  selectAtRef.current = selectAt;
+  const endScrub = () => {
+    const sc = scrub.current;
+    window.clearTimeout(sc.timer);
+    // The tap that ends a slide shouldn't also toggle the square off
+    if (sc.active) sc.justEnded = true;
+    sc.active = false;
+  };
+
+  // Touch: listeners on the svg itself, non-passive so a slide can hold the page still
+  useEffect(() => {
+    const svg = svgRef.current;
+    if (!svg) return;
+    const HOLD_MS = 180;
+    const MOVE_PX = 8;
+    const onStart = (e: TouchEvent) => {
+      if (e.touches.length !== 1) return endScrub();
+      const t = e.touches[0];
+      const sc = scrub.current;
+      sc.x = t.clientX;
+      sc.y = t.clientY;
+      sc.active = false;
+      window.clearTimeout(sc.timer);
+      sc.timer = window.setTimeout(() => {
+        sc.active = true;
+        selectAtRef.current(sc.x, sc.y);
+      }, HOLD_MS);
+    };
+    const onMove = (e: TouchEvent) => {
+      const sc = scrub.current;
+      const t = e.touches[0];
+      if (!t) return;
+      if (sc.active) {
+        e.preventDefault();
+        selectAtRef.current(t.clientX, t.clientY);
+        return;
+      }
+      // Moved before the hold: it's a swipe, let the page scroll
+      if (Math.hypot(t.clientX - sc.x, t.clientY - sc.y) > MOVE_PX) window.clearTimeout(sc.timer);
+    };
+    svg.addEventListener('touchstart', onStart, { passive: true });
+    svg.addEventListener('touchmove', onMove, { passive: false });
+    svg.addEventListener('touchend', endScrub);
+    svg.addEventListener('touchcancel', endScrub);
+    return () => {
+      endScrub();
+      svg.removeEventListener('touchstart', onStart);
+      svg.removeEventListener('touchmove', onMove);
+      svg.removeEventListener('touchend', endScrub);
+      svg.removeEventListener('touchcancel', endScrub);
+    };
+  }, [view]);
+
+  // Mouse: press and drag across the squares
+  const handlePointerDown = (e: React.PointerEvent<SVGSVGElement>) => {
+    if (e.pointerType !== 'mouse' || e.button !== 0) return;
+    const sc = scrub.current;
+    sc.x = e.clientX;
+    sc.y = e.clientY;
+    sc.active = false;
+  };
+  const handlePointerMove = (e: React.PointerEvent<SVGSVGElement>) => {
+    if (e.pointerType !== 'mouse' || !(e.buttons & 1)) return;
+    const sc = scrub.current;
+    if (!sc.active && Math.hypot(e.clientX - sc.x, e.clientY - sc.y) > 4) {
+      sc.active = true;
+      e.currentTarget.setPointerCapture(e.pointerId);
+    }
+    if (sc.active) selectAt(e.clientX, e.clientY);
+  };
+  const handlePointerUp = (e: React.PointerEvent<SVGSVGElement>) => {
+    if (e.pointerType === 'mouse') endScrub();
+  };
+
   const handleMapClick = (e: React.MouseEvent<SVGSVGElement>) => {
+    if (scrub.current.justEnded) {
+      scrub.current.justEnded = false;
+      return;
+    }
     const p = toMapPoint(e.clientX, e.clientY);
     const hit = p ? hitFor(p) : null;
-    // Tapping the same square again clears it
-    const same = hit?.kind === 'cell' && selection?.kind === 'cell' && selection.col === hit.col && selection.row === hit.row;
+    // Tapping the same square or state again clears it
+    const same =
+      (hit?.kind === 'cell' && selection?.kind === 'cell' && selection.col === hit.col && selection.row === hit.row) ||
+      (hit?.kind === 'state' && selection?.kind === 'state' && selection.abbr === hit.abbr);
     setSelection(same ? null : hit);
   };
 
-  const handlePointerMove = (e: React.PointerEvent<SVGSVGElement>) => {
-    if (e.pointerType !== 'mouse') return;
-    const p = toMapPoint(e.clientX, e.clientY);
-    const hit = p ? hitFor(p) : null;
-    setHoverCell(hit?.kind === 'cell' ? { col: hit.col, row: hit.row } : null);
-  };
-
-  const shownCell = selection?.kind === 'cell' ? selection : hoverCell;
+  const shownCell = selection?.kind === 'cell' ? selection : null;
   const cellRect = shownCell && {
     x: GRID.x0 + shownCell.col * GRID.cellW,
     y: GRID.y0 + shownCell.row * GRID.cellH,
@@ -262,21 +434,25 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
       top: ((y - viewBox.y) / viewBox.height) * 100,
     });
     if (cellRect && shownCell && view === 'elevation') {
-      // Columns are slices of 1500' to 12,000'; rows are equal slices of the route (about 102 miles)
-      const feetPerCol = (ELEVATION_LAYOUT.maxFeet - ELEVATION_LAYOUT.minFeet) / GRID.cols;
-      const lowFt = ELEVATION_LAYOUT.minFeet + shownCell.col * feetPerCol;
+      // Rows are equal bands of 1500' to 12,000' counted up from the bottom; columns are equal slices of the route
+      const feetPerRow = (ELEVATION_LAYOUT.maxFeet - ELEVATION_LAYOUT.minFeet) / ELEV_ROWS;
+      const lowFt = ELEVATION_LAYOUT.minFeet + (ELEV_ROWS - 1 - shownCell.row) * feetPerRow;
       const band =
         measurementSystem === 'metric'
-          ? `${formatNumber((Math.round((lowFt * 0.3048) / 10) * 10))}–${formatNumber((Math.round(((lowFt + feetPerCol) * 0.3048) / 10) * 10))} m`
-          : `${formatNumber((Math.round(lowFt / 50) * 50))}–${formatNumber((Math.round((lowFt + feetPerCol) / 50) * 50))}'`;
-      const milesPerRow = ROUTE_TOTAL_MILES / GRID.rows;
-      const sStart = Math.round(shownCell.row * milesPerRow);
-      const sEnd = Math.min(ROUTE_TOTAL_MILES, Math.round((shownCell.row + 1) * milesPerRow));
+          ? `${formatNumber((Math.round((lowFt * 0.3048) / 10) * 10))}–${formatNumber((Math.round(((lowFt + feetPerRow) * 0.3048) / 10) * 10))} m`
+          : `${formatNumber((Math.round(lowFt / 50) * 50))}–${formatNumber((Math.round((lowFt + feetPerRow) / 50) * 50))}'`;
+      const milesPerCol = ROUTE_TOTAL_MILES / ELEV_COLS;
+      const sStart = Math.round(shownCell.col * milesPerCol);
+      const sEnd = Math.min(ROUTE_TOTAL_MILES, Math.round((shownCell.col + 1) * milesPerCol));
       const [rStart, rEnd] = direction === 'nobo' ? [rideMile(sEnd, direction), rideMile(sStart, direction)] : [sStart, sEnd];
       const from = formatNumber(Math.round(toUnits(rStart, measurementSystem)));
       const to = formatNumber(Math.round(toUnits(rEnd, measurementSystem)));
+      // The strip ends just above the grid, so labels for the top rows hang below the square
+      const below = shownCell.row < 3;
       return {
-        ...pct(cellRect.x + GRID.cellW / 2, cellRect.y),
+        left: ((cellRect.x + GRID.cellW / 2 - ELEV_VIEWBOX.x) / ELEV_VIEWBOX.width) * 100,
+        top: (((below ? cellRect.y + GRID.cellH : cellRect.y) - ELEV_VIEWBOX.y) / ELEV_VIEWBOX.height) * 100,
+        below,
         text: band,
         detail: `${measurementSystem === 'metric' ? 'Km' : 'Miles'} ${from}–${to}`,
       };
@@ -331,80 +507,125 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
   return (
     <div className="w-full space-y-4">
       {/* Map */}
-      {/* Full-width strip; the grid is centered and the rest falls off the sides */}
+      {view === 'elevation' ? (
+        // Elevation: a full-width strip that scrolls sideways along the route
+        <div className="relative w-screen max-w-[100vw] left-1/2 -translate-x-1/2" style={{ height: MAP_PX_HEIGHT + MAP_TOP_ROOM }}>
+          <div ref={elevationScrollerRef} className="absolute inset-0 overflow-x-auto overflow-y-hidden overscroll-x-contain">
+            {/* Same headroom and height as the map, so switching views doesn't move anything */}
+            <div className={`flex h-full ${elevationFits ? 'justify-center' : ''}`} style={{ paddingTop: MAP_TOP_ROOM }}>
+              {!elevationFits && <div aria-hidden="true" className="shrink-0" style={{ flexBasis: ELEV_LEFT_SPACER }} />}
+              <div className="relative shrink-0 select-none" style={{ width: ELEV_PX_WIDTH }}>
+                <svg
+                  ref={svgRef}
+                  viewBox={`${ELEV_VIEWBOX.x} ${ELEV_VIEWBOX.y} ${ELEV_VIEWBOX.width} ${ELEV_VIEWBOX.height}`}
+                  fill="none"
+                  className="w-full h-auto block cursor-pointer overflow-visible [-webkit-touch-callout:none]"
+                  role="img"
+                  aria-label="Elevation profile from Banff (left) to Antelope Wells (right). Each grid column is about 100 route miles and each row about 390 feet."
+                  onClick={handleMapClick}
+                  onPointerDown={handlePointerDown}
+                  onPointerMove={handlePointerMove}
+                  onPointerUp={handlePointerUp}
+                >
+                  <defs>
+                    <pattern id="elevation-dots" patternUnits="userSpaceOnUse" width={222} height={222} patternTransform={ELEV_DOTS_UNSTRETCH}>
+                      <rect width={222} height={222} fill="#ffffff" />
+                      <image href={navBgPattern} width={222} height={222} preserveAspectRatio="none" />
+                    </pattern>
+                  </defs>
+                  <path d={ELEV_GRID_PATHS[0]} stroke="#40C8EF" />
+                  <path d={ELEV_GRID_PATHS[1]} stroke="#40C8EF" />
+                  {cellRect && (
+                    <rect x={cellRect.x} y={cellRect.y} width={GRID.cellW} height={GRID.cellH} fill="#40C8EF" opacity={0.45} pointerEvents="none" />
+                  )}
+                  {/* The profile, stretched onto the grid; its line keeps a 1px stroke */}
+                  <g transform={ELEV_ART} pointerEvents="none">
+                    <g
+                      fill="none"
+                      className="[&_*]:[vector-effect:non-scaling-stroke]"
+                      transform={`translate(${ELEVATION_LAYOUT.artLeft} 0) scale(${ELEVATION_SCALE_X} 1) translate(${-ELEVATION_LAYOUT.artLeft} 0)`}
+                      dangerouslySetInnerHTML={{ __html: LAYERS.elevation }}
+                    />
+                  </g>
+
+                  {/* Passes and climbs: dots like the towns on the map; tap to show one in the card */}
+                  {passes.map((poi, i) => {
+                    const [x, y] = toElevationGrid(mileToElevationPoint(poi.mile));
+                    return (
+                      <g
+                        key={poi.id}
+                        data-active-pass={i === activePassIndex ? '' : undefined}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelection(null);
+                          setPassIndex(i);
+                        }}
+                      >
+                        <circle cx={x} cy={y} r={7} fill="transparent" />
+                        {i === activePassIndex && <circle cx={x} cy={y} r={4.6} fill="none" stroke="#231F20" strokeWidth={1} />}
+                        <circle cx={x} cy={y} r={2.4} fill="#231F20" />
+                      </g>
+                    );
+                  })}
+
+                  {/* You are here: nearest route mile, even when off route */}
+                  {position && (() => {
+                    const [x, y] = toElevationGrid(mileToElevationPoint(position.mile));
+                    return (
+                      <g pointerEvents="none" opacity={position.onRoute ? 1 : 0.5}>
+                        <circle cx={x} cy={y} r={4} fill="#febc12" opacity={0.35} className="motion-safe:animate-[map-pulse_2s_ease-out_infinite] origin-center [transform-box:fill-box]" />
+                        <circle cx={x} cy={y} r={4} fill="#febc12" stroke="#231F20" strokeWidth={1.2} />
+                      </g>
+                    );
+                  })()}
+                </svg>
+
+              {/* Label for the selected square */}
+              {label && (
+                <div
+                  className={`absolute pointer-events-none ${'below' in label && label.below ? 'translate-y-[6px]' : '-translate-y-[calc(100%+6px)]'} whitespace-nowrap ${
+                    // keep the label on screen: anchor it inward near the edges
+                    label.left > 65 ? '-translate-x-[calc(100%-10px)]' : label.left < 35 ? '-translate-x-[10px]' : '-translate-x-1/2'
+                  } bg-[#231F20] text-white text-center text-[11px] font-display font-medium uppercase tracking-[0.02em] px-2.5 py-1.5 rounded`}
+                  style={{ left: `${label.left}%`, top: `${label.top}%` }}
+                  role="status"
+                >
+                  <span className="block">{label.text}</span>
+                  {'detail' in label && label.detail && (
+                    <span className="block font-normal normal-case tracking-normal text-white/80 mt-0.5">{label.detail}</span>
+                  )}
+                </div>
+              )}
+              </div>
+              {!elevationFits && <div aria-hidden="true" className="shrink-0" style={{ flexBasis: ELEV_RIGHT_SPACER }} />}
+            </div>
+          </div>
+          {!DEMO_LOCATION && locationEnabled && (
+            <button
+              onClick={locate}
+              disabled={location.status === 'locating'}
+              aria-label="Find my location"
+              className="absolute right-4 bottom-2 z-10 w-11 h-11 flex items-center justify-center rounded-full bg-[#febc12] text-[#231F20] shadow-lg hover:bg-[#feca3d] transition-colors disabled:opacity-60 touch-manipulation"
+            >
+              {location.status === 'locating' ? <Loader2 size={20} className="animate-spin" /> : <LocateFixed size={20} />}
+            </button>
+          )}
+        </div>
+      ) : (
+      // Map: full-width strip; the grid is centered and the rest falls off the sides
       <div className="relative w-screen max-w-[100vw] left-1/2 -translate-x-1/2 overflow-clip" style={{ height: MAP_PX_HEIGHT + MAP_TOP_ROOM }}>
       <div className="absolute select-none" style={{ top: MAP_TOP_ROOM, width: MAP_PX_WIDTH, left: `calc(50% - ${MAP_PX_LEFT_OF_CENTER}px)` }}>
-        {view === 'elevation' ? (
-          <svg
-            ref={svgRef}
-            viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
-            fill="none"
-            className="w-full h-auto block cursor-pointer overflow-visible"
-            role="img"
-            aria-label="Elevation profile from Banff (top) to Antelope Wells (bottom). Each grid row is about 100 route miles."
-            onClick={handleMapClick}
-            onPointerMove={handlePointerMove}
-            onPointerLeave={() => setHoverCell(null)}
-          >
-            <defs>
-              <pattern id="elevation-dots" patternUnits="userSpaceOnUse" width={222} height={222}>
-                <rect width={222} height={222} fill="#ffffff" />
-                <image href={navBgPattern} width={222} height={222} preserveAspectRatio="none" />
-              </pattern>
-            </defs>
-            <g fill="none" dangerouslySetInnerHTML={{ __html: LAYERS.grid }} />
-            {cellRect && (
-              <rect x={cellRect.x} y={cellRect.y} width={GRID.cellW} height={GRID.cellH} fill="#40C8EF" opacity={0.45} pointerEvents="none" />
-            )}
-            <g
-              fill="none"
-              pointerEvents="none"
-              transform={`translate(${ELEVATION_LAYOUT.artLeft} 0) scale(${ELEVATION_SCALE_X} 1) translate(${-ELEVATION_LAYOUT.artLeft} 0)`}
-              dangerouslySetInnerHTML={{ __html: LAYERS.elevation }}
-            />
-
-
-            {/* Passes and climbs: dots like the towns on the map; tap to show one in the card */}
-            {passes.map((poi, i) => {
-              const [x, y] = mileToElevationPoint(poi.mile);
-              return (
-                <g
-                  key={poi.id}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelection(null);
-                    setPassIndex(i);
-                  }}
-                >
-                  <circle cx={x} cy={y} r={7} fill="transparent" />
-                  {i === activePassIndex && <circle cx={x} cy={y} r={4.6} fill="none" stroke="#231F20" strokeWidth={1} />}
-                  <circle cx={x} cy={y} r={2.4} fill="#231F20" />
-                </g>
-              );
-            })}
-
-            {/* You are here: nearest route mile, even when off route */}
-            {position && (() => {
-              const [x, y] = mileToElevationPoint(position.mile);
-              return (
-                <g pointerEvents="none" opacity={position.onRoute ? 1 : 0.5}>
-                  <circle cx={x} cy={y} r={4} fill="#febc12" opacity={0.35} className="motion-safe:animate-[map-pulse_2s_ease-out_infinite] origin-center [transform-box:fill-box]" />
-                  <circle cx={x} cy={y} r={4} fill="#febc12" stroke="#231F20" strokeWidth={1.2} />
-                </g>
-              );
-            })()}
-          </svg>
-        ) : (
         <svg
           ref={svgRef}
           viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
           fill="none"
-          className="w-full h-auto block cursor-pointer overflow-visible"
+          className="w-full h-auto block cursor-pointer overflow-visible [-webkit-touch-callout:none]"
           role="img"
           aria-label="Map of the Tour Divide route from Banff to Antelope Wells. Tap a grid square for details."
           onClick={handleMapClick}
+          onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
-          onPointerLeave={() => setHoverCell(null)}
+          onPointerUp={handlePointerUp}
         >
           <g fill="none" transform={`translate(${MAP_LAYOUT.grid.x} ${MAP_LAYOUT.grid.y})`} dangerouslySetInnerHTML={{ __html: LAYERS.grid }} />
 
@@ -413,7 +634,31 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
             <rect x={cellRect.x} y={cellRect.y} width={GRID.cellW} height={GRID.cellH} fill="#40C8EF" opacity={0.45} pointerEvents="none" />
           )}
 
+          <defs>
+            <pattern id="map-dots" patternUnits="userSpaceOnUse" width={222} height={222}>
+              <rect width={222} height={222} fill="#ffffff" />
+              <image href={navBgPattern} width={222} height={222} preserveAspectRatio="none" />
+            </pattern>
+            <clipPath id="states-clip">
+              <polygon points={STATES_OUTLINE.map((pt) => pt.join(',')).join(' ')} />
+            </clipPath>
+          </defs>
+
           <g fill="none" transform={`translate(${MAP_LAYOUT.statesOutline.x} ${MAP_LAYOUT.statesOutline.y})`} dangerouslySetInnerHTML={{ __html: LAYERS.outline }} />
+
+          {/* The tapped state fills with the app's dot pattern */}
+          {selection?.kind === 'state' && (() => {
+            const state = MAP_STATES.find((st) => st.abbr === selection.abbr);
+            if (!state) return null;
+            return (
+              <>
+                <g transform={`translate(${MAP_LAYOUT.stateLines.x} ${MAP_LAYOUT.stateLines.y})`} pointerEvents="none">
+                  <polygon points={state.polygon.map((pt) => pt.join(',')).join(' ')} fill="url(#map-dots)" clipPath="url(#states-clip)" />
+                </g>
+                <g fill="none" pointerEvents="none" transform={`translate(${MAP_LAYOUT.statesOutline.x} ${MAP_LAYOUT.statesOutline.y})`} dangerouslySetInnerHTML={{ __html: LAYERS.outlineStroke }} />
+              </>
+            );
+          })()}
 
           <g fill="none" transform={`translate(${MAP_LAYOUT.stateLines.x} ${MAP_LAYOUT.stateLines.y})`} dangerouslySetInnerHTML={{ __html: LAYERS.stateLines }} />
 
@@ -476,13 +721,11 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
             )}
           </g>
         </svg>
-        )}
-
 
         {/* Label for the selected square */}
         {label && (
           <div
-            className={`absolute pointer-events-none -translate-y-[calc(100%+6px)] whitespace-nowrap ${
+            className={`absolute pointer-events-none ${'below' in label && label.below ? 'translate-y-[6px]' : '-translate-y-[calc(100%+6px)]'} whitespace-nowrap ${
               // keep the label on screen: anchor it inward near the edges
               label.left > 65 ? '-translate-x-[calc(100%-10px)]' : label.left < 35 ? '-translate-x-[10px]' : '-translate-x-1/2'
             } bg-[#231F20] text-white text-center text-[11px] font-display font-medium uppercase tracking-[0.02em] px-2.5 py-1.5 rounded`}
@@ -507,6 +750,7 @@ export function RouteMap({ view = 'map', direction = 'sobo', towns, measurementS
           </button>
         )}
       </div>
+      )}
 
       {/* Waypoint card: towns on the map, passes and climbs on the elevation profile.
           Compact, the same width as the grid, and pinned just above the bottom nav. */}

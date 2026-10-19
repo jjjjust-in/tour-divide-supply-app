@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import type { Town } from '../types';
 import type { MeasurementSystem } from '../utils/measurements';
 import { formatNumber } from '../utils/measurements';
@@ -19,21 +19,8 @@ type RouteView = 'map' | 'elevation';
 
 // The Route page: map or elevation profile, each with the live location dot
 export function MapPage({ direction, towns, measurementSystem, locationEnabled, onOpenTown }: MapPageProps) {
-  const [view, setView] = useState<RouteView>(() => {
-    try {
-      return localStorage.getItem('tour-divide-route-view') === 'elevation' ? 'elevation' : 'map';
-    } catch {
-      return 'map';
-    }
-  });
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('tour-divide-route-view', view);
-    } catch {
-      // not critical
-    }
-  }, [view]);
+  // Opening the Route tab always starts on the map
+  const [view, setView] = useState<RouteView>('map');
 
   // Map / Elevation: one switch with a sliding highlight, styled like the main nav
   const viewSwitch = (
